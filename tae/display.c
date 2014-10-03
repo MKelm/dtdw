@@ -66,23 +66,6 @@ char *dsp_input(void) {
 void dsp_output(char *str) {
   char *t;
   t = str;
-  int line = 0, len = strlen(str), llen = maxx-3;
-  line = (int)ceil(((double)len) / llen);
-  while (len) {
-    if (len > 1 && len % llen == 0) {
-      line--;
-    }
-    wmove(output, line, 1);
-    winsch(output, *(t+len-1));
-    len--;
-    wrefresh(output);
-    napms(1);
-  }
-}
-
-void dsp_output2(char *str) {
-  char *t;
-  t = str;
   int line = 1, pos = 0, tmppos = 0, len = strlen(str), llen = maxx-3;
   curs_set(1);
 
@@ -121,7 +104,7 @@ int main(void) {
   dsp_windows_init();
 
   char output[256] = "Something in the output window, and something other than my dog in window fight. But in all situations it is the best to perform a rabbit. It is like any other game here and there. Motivations are good to have so we go further and further.";
-  dsp_output2(output);
+  dsp_output(output);
 
   char *input = dsp_input();
 
