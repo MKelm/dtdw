@@ -66,14 +66,15 @@ char *dsp_input(void) {
 void dsp_output(char *str) {
   char *t;
   t = str;
-  int line = 1, pos = 0, tmppos = 0, len = strlen(str), llen = maxx-3;
+  int line = 1, pos = 0, tmppos = 0, attr = 0, len = strlen(str), llen = maxx-3;
   curs_set(1);
 
   wmove(output, line, 1);
   while (pos < len) {
+    //napms(50);
     if (pos > 0 && pos % llen == 0) {
       // word wrap, move word to next line on word break
-      if (!isspace(*(t)) && !isspace(*(t-1))) {
+      if (!isspace(*(t)) && !isspace(*(t+1))) {
         tmppos = pos;
         while (!isspace(*(t))) {
           mvwdelch(output, line, tmppos);
@@ -81,17 +82,18 @@ void dsp_output(char *str) {
           t--;
           len++;
         };
-        if (isspace(*(t))) {
-          t++;
-          len--;
-        }
       }
       // got to next line if end of line has been reached
       line++;
+      if (isspace(*(t))) {
+        t++;
+        pos++;
+      }
       wmove(output, line, 1);
     }
     waddch(output, *(t++));
     pos++;
+    //wrefresh(output);
   }
   wrefresh(output);
 }
@@ -103,7 +105,7 @@ int main(void) {
 
   dsp_windows_init();
 
-  char output[256] = "Something in the output window, and something other than my dog in window fight. But in all situations it is the best to perform a rabbit. It is like any other game here and there. Motivations are good to have so we go further and further.";
+  char output[256] = "Something in the output #window#, and something other than my dog in window fight. But in all situations it is the best to perform a rabbit. It is like any other game here and there. Motivations are good to have so we go further and further.";
   dsp_output(output);
 
   char *input = dsp_input();
