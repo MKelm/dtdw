@@ -1,1 +1,1 @@
-void load_descriptions(void);
+int load_descriptions(void);
