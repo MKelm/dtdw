@@ -1,5 +1,6 @@
 #include <string.h>
 #include "display.h"
+#include "loader.h"
 #include "main.h"
 
 int main(void) {
