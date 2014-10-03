@@ -2,6 +2,7 @@
 #include <string.h>
 #include <locale.h>
 #include <math.h>
+#include <ctype.h>
 
 #define DEBUG
 
@@ -67,7 +68,6 @@ void dsp_output(char *str) {
   t = str;
   int line = 0, len = strlen(str), llen = maxx-3;
   line = (int)ceil(((double)len) / llen);
-  printf("%d", line);
   while (len) {
     if (len > 1 && len % llen == 0) {
       line--;
@@ -75,6 +75,40 @@ void dsp_output(char *str) {
     wmove(output, line, 1);
     winsch(output, *(t+len-1));
     len--;
+    wrefresh(output);
+    napms(1);
+  }
+}
+
+void dsp_output2(char *str) {
+  char *t;
+  t = str;
+  int line = 1, pos = 0, tmppos = 0, len = strlen(str), llen = maxx-3;
+  curs_set(1);
+
+  wmove(output, line, 1);
+  while (pos < len) {
+    if (pos > 0 && pos % llen == 0) {
+      // word wrap, move word to next line on word break
+      if (!isspace(*(t)) && !isspace(*(t-1))) {
+        tmppos = pos;
+        while (!isspace(*(t))) {
+          mvwdelch(output, line, tmppos);
+          tmppos--;
+          t--;
+          len++;
+        };
+        if (isspace(*(t))) {
+          t++;
+          len--;
+        }
+      }
+      // got to next line if end of line has been reached
+      line++;
+      wmove(output, line, 1);
+    }
+    waddch(output, *(t++));
+    pos++;
   }
   wrefresh(output);
 }
@@ -86,8 +120,9 @@ int main(void) {
 
   dsp_windows_init();
 
-  char output[256] = "Something in the output window, and something other than my dog in window fight. But in all situations it is the best to perform a rabbit. it is like any other game here and there. Motivations are good to have so we go further and further.";
-  dsp_output(output);
+  char output[256] = "Something in the output window, and something other than my dog in window fight. But in all situations it is the best to perform a rabbit. It is like any other game here and there. Motivations are good to have so we go further and further.";
+  dsp_output2(output);
+
   char *input = dsp_input();
 
   dsp_end();
