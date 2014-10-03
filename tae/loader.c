@@ -6,6 +6,30 @@
 
 #define DEBUG
 
+void load_meta(struct meta *meta_data) {
+  FILE *f = fopen(FILE_META, "r");
+  int ch, linenum = 0;
+  char line[1024] = "", chstr[2];
+
+  while ((ch = fgetc(f)) != EOF) {
+    if (ch != '\n') {
+      snprintf(chstr, 2, "%c", ch);
+      strcat(line, chstr);
+    } else {
+      if (linenum == 0)
+        strncpy(meta_data->title, line, sizeof(meta_data->title));
+      else if (linenum == 1)
+        strncpy(meta_data->version, line, sizeof(meta_data->version));
+      else if (linenum == 2)
+        strncpy(meta_data->author, line, sizeof(meta_data->author));
+      else
+        meta_data->cyear = atoi(line);
+      strncpy(line, "", sizeof(line));
+      linenum++;
+    }
+  }
+}
+
 /*
  Description definitions:
  #placeId$itemId...(optional)/verb(optional)
@@ -129,6 +153,11 @@ int load_descriptions(struct description descriptions[], int lmax) {
 #ifdef DEBUG
 
 int main(void) {
+
+  struct meta meta_data;
+  load_meta(&meta_data);
+  printf("meta title: %s\nversion: %s, author: %s, year: %d\n\n",
+    meta_data.title, meta_data.version, meta_data.author, meta_data.cyear);
 
   struct description descriptions[1000];
   int i, desc_count = load_descriptions(descriptions, 1000);

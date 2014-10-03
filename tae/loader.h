@@ -1,4 +1,14 @@
+#define FILE_META "../def/meta.txt"
 #define FILE_DESCRIPTIONS "../def/descriptions.txt"
+
+struct meta {
+  char title[256];
+  char version[24];
+  char author[36];
+  int cyear;
+};
+
+void load_meta(struct meta *meta_data);
 
 struct description {
   int id;
