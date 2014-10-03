@@ -1,7 +1,27 @@
-1
-Du bist im Zimmer. Es gibt eine Tür zum Flur der nach unten führt.
-Tür 2
+#0
+Hallo Joara, du hast gerade eben deinen 23. Geburtstag gefeiert und bist eine angehende Portalwächterin. Im Moment bist du noch die Assistentin von deinem Meister Taomix, aber dieser wird bald das Amt niederlegen. Wie auch immer, an Arbeit ist jetzt garnicht zu denken, du bist erschöpft von der Feier. Aber irgend etwas wolltest du noch vorher erledigen ...
 
-2
-Du bist im Wohnzimmer. Es gibt eine Treppe die nach oben führt.
-Treppe 1
+#1
+Du bist in deinem Zimmer. Es gibt eine #Tür# zum Flur der nach unten führt.
+#Tür 2
+$1$2$3
+
+#1$1
+In der linken Ecke steht eine alte $Holzbank$.
+$1
+
+#1$1/lookat
+Die Holzbank hat dir Marunix dein Vater mit 3 Jahren geschenkt, auf ihr liegt ein gelber $Zettel$.
+$4
+
+#1$2$3
+In der rechten Ecke steht eine $Kommode$ und auf der rechten Seite ein $Bett$.
+$2$3
+
+#1$2/lookat
+Auf der Kommode ist eine $Kerze$ die noch ungenutzt ist.
+$5
+
+#2
+Du bist im Wohnzimmer. Es gibt eine #Treppe# die nach oben führt.
+#Treppe 1
