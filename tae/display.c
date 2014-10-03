@@ -22,7 +22,6 @@ void dsp_init(void) {
 }
 
 void dsp_end(void) {
-  getch();
   endwin();
 }
 
