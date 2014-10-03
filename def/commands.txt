@@ -1,0 +1,12 @@
+give %s=gebe %s
+open %s=öffne %s
+close %s=schließe %s
+pickup %s=nimm %s
+lookat %s=schauan %s
+talkto %s=redemit %s
+use %s=benutze %s
+use %s with %s=benutze %s mit %s
+push %s=drücke %s
+pull %s=ziehe %s
+inventory=inventar
+quit=beenden
