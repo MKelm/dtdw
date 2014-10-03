@@ -1,0 +1,7 @@
+1
+Du bist im Zimmer. Es gibt eine Tür zum Flur der nach unten führt.
+Tür 2
+
+2
+Du bist im Wohnzimmer. Es gibt eine Treppe die nach oben führt.
+Treppe 1
