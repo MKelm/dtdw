@@ -71,7 +71,19 @@ void dsp_output(char *str) {
 
   wmove(output, line, 1);
   while (pos < len) {
-    //napms(50);
+    // mark items and transitions
+    if (*t == '$' || *t == '#') {
+      if (attr == 0) {
+        wattron(output, COLOR_PAIR((*t == '$') ? 3 : 4) | A_BOLD);
+        attr = 1;
+      } else {
+        wattroff(output, COLOR_PAIR((*t == '$') ? 3 : 4) | A_BOLD);
+        attr = 0;
+      }
+      len--;
+      t++;
+    }
+
     if (pos > 0 && pos % llen == 0) {
       // word wrap, move word to next line on word break
       if (!isspace(*(t)) && !isspace(*(t+1))) {
@@ -91,9 +103,9 @@ void dsp_output(char *str) {
       }
       wmove(output, line, 1);
     }
+
     waddch(output, *(t++));
     pos++;
-    //wrefresh(output);
   }
   wrefresh(output);
 }
@@ -105,7 +117,7 @@ int main(void) {
 
   dsp_windows_init();
 
-  char output[256] = "Something in the output #window#, and something other than my dog in window fight. But in all situations it is the best to perform a rabbit. It is like any other game here and there. Motivations are good to have so we go further and further.";
+  char output[256] = "Something in the output #window#, and something other than my dog in window fight. But in all situations it is the best to perform a $rabbit$. It is like any other game here and there. Motivations are good to have so we go further and further.";
   dsp_output(output);
 
   char *input = dsp_input();
