@@ -1,4 +1,8 @@
 *
+!def
+!tae
 !.gitignore
+!Makefile
 !*.c
+!*.h
 !*.txt
