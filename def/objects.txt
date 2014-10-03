@@ -1,0 +1,14 @@
+1/0-0
+Holzbank
+
+2/0-0
+Kommode
+
+3/0-0
+Bett
+
+4/0-0
+Zettel
+
+5/0-0
+Kerze
