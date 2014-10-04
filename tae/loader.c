@@ -4,8 +4,6 @@
 #include <ctype.h>
 #include "loader.h"
 
-#define DEBUG
-
 void load_meta(struct meta *data) {
   FILE *f = fopen(FILE_META, "r");
   int ch, linenum = 0;
@@ -201,6 +199,7 @@ int load_descriptions(struct description data[], int lmax) {
           loadid = 0;
           data[entryidx].id = atoi(line);
           strncpy(line, "", sizeof(line));
+          liditemidx = 0;
           ltransidx = 0;
           litemidx = 0;
           if (ch == '\n')
