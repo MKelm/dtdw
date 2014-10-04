@@ -6,7 +6,7 @@
 
 #define DEBUG
 
-void load_meta(struct meta *meta_data) {
+void load_meta(struct meta *data) {
   FILE *f = fopen(FILE_META, "r");
   int ch, linenum = 0;
   char line[1024] = "", chstr[2];
@@ -17,20 +17,20 @@ void load_meta(struct meta *meta_data) {
       strcat(line, chstr);
     } else {
       if (linenum == 0)
-        strncpy(meta_data->title, line, sizeof(meta_data->title));
+        strncpy(data->title, line, sizeof(data->title));
       else if (linenum == 1)
-        strncpy(meta_data->version, line, sizeof(meta_data->version));
+        strncpy(data->version, line, sizeof(data->version));
       else if (linenum == 2)
-        strncpy(meta_data->author, line, sizeof(meta_data->author));
+        strncpy(data->author, line, sizeof(data->author));
       else
-        meta_data->cyear = atoi(line);
+        data->cyear = atoi(line);
       strncpy(line, "", sizeof(line));
       linenum++;
     }
   }
 }
 
-int load_commands(struct command *commands, int lmax) {
+int load_commands(struct command *data, int lmax) {
   FILE *f = fopen(FILE_COMMANDS, "r");
   int ch, entryidx = 0;
   char line[1024] = "", chstr[2];
@@ -44,12 +44,12 @@ int load_commands(struct command *commands, int lmax) {
       snprintf(chstr, 2, "%c", ch);
       strcat(line, chstr);
     } else if (loadin == 1 && ch == '=') {
-      strncpy(commands[entryidx].in, line, sizeof(commands[entryidx].in));
+      strncpy(data[entryidx].in, line, sizeof(data[entryidx].in));
       strncpy(line, "", sizeof(line));
       loadin = 0;
       loadex = 1;
     } else if (loadex == 1 && ch == '\n') {
-      strncpy(commands[entryidx].ex, line, sizeof(commands[entryidx].ex));
+      strncpy(data[entryidx].ex, line, sizeof(data[entryidx].ex));
       strncpy(line, "", sizeof(line));
       loadex = 0;
       entryidx++;
@@ -61,7 +61,7 @@ int load_commands(struct command *commands, int lmax) {
   return entryidx;
 }
 
-int load_areas(struct area *areas, int lmax) {
+int load_areas(struct area *data, int lmax) {
   FILE *f = fopen(FILE_AREAS, "r");
   int ch, entryidx = 0;
   char line[1024] = "", chstr[2];
@@ -75,12 +75,12 @@ int load_areas(struct area *areas, int lmax) {
       snprintf(chstr, 2, "%c", ch);
       strcat(line, chstr);
     } else if (loadid == 1 && ch == '\n') {
-      areas[entryidx].id = atoi(line);
+      data[entryidx].id = atoi(line);
       strncpy(line, "", sizeof(line));
       loadid = 0;
       loadtitle = 1;
     } else if (loadtitle == 1 && ch == '\n') {
-      strncpy(areas[entryidx].title, line, sizeof(areas[entryidx].title));
+      strncpy(data[entryidx].title, line, sizeof(data[entryidx].title));
       strncpy(line, "", sizeof(line));
       loadtitle = 0;
       entryidx++;
@@ -92,7 +92,7 @@ int load_areas(struct area *areas, int lmax) {
   return entryidx;
 }
 
-int load_places(struct place *places, int lmax) {
+int load_places(struct place *data, int lmax) {
   FILE *f = fopen(FILE_PLACES, "r");
   int ch, entryidx = 0;
   char line[1024] = "", chstr[2];
@@ -106,17 +106,17 @@ int load_places(struct place *places, int lmax) {
       snprintf(chstr, 2, "%c", ch);
       strcat(line, chstr);
     } else if (loadareaid == 1 && ch == '#') {
-      places[entryidx].area_id = atoi(line);
+      data[entryidx].area_id = atoi(line);
       strncpy(line, "", sizeof(line));
       loadareaid = 0;
       loadid = 1;
     } else if (loadid == 1 && ch == '\n') {
-      places[entryidx].id = atoi(line);
+      data[entryidx].id = atoi(line);
       strncpy(line, "", sizeof(line));
       loadid = 0;
       loadtitle = 1;
     } else if (loadtitle == 1 &&  ch == '\n') {
-      strncpy(places[entryidx].title, line, sizeof(places[entryidx].title));
+      strncpy(data[entryidx].title, line, sizeof(data[entryidx].title));
       strncpy(line, "", sizeof(line));
       loadtitle = 0;
       entryidx++;
@@ -128,7 +128,7 @@ int load_places(struct place *places, int lmax) {
   return entryidx;
 }
 
-int load_objects(struct object objects[], int lmax) {
+int load_objects(struct object data[], int lmax) {
   FILE *f = fopen(FILE_OBJECTS, "r");
   int ch, entryidx = 0;
   char line[1024] = "", chstr[2];
@@ -143,22 +143,22 @@ int load_objects(struct object objects[], int lmax) {
       strcat(line, chstr);
     } else if (ch == '&' || ch == '=' || ch == '\n') {
       if (loadtitle == 1) {
-        strncpy(objects[entryidx].title, line, sizeof(objects[entryidx].title));
+        strncpy(data[entryidx].title, line, sizeof(data[entryidx].title));
         loadtitle = 0;
         entryidx++;
         if (entryidx == lmax)
           return lmax;
       } else {
         if (loadid == 1) {
-          objects[entryidx].id = atoi(line);
+          data[entryidx].id = atoi(line);
           loadid = 0;
           loadcombid = 1;
         } else if (loadcombid == 1) {
-          objects[entryidx].comb_id = atoi(line);
+          data[entryidx].comb_id = atoi(line);
           loadcombid = 0;
           loadfinalid = 1;
         } else if (loadfinalid == 1) {
-          objects[entryidx].final_id = atoi(line);
+          data[entryidx].final_id = atoi(line);
           loadfinalid = 0;
           loadtitle = 1;
         }
@@ -176,7 +176,7 @@ int load_objects(struct object objects[], int lmax) {
  Text with #transition# or $item$ ...
  #transitionID...$itemID...
 */
-int load_descriptions(struct description descriptions[], int lmax) {
+int load_descriptions(struct description data[], int lmax) {
   FILE *f = fopen(FILE_DESCRIPTIONS, "r");
   int ch, entryidx = 0;
   // load status values: main id, id items id, id verb, transition id, items id
@@ -199,7 +199,7 @@ int load_descriptions(struct description descriptions[], int lmax) {
           strcat(line, chstr);
         } else if (loadid == 1 && (ch == '\n' || ch == '$' || ch == '/')) {
           loadid = 0;
-          descriptions[entryidx].id = atoi(line);
+          data[entryidx].id = atoi(line);
           strncpy(line, "", sizeof(line));
           ltransidx = 0;
           litemidx = 0;
@@ -213,7 +213,7 @@ int load_descriptions(struct description descriptions[], int lmax) {
           snprintf(chstr, 2, "%c", ch);
           strcat(line, chstr);
         } else if (liditemsid == 1 && (ch == '\n' || ch == '$' || ch == '/')) {
-          descriptions[entryidx].id_items[liditemidx] = atoi(line);
+          data[entryidx].id_items[liditemidx] = atoi(line);
           strncpy(line, "", sizeof(line));
           liditemidx++;
           liditemsid = (ch == '$') ? 1 : 0;
@@ -227,7 +227,7 @@ int load_descriptions(struct description descriptions[], int lmax) {
           snprintf(chstr, 2, "%c", ch);
           strcat(line, chstr);
         } else if (lidverb == 1 && ch == '\n') {
-          strncpy(descriptions[entryidx].id_verb, line, sizeof(descriptions[entryidx].id_verb));
+          strncpy(data[entryidx].id_verb, line, sizeof(data[entryidx].id_verb));
           strncpy(line, "", sizeof(line));
           lidverb = 0;
           loadmode = 1;
@@ -239,7 +239,7 @@ int load_descriptions(struct description descriptions[], int lmax) {
           snprintf(chstr, 2, "%c", ch);
           strcat(line, chstr);
         } else if (ch == '\n' && strlen(line) > 0) {
-          strncpy(descriptions[entryidx].text, line, sizeof(descriptions[entryidx].text));
+          strncpy(data[entryidx].text, line, sizeof(data[entryidx].text));
           strncpy(line, "", sizeof(line));
           loadmode = 2;
         }
@@ -252,7 +252,7 @@ int load_descriptions(struct description descriptions[], int lmax) {
           snprintf(chstr, 2, "%c", ch);
           strcat(line, chstr);
         } else if (ltransid == 1 && (ch == '\n' || ch == '#' || ch == '$')) {
-          descriptions[entryidx].transitions[ltransidx] = atoi(line);
+          data[entryidx].transitions[ltransidx] = atoi(line);
           strncpy(line, "", sizeof(line));
           ltransidx++;
           ltransid = (ch == '#') ? 1 : 0;
@@ -264,7 +264,7 @@ int load_descriptions(struct description descriptions[], int lmax) {
           snprintf(chstr, 2, "%c", ch);
           strcat(line, chstr);
         } else if (litemsid == 1 && (ch == '\n' || ch == '$')) {
-          descriptions[entryidx].items[litemidx] = atoi(line);
+          data[entryidx].items[litemidx] = atoi(line);
           strncpy(line, "", sizeof(line));
           litemidx++;
           litemsid = (ch == '$') ? 1 : 0;

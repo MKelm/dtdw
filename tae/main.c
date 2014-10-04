@@ -3,14 +3,16 @@
 #include "loader.h"
 #include "display.h"
 
-int counts[5];
+int current_area = 0;
+int current_place = 0;
 
+int data_counts[5];
 struct meta meta_data;
-struct command commands[MAX_COMMANDS];
-struct area areas[MAX_AREAS];
-struct place places[MAX_PLACES];
-struct object objects[MAX_OBJECTS];
-struct description descriptions[MAX_DESCRIPTIONS];
+struct command commands_data[MAX_COMMANDS];
+struct area areas_data[MAX_AREAS];
+struct place places_data[MAX_PLACES];
+struct object objects_data[MAX_OBJECTS];
+struct description descriptions_data[MAX_DESCRIPTIONS];
 
 int main(void) {
   load_data();
@@ -36,13 +38,13 @@ void load_data(void) {
   // meta
   load_meta(&meta_data);
   // commands
-  counts[0] = load_commands(commands, MAX_COMMANDS);
+  data_counts[0] = load_commands(commands_data, MAX_COMMANDS);
   // areas
-  counts[1] = load_areas(areas, MAX_AREAS);
+  data_counts[1] = load_areas(areas_data, MAX_AREAS);
   // places
-  counts[2] = load_places(places, MAX_PLACES);
+  data_counts[2] = load_places(places_data, MAX_PLACES);
   // objects
-  counts[3] = load_objects(objects, MAX_OBJECTS);
+  data_counts[3] = load_objects(objects_data, MAX_OBJECTS);
   // descriptions
-  counts[4] = load_descriptions(descriptions, MAX_DESCRIPTIONS);
+  data_counts[4] = load_descriptions(descriptions_data, MAX_DESCRIPTIONS);
 }
