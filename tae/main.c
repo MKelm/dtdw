@@ -25,6 +25,7 @@ int main(void) {
 
   dsp_windows_init();
   dsp_set_meta(&meta_data);
+  dsp_set_location(&areas_data[0], &places_data[0]);
 
   char *output = get_output();
   dsp_output(output);

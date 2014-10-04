@@ -35,7 +35,6 @@ void dsp_windows_init(void) {
   refresh();
 
   wbkgd(header, COLOR_PAIR(1));
-  mvwaddstr(header, 0, 1, "Area one, place two");
   wrefresh(header);
 
   wbkgd(footer, COLOR_PAIR(1));
@@ -53,12 +52,20 @@ void dsp_set_meta(struct meta *meta_data) {
   char chstr[256];
 
   snprintf(chstr, 256, "%s, %s", meta_data->title, meta_data->version);
-  mvwaddstr(header, 0, maxx-strlen(chstr), chstr);
-  wrefresh(header);
+  mvwaddstr(footer, 0, 1, chstr);
+  wrefresh(footer);
 
   snprintf(chstr, 256, "%s, %d", meta_data->author, meta_data->cyear);
   mvwaddstr(footer, 0, maxx-strlen(chstr)-1, chstr);
   wrefresh(footer);
+}
+
+void dsp_set_location(struct area *area_data, struct place *place_data) {
+  char chstr[256];
+
+  snprintf(chstr, 256, "%s, %s", area_data->title, place_data->title);
+  mvwaddstr(header, 0, 1, chstr);
+  wrefresh(header);
 }
 
 char *dsp_input(void) {
