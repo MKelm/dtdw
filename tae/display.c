@@ -97,13 +97,15 @@ void dsp_output(char *str) {
       if (!isspace(*(t)) && !isspace(*(t+1))) {
         tmppos = pos;
         while (!isspace(*(t))) {
+          // sometimes mvwdelch does not work properly, to inspect later
           mvwdelch(output, line, tmppos);
           tmppos--;
           t--;
           len++;
         };
       }
-      // got to next line if end of line has been reached
+    } else if (pos > 1 && pos % llen == 1) {
+      // got to next line if the new line has been reached
       line++;
       if (isspace(*(t))) {
         t++;
@@ -112,15 +114,9 @@ void dsp_output(char *str) {
       wmove(output, line, 1);
     }
 
-    // test implementation, needs another implementation by using waddstr only!
-    char wchars[] = "äüöÄÜÖ";
-    if (strchr(wchars, *t) == 0) {
-      waddch(output, *(t++));
-    } else {
-      char ch[2];
-      snprintf(ch, 2, "%s", t++);
-      waddstr(output, ch);
-    }
+    char ch[2];
+    snprintf(ch, 2, "%s", t++); // workaround for unicode chars
+    waddstr(output, ch);
     pos++;
   }
   wrefresh(output);

@@ -17,7 +17,7 @@ struct object objects_data[MAX_OBJECTS];
 struct description descriptions_data[MAX_DESCRIPTIONS];
 
 int main(void) {
-  setlocale (LC_ALL, "de_DE.UTF-8");
+  setlocale (LC_ALL, "");
 
   load_data();
 
