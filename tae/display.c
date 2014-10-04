@@ -3,6 +3,7 @@
 #include <locale.h>
 #include <math.h>
 #include <ctype.h>
+#include "display.h"
 
 int maxy, maxx;
 WINDOW *header, *footer, *output, *input;
@@ -35,11 +36,11 @@ void dsp_windows_init(void) {
 
   wbkgd(header, COLOR_PAIR(1));
   mvwaddstr(header, 0, 1, "Area one, place two");
-  mvwaddstr(header, 0, maxx-23, "Adventure demo, v0.0.1");
+  //mvwaddstr(header, 0, maxx-23, "Adventure demo, v0.0.1");
   wrefresh(header);
 
   wbkgd(footer, COLOR_PAIR(1));
-  mvwaddstr(footer, 0, maxx-18, "Martin Kelm, 2014");
+  //mvwaddstr(footer, 0, maxx-18, "Martin Kelm, 2014");
   wrefresh(footer);
 
   wbkgd(output, COLOR_PAIR(2));
@@ -48,6 +49,18 @@ void dsp_windows_init(void) {
   wbkgd(input, COLOR_PAIR(5));
   wattrset(input, A_BOLD);
   wrefresh(input);
+}
+
+void dsp_set_meta(struct meta *meta_data) {
+  char chstr[256];
+
+  snprintf(chstr, 256, "%s, %s", meta_data->title, meta_data->version);
+  mvwaddstr(header, 0, maxx-strlen(chstr), chstr);
+  wrefresh(header);
+
+  snprintf(chstr, 256, "%s, %d", meta_data->author, meta_data->cyear);
+  mvwaddstr(footer, 0, maxx-strlen(chstr)-1, chstr);
+  wrefresh(footer);
 }
 
 char *dsp_input(void) {
