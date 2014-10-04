@@ -70,11 +70,11 @@ void dsp_set_location(struct area *area_data, struct place *place_data) {
 void dsp_set_output(char *str) {
   char buffer[1024];
   wmove(output, 0, 0);
-  waddstr(output, word_wrap(buffer, str, maxx-2));
+  waddstr(output, dsp_word_wrap(buffer, str, maxx-2));
   wrefresh(output);
 }
 
-char *word_wrap(char* buffer, char* string, int line_width) {
+char *dsp_word_wrap(char* buffer, char* string, int line_width) {
   int i = 0;
   int k, counter;
 
