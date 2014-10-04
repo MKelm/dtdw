@@ -5,9 +5,10 @@
 #include "loader.h"
 #include "display.h"
 
-int current_area = 0;
-int current_place = 0;
+int current_area = 1;
+int current_place = 1;
 
+// dc: 0 == commands, 2 == areas, 3 == places, 4 == objects, 5 == descriptions
 int data_counts[5];
 struct meta meta_data;
 struct command commands_data[MAX_COMMANDS];
@@ -26,16 +27,26 @@ int main(void) {
   dsp_windows_init();
   dsp_set_meta(&meta_data);
 
-  int *area_place_idx = get_area_place_idx();
-  dsp_set_location(
-    &areas_data[area_place_idx[0]], &places_data[area_place_idx[1]]
-  );
+  int location_change = 1, output_change = 1;
+  int *area_place_idx;
+  char *output, *input;
 
-  char *output = get_output();
-  dsp_set_output(output);
-
-  char *input;
   do {
+    // check location change, change header display output if needed
+    if (location_change == 1) {
+      area_place_idx = get_area_place_idx();
+      dsp_set_location(
+        &areas_data[area_place_idx[0]], &places_data[area_place_idx[1]]
+      );
+      location_change = 0;
+    }
+    // check output change, change output display window if needed
+    if (output_change == 1) {
+      output = get_output();
+      dsp_set_output(output);
+      output_change = 0;
+    }
+    // input prompt
     input = dsp_get_input();
   } while (strcmp(input, "~") != 0);
 
@@ -45,12 +56,11 @@ int main(void) {
 
 int *get_area_place_idx(void) {
   static int area_place_idx[2];
-  int carea = (current_area == 0) ? 1 : 0, cplace = (current_place == 0) ? 1 : 0;
   int areaidx = 0, placeidx = 0;
 
   int i = 0, run = 1;
   while (run == 1) {
-    if (areas_data[i].id == carea) {
+    if (areas_data[i].id == current_area) {
       areaidx = i;
       run = 0;
     } else
@@ -58,7 +68,8 @@ int *get_area_place_idx(void) {
   }
   i = 0, run = 1;
   while (run == 1) {
-    if (places_data[i].area_id == carea && places_data[i].id == cplace) {
+    if (places_data[i].area_id == current_area &&
+        places_data[i].id == current_place) {
       placeidx = i;
       run = 0;
     } else
@@ -72,12 +83,11 @@ int *get_area_place_idx(void) {
 
 char *get_output(void) {
   // get first output with intro by using virtual description
-  int desc_idx = 0;
+  int desc_idx = 0, has_text = 0;;
   static char line[1024], output[1024];
-  if (current_place == 0 && descriptions_data[desc_idx].id == 0) {
+  if (current_area == 1 && current_place == 1 && descriptions_data[desc_idx].id == 0) {
     snprintf(output, 1024, "%s\n\n", descriptions_data[desc_idx].text);
-    current_area = 1;
-    current_place = 1;
+    has_text = 1;
     desc_idx++;
   }
 
@@ -87,7 +97,7 @@ char *get_output(void) {
         strlen(descriptions_data[desc_idx].id_verb) == 0) {
 
       snprintf(line, 1024, "%s ", descriptions_data[desc_idx].text);
-      if (desc_idx > 0) {
+      if (has_text == 1) {
         strcat(output, line);
       } else {
         snprintf(output, 1024, "%s ", descriptions_data[desc_idx].text);
