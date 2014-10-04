@@ -25,18 +25,49 @@ int main(void) {
 
   dsp_windows_init();
   dsp_set_meta(&meta_data);
-  dsp_set_location(&areas_data[0], &places_data[0]);
+
+  int *area_place_idx = get_area_place_idx();
+  dsp_set_location(
+    &areas_data[area_place_idx[0]], &places_data[area_place_idx[1]]
+  );
 
   char *output = get_output();
-  dsp_output(output);
+  dsp_set_output(output);
 
   char *input;
   do {
-    input = dsp_input();
+    input = dsp_get_input();
   } while (strcmp(input, "~") != 0);
 
   dsp_end();
   return 0;
+}
+
+int *get_area_place_idx(void) {
+  static int area_place_idx[2];
+  int carea = (current_area == 0) ? 1 : 0, cplace = (current_place == 0) ? 1 : 0;
+  int areaidx = 0, placeidx = 0;
+
+  int i = 0, run = 1;
+  while (run == 1) {
+    if (areas_data[i].id == carea) {
+      areaidx = i;
+      run = 0;
+    } else
+     i++;
+  }
+  i = 0, run = 1;
+  while (run == 1) {
+    if (places_data[i].area_id == carea && places_data[i].id == cplace) {
+      placeidx = i;
+      run = 0;
+    } else
+     i++;
+  }
+
+  area_place_idx[0] = areaidx;
+  area_place_idx[1] = placeidx;
+  return area_place_idx;
 }
 
 char *get_output(void) {

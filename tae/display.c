@@ -67,24 +67,14 @@ void dsp_set_location(struct area *area_data, struct place *place_data) {
   wrefresh(header);
 }
 
-char *dsp_input(void) {
-  static char str[25];
-  wclear(input);
-  mvwaddstr(input, 0, 1, ">> ");
-  curs_set(1);
-  mvwgetnstr(input, 0, 4, str, 24);
-  curs_set(0);
-  return str;
-}
-
-void dsp_output(char *str) {
+void dsp_set_output(char *str) {
   // output for debugging
   wmove(output, 0, 0);
   waddstr(output, str);
   wrefresh(output);
 }
 
-void dsp_output_old(char *str) {
+void dsp_set_output_old(char *str) {
   char *t;
   t = str;
   int line = 1, pos = 0, tmppos = 0, attr = 0, len = strlen(str), llen = maxx-3;
@@ -133,4 +123,14 @@ void dsp_output_old(char *str) {
     pos++;
   }
   wrefresh(output);
+}
+
+char *dsp_get_input(void) {
+  static char str[25];
+  wclear(input);
+  mvwaddstr(input, 0, 1, ">> ");
+  curs_set(1);
+  mvwgetnstr(input, 0, 4, str, 24);
+  curs_set(0);
+  return str;
 }
