@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <string.h>
 #include "main.h"
 #include "loader.h"
@@ -22,7 +23,7 @@ int main(void) {
   dsp_windows_init();
   dsp_set_meta(&meta_data);
 
-  char output[256] = "Something in the output #window#, and something other than my dog in window fight. But in all situations it is the best to perform a $rabbit$. It is like any other game here and there. Motivations are good to have so we go further and further.";
+  char *output = get_output();
   dsp_output(output);
 
   char *input;
@@ -32,6 +33,16 @@ int main(void) {
 
   dsp_end();
   return 0;
+}
+
+char *get_output(void) {
+  static char output[1024];
+  if (current_place == 0 && descriptions_data[0].id == 0) {
+    snprintf(output, 1024, "%s", descriptions_data[0].text);
+  }
+  current_place = 1;
+  current_place = 1;
+  return output;
 }
 
 void load_data(void) {

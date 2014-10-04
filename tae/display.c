@@ -36,11 +36,9 @@ void dsp_windows_init(void) {
 
   wbkgd(header, COLOR_PAIR(1));
   mvwaddstr(header, 0, 1, "Area one, place two");
-  //mvwaddstr(header, 0, maxx-23, "Adventure demo, v0.0.1");
   wrefresh(header);
 
   wbkgd(footer, COLOR_PAIR(1));
-  //mvwaddstr(footer, 0, maxx-18, "Martin Kelm, 2014");
   wrefresh(footer);
 
   wbkgd(output, COLOR_PAIR(2));
@@ -115,6 +113,7 @@ void dsp_output(char *str) {
     }
 
     waddch(output, *(t++));
+    //wadd_wch(output, *(t++));
     pos++;
   }
   wrefresh(output);
