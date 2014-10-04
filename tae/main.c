@@ -30,7 +30,11 @@ int main(void) {
   int location_change = 1, output_change = 1;
   int *area_place_idx;
   char *output, *input;
+
   struct action caction;
+  strcpy(caction.in_command, "");
+  caction.pobject_id = 0;
+  caction.sobject_id = 0;
 
   do {
     // check location change, change header display output if needed
@@ -43,15 +47,18 @@ int main(void) {
     }
     // check output change, change output display window if needed
     if (output_change == 1) {
-      output = get_output();
+      output = get_output(&caction);
       dsp_set_output(output);
       output_change = 0;
     }
     // input prompt
     input = dsp_get_input();
     // check input to set action flags
-    if (strlen(input) > 0) {
+    if (strlen(input) > 0 && strcmp(input, "~") != 0) {
       check_input_command(input, &caction);
+      if (strlen(caction.in_command) > 0) {
+        output_change = 1;
+      }
     }
   } while (strcmp(input, "~") != 0);
 
@@ -155,7 +162,7 @@ int *get_area_place_idx(void) {
   return area_place_idx;
 }
 
-char *get_output(void) {
+char *get_output(struct action *caction) {
   // get first output with intro by using virtual description
   int desc_idx = 0, has_text = 0;;
   static char line[1024], output[1024];
@@ -177,7 +184,24 @@ char *get_output(void) {
         snprintf(output, 1024, "%s ", descriptions_data[desc_idx].text);
       }
     } else if (descriptions_data[desc_idx].id == current_place + 1) {
-      return output;
+      break;
+    }
+    desc_idx++;
+  }
+
+  // get action related data of the current area place
+  desc_idx = 0;
+  while (desc_idx < data_counts[4]) {
+
+    if (descriptions_data[desc_idx].id == current_place &&
+        strlen(caction->in_command) > 0 &&
+        strcmp(descriptions_data[desc_idx].id_verb, caction->in_command) == 0 &&
+        descriptions_data[desc_idx].id_items[0] == caction->pobject_id) {
+
+      snprintf(line, 1024, "\n\n%s", descriptions_data[desc_idx].text);
+      strcat(output, line);
+    } else if (descriptions_data[desc_idx].id == current_place + 1) {
+      break;
     }
     desc_idx++;
   }
