@@ -44,6 +44,19 @@ struct place {
 
 int load_places(struct place places[], int lmax);
 
+// objects
+#define FILE_OBJECTS "../def/objects.txt"
+#define MAX_OBJECTS 500
+
+struct object {
+  int id;
+  int comb_id; // combination object id
+  int final_id; // final object id after combination
+  char title[56];
+};
+
+int load_objects(struct object objects[], int lmax);
+
 // descriptions
 #define FILE_DESCRIPTIONS "../def/descriptions.txt"
 #define MAX_DESCRIPTIONS 1000

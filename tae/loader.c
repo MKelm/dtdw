@@ -128,6 +128,48 @@ int load_places(struct place *places, int lmax) {
   return entryidx;
 }
 
+int load_objects(struct object objects[], int lmax) {
+  FILE *f = fopen(FILE_OBJECTS, "r");
+  int ch, entryidx = 0;
+  char line[1024] = "", chstr[2];
+  int loadid = 0, loadcombid = 0, loadfinalid = 0, loadtitle = 0;
+
+  while ((ch = fgetc(f)) != EOF) {
+    if (ch == '$') {
+      loadid = 1;
+    } else if ((loadid == 1 || loadcombid == 1 || loadfinalid == 1 || loadtitle == 1) &&
+               ch != '&' && ch != '=' && ch != '\n') {
+      snprintf(chstr, 2, "%c", ch);
+      strcat(line, chstr);
+    } else if (ch == '&' || ch == '=' || ch == '\n') {
+      if (loadtitle == 1) {
+        strncpy(objects[entryidx].title, line, sizeof(objects[entryidx].title));
+        loadtitle = 0;
+        entryidx++;
+        if (entryidx == lmax)
+          return lmax;
+      } else {
+        if (loadid == 1) {
+          objects[entryidx].id = atoi(line);
+          loadid = 0;
+          loadcombid = 1;
+        } else if (loadcombid == 1) {
+          objects[entryidx].comb_id = atoi(line);
+          loadcombid = 0;
+          loadfinalid = 1;
+        } else if (loadfinalid == 1) {
+          objects[entryidx].final_id = atoi(line);
+          loadfinalid = 0;
+          loadtitle = 1;
+        }
+        strncpy(line, "", sizeof(line));
+      }
+    }
+  }
+
+  return entryidx;
+}
+
 /*
  Description definitions:
  #placeId$itemId...(optional)/verb(optional)
@@ -158,7 +200,6 @@ int load_descriptions(struct description descriptions[], int lmax) {
         } else if (loadid == 1 && (ch == '\n' || ch == '$' || ch == '/')) {
           loadid = 0;
           descriptions[entryidx].id = atoi(line);
-          //printf("\nroom id %d:\n", descriptions[entryidx].id);
           strncpy(line, "", sizeof(line));
           ltransidx = 0;
           litemidx = 0;
@@ -173,7 +214,6 @@ int load_descriptions(struct description descriptions[], int lmax) {
           strcat(line, chstr);
         } else if (liditemsid == 1 && (ch == '\n' || ch == '$' || ch == '/')) {
           descriptions[entryidx].id_items[liditemidx] = atoi(line);
-          //printf("id item %d = %s\n ", liditemidx, line);
           strncpy(line, "", sizeof(line));
           liditemidx++;
           liditemsid = (ch == '$') ? 1 : 0;
@@ -188,7 +228,6 @@ int load_descriptions(struct description descriptions[], int lmax) {
           strcat(line, chstr);
         } else if (lidverb == 1 && ch == '\n') {
           strncpy(descriptions[entryidx].id_verb, line, sizeof(descriptions[entryidx].id_verb));
-          //printf("id verb = %s\n ", descriptions[entryidx].id_verb);
           strncpy(line, "", sizeof(line));
           lidverb = 0;
           loadmode = 1;
@@ -201,7 +240,6 @@ int load_descriptions(struct description descriptions[], int lmax) {
           strcat(line, chstr);
         } else if (ch == '\n' && strlen(line) > 0) {
           strncpy(descriptions[entryidx].text, line, sizeof(descriptions[entryidx].text));
-          //printf("desc = %s\n ", descriptions[entryidx].text);
           strncpy(line, "", sizeof(line));
           loadmode = 2;
         }
@@ -215,7 +253,6 @@ int load_descriptions(struct description descriptions[], int lmax) {
           strcat(line, chstr);
         } else if (ltransid == 1 && (ch == '\n' || ch == '#' || ch == '$')) {
           descriptions[entryidx].transitions[ltransidx] = atoi(line);
-          //printf("trans %d = %d\n ", ltransidx, descriptions[entryidx].transitions[ltransidx]);
           strncpy(line, "", sizeof(line));
           ltransidx++;
           ltransid = (ch == '#') ? 1 : 0;
@@ -228,7 +265,6 @@ int load_descriptions(struct description descriptions[], int lmax) {
           strcat(line, chstr);
         } else if (litemsid == 1 && (ch == '\n' || ch == '$')) {
           descriptions[entryidx].items[litemidx] = atoi(line);
-          //printf("item %d = %s\n ", litemidx, line);
           strncpy(line, "", sizeof(line));
           litemidx++;
           litemsid = (ch == '$') ? 1 : 0;
@@ -282,6 +318,16 @@ int main(void) {
 
   for (i = 0; i < places_count; i++) {
     printf("place %d->#%d %s\n", places[i].area_id,  places[i].id, places[i].title);
+  }
+  printf("\n");
+
+  // objects
+  struct object objects[MAX_OBJECTS];
+  int objects_count = load_objects(objects, MAX_OBJECTS);
+
+  for (i = 0; i < objects_count; i++) {
+    printf("object $%d & %d-%d = %s\n",
+      objects[i].id, objects[i].comb_id, objects[i].final_id, objects[i].title);
   }
   printf("\n");
 
