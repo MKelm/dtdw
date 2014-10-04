@@ -40,12 +40,33 @@ int main(void) {
 }
 
 char *get_output(void) {
-  static char output[1024];
-  if (current_place == 0 && descriptions_data[0].id == 0) {
-    snprintf(output, 1024, "%s", descriptions_data[0].text);
+  // get first output with intro by using virtual description
+  int desc_idx = 0;
+  static char line[1024], output[1024];
+  if (current_place == 0 && descriptions_data[desc_idx].id == 0) {
+    snprintf(output, 1024, "%s\n\n", descriptions_data[desc_idx].text);
+    current_area = 1;
+    current_place = 1;
+    desc_idx++;
   }
-  current_place = 1;
-  current_place = 1;
+
+  // get more data of the current area place
+  while (desc_idx < data_counts[4]) {
+    if (descriptions_data[desc_idx].id == current_place &&
+        strlen(descriptions_data[desc_idx].id_verb) == 0) {
+
+      snprintf(line, 1024, "%s ", descriptions_data[desc_idx].text);
+      if (desc_idx > 0) {
+        strcat(output, line);
+      } else {
+        snprintf(output, 1024, "%s ", descriptions_data[desc_idx].text);
+      }
+    } else if (descriptions_data[desc_idx].id == current_place + 1) {
+      return output;
+    }
+    desc_idx++;
+  }
+
   return output;
 }
 

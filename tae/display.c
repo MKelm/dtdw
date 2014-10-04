@@ -29,8 +29,7 @@ void dsp_end(void) {
 void dsp_windows_init(void) {
   header = newwin(1, maxx, 0, 0);
   footer = newwin(1, maxx, maxy-1, 0);
-
-  output = newwin(maxy-2, maxx, 1, 0);
+  output = newwin(maxy-5, maxx-2, 2, 1);
   input = newwin(1, maxx, maxy-2, 0);
   refresh();
 
@@ -79,6 +78,13 @@ char *dsp_input(void) {
 }
 
 void dsp_output(char *str) {
+  // output for debugging
+  wmove(output, 0, 0);
+  waddstr(output, str);
+  wrefresh(output);
+}
+
+void dsp_output_old(char *str) {
   char *t;
   t = str;
   int line = 1, pos = 0, tmppos = 0, attr = 0, len = strlen(str), llen = maxx-3;
