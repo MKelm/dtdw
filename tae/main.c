@@ -95,11 +95,13 @@ void check_input_command(char *input, struct action *caction) {
       ptr = strtok(icommand, " ");
       int j = 0;
       while (ptr != NULL) {
-        strcpy(commandarr[j], ptr);
-        ptr = strtok(NULL, " ");
-        j++;
+        if (j < 4) {
+          strcpy(commandarr[j], ptr);
+          ptr = strtok(NULL, " ");
+          j++;
+        }
       }
-      if (j == 2 || j == 4) {
+      if (j > 0) {
         if (i == 2) {
           // more actions for action command
           strcpy(caction->in_command, commandarr[0]);
