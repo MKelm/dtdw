@@ -1,7 +1,7 @@
 #include <ncurses.h>
+#include <stdlib.h>
 #include <string.h>
 #include <locale.h>
-#include <math.h>
 #include <ctype.h>
 #include "display.h"
 
@@ -112,8 +112,15 @@ void dsp_output(char *str) {
       wmove(output, line, 1);
     }
 
-    waddch(output, *(t++));
-    //wadd_wch(output, *(t++));
+    // test implementation, needs another implementation by using waddstr only!
+    char wchars[] = "äüöÄÜÖ";
+    if (strchr(wchars, *t) == 0) {
+      waddch(output, *(t++));
+    } else {
+      char ch[2];
+      snprintf(ch, 2, "%s", t++);
+      waddstr(output, ch);
+    }
     pos++;
   }
   wrefresh(output);
