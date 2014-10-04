@@ -40,6 +40,7 @@ void dsp_windows_init(void) {
   wrefresh(footer);
 
   wbkgd(output, COLOR_PAIR(2));
+  wattrset(output, A_BOLD);
   wrefresh(output);
 
   wbkgd(input, COLOR_PAIR(5));
