@@ -7,7 +7,7 @@ void load_meta(struct meta *data);
 
 // commands
 #define FILE_COMMANDS "../data/commands.txt"
-#define MAX_COMMANDS 12
+#define MAX_COMMANDS 20
 
 int load_commands(struct command data[], int lmax);
 

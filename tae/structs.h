@@ -1,6 +1,12 @@
 #ifndef STRUCTS_DEFINITION
 #define STRUCTS_DEFINITION
 
+struct action {
+  char in_command[256]; // internal command
+  int pobject_id; // primary object id
+  int sobject_id; // sub object id
+};
+
 struct meta {
   char title[256];
   char version[24];

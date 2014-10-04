@@ -30,6 +30,7 @@ int main(void) {
   int location_change = 1, output_change = 1;
   int *area_place_idx;
   char *output, *input;
+  struct action caction;
 
   do {
     // check location change, change header display output if needed
@@ -48,10 +49,83 @@ int main(void) {
     }
     // input prompt
     input = dsp_get_input();
+    // check input to set action flags
+    if (strlen(input) > 0) {
+      check_input_command(input, &caction);
+    }
   } while (strcmp(input, "~") != 0);
 
   dsp_end();
   return 0;
+}
+
+void check_input_command(char *input, struct action *caction) {
+  char inputarr[4][24], commandarr[2][24];
+  char *ptr;
+  ptr = strtok(input, " ");
+  int i = 0;
+  while (ptr != NULL) {
+    if (i < 4) {
+      strcpy(inputarr[i], ptr);
+      ptr = strtok(NULL, " ");
+      i++;
+    }
+  }
+  char *icommand; // internal command
+  char ccommand[24];
+  if (i == 2) {
+    // action command
+    snprintf(ccommand, 24, "%s $$", inputarr[0]);
+    icommand = get_internal_command(ccommand);
+  } else if (i == 4) {
+    // combinition action command
+    snprintf(ccommand, 24, "%s $$ %s $$", inputarr[0], inputarr[2]);
+    icommand = get_internal_command(ccommand);
+  }
+
+  if (strlen(icommand) > 0) {
+    ptr = strtok(icommand, " ");
+    int j = 0;
+    while (ptr != NULL) {
+      if (j < 2) {
+        strcpy(commandarr[j], ptr);
+        ptr = strtok(NULL, " ");
+        j++;
+      }
+    }
+    if (j > 0) {
+      if (i == 2) {
+        // more actions for action command
+        strcpy(caction->in_command, commandarr[0]);
+        caction->pobject_id = get_object_id(inputarr[1]);
+      } else if (i == 4) {
+        // more actions for combinition action command
+        strcpy(caction->in_command, commandarr[0]);
+        caction->pobject_id = get_object_id(inputarr[1]);
+        caction->sobject_id = get_object_id(inputarr[3]);
+      }
+    }
+  }
+}
+
+int get_object_id(char *tobject) {
+  int i;
+  for (i = 0; i < data_counts[4]; i++) {
+    if (strcasecmp(objects_data[i].title, tobject) == 0) {
+      return objects_data[i].id;
+    }
+  }
+  return 0;
+}
+
+char *get_internal_command(char *ccommand) {
+  int i;
+  for (i = 0; i < data_counts[0]; i++) {
+    if (strcmp(commands_data[i].ex, ccommand) == 0) {
+      return commands_data[i].in;
+    }
+  }
+  return ccommand;
 }
 
 int *get_area_place_idx(void) {
