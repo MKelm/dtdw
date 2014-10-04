@@ -78,38 +78,38 @@ void check_input_command(char *input, struct action *caction) {
       i++;
     }
   }
-  char *icommand; // internal command
-  char ccommand[24];
-  if (i == 2) {
-    // action command
-    snprintf(ccommand, 24, "%s $$", inputarr[0]);
-    icommand = get_internal_command(ccommand);
-  } else if (i == 4) {
-    // combinition action command
-    snprintf(ccommand, 24, "%s $$ %s $$", inputarr[0], inputarr[2]);
-    icommand = get_internal_command(ccommand);
-  }
+  if (i == 2 || i == 4) {
+    char *icommand; // internal command
+    char ccommand[24];
+    if (i == 2) {
+      // action command
+      snprintf(ccommand, 24, "%s $$", inputarr[0]);
+      icommand = get_internal_command(ccommand);
+    } else if (i == 4) {
+      // combinition action command
+      snprintf(ccommand, 24, "%s $$ %s $$", inputarr[0], inputarr[2]);
+      icommand = get_internal_command(ccommand);
+    }
 
-  if (strlen(icommand) > 0) {
-    ptr = strtok(icommand, " ");
-    int j = 0;
-    while (ptr != NULL) {
-      if (j < 2) {
+    if (strlen(icommand) > 0) {
+      ptr = strtok(icommand, " ");
+      int j = 0;
+      while (ptr != NULL) {
         strcpy(commandarr[j], ptr);
         ptr = strtok(NULL, " ");
         j++;
       }
-    }
-    if (j > 0) {
-      if (i == 2) {
-        // more actions for action command
-        strcpy(caction->in_command, commandarr[0]);
-        caction->pobject_id = get_object_id(inputarr[1]);
-      } else if (i == 4) {
-        // more actions for combinition action command
-        strcpy(caction->in_command, commandarr[0]);
-        caction->pobject_id = get_object_id(inputarr[1]);
-        caction->sobject_id = get_object_id(inputarr[3]);
+      if (j == 2 || j == 4) {
+        if (i == 2) {
+          // more actions for action command
+          strcpy(caction->in_command, commandarr[0]);
+          caction->pobject_id = get_object_id(inputarr[1]);
+        } else if (i == 4) {
+          // more actions for combinition action command
+          strcpy(caction->in_command, commandarr[0]);
+          caction->pobject_id = get_object_id(inputarr[1]);
+          caction->sobject_id = get_object_id(inputarr[3]);
+        }
       }
     }
   }
