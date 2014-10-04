@@ -61,6 +61,37 @@ int load_commands(struct command *commands, int lmax) {
   return entryidx;
 }
 
+int load_areas(struct area *areas, int lmax) {
+  FILE *f = fopen(FILE_AREAS, "r");
+  int ch, entryidx = 0;
+  char line[1024] = "", chstr[2];
+  int loadid = 0, loadtitle = 0;
+
+  while ((ch = fgetc(f)) != EOF) {
+    if (loadid == 0 && loadtitle == 0) {
+      loadid = 1;
+    }
+    if ((loadid == 1 || loadtitle == 1) && ch != '\n') {
+      snprintf(chstr, 2, "%c", ch);
+      strcat(line, chstr);
+    } else if (loadid == 1 && ch == '\n') {
+      areas[entryidx].id = atoi(line);
+      strncpy(line, "", sizeof(line));
+      loadid = 0;
+      loadtitle = 1;
+    } else if (loadtitle == 1 && ch == '\n') {
+      strncpy(areas[entryidx].title, line, sizeof(areas[entryidx].title));
+      strncpy(line, "", sizeof(line));
+      loadtitle = 0;
+      entryidx++;
+      if (entryidx == lmax)
+        return lmax;
+    }
+  }
+
+  return entryidx;
+}
+
 /*
  Description definitions:
  #placeId$itemId...(optional)/verb(optional)
@@ -185,11 +216,13 @@ int load_descriptions(struct description descriptions[], int lmax) {
 int main(void) {
   int i;
 
+  // meta
   struct meta meta_data;
   load_meta(&meta_data);
   printf("meta title: %s\nversion: %s, author: %s, year: %d\n\n",
     meta_data.title, meta_data.version, meta_data.author, meta_data.cyear);
 
+  // commands
   struct command commands[MAX_COMMANDS];
   int commands_count = load_commands(commands, MAX_COMMANDS);
 
@@ -198,6 +231,16 @@ int main(void) {
   }
   printf("\n");
 
+  // areas
+  struct area areas[MAX_AREAS];
+  int areas_count = load_areas(areas, MAX_AREAS);
+
+  for (i = 0; i < areas_count; i++) {
+    printf("area %d -> %s\n", areas[i].id, areas[i].title);
+  }
+  printf("\n");
+
+  // descriptions
   struct description descriptions[MAX_DESCRIPTIONS];
   int desc_count = load_descriptions(descriptions, MAX_DESCRIPTIONS);
 
