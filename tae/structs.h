@@ -1,5 +1,5 @@
-#ifndef data_structs
-#define data_structs
+#ifndef STRUCTS_DEFINITION
+#define STRUCTS_DEFINITION
 
 struct meta {
   char title[256];

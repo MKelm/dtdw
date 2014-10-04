@@ -1,4 +1,4 @@
-#include "data.h"
+#include "structs.h"
 
 void dsp_init(void);
 void dsp_windows_init(void);

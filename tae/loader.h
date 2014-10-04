@@ -1,4 +1,4 @@
-#include "data.h"
+#include "structs.h"
 
 // meta
 #define FILE_META "../def/meta.txt"
