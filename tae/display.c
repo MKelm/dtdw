@@ -68,61 +68,51 @@ void dsp_set_location(struct area *area_data, struct place *place_data) {
 }
 
 void dsp_set_output(char *str) {
-  // output for debugging
+  char buffer[1024];
   wmove(output, 0, 0);
-  waddstr(output, str);
+  waddstr(output, word_wrap(buffer, str, maxx-2));
   wrefresh(output);
 }
 
-void dsp_set_output_old(char *str) {
-  char *t;
-  t = str;
-  int line = 1, pos = 0, tmppos = 0, attr = 0, len = strlen(str), llen = maxx-3;
-  curs_set(1);
+char *word_wrap(char* buffer, char* string, int line_width) {
+  int i = 0;
+  int k, counter;
 
-  wmove(output, line, 1);
-  while (pos < len) {
-    // mark items and transitions
-    if (*t == '$' || *t == '#') {
-      if (attr == 0) {
-        wattron(output, COLOR_PAIR((*t == '$') ? 3 : 4) | A_BOLD);
-        attr = 1;
-      } else {
-        wattroff(output, COLOR_PAIR((*t == '$') ? 3 : 4) | A_BOLD);
-        attr = 0;
+  while (i < strlen(string)) {
+    // copy string until the end of the line is reached
+    for (counter = 1; counter <= line_width; counter++) {
+      // check if end of string reached
+      if (i == strlen(string)) {
+        buffer[i] = 0;
+        return buffer;
       }
-      len--;
-      t++;
+      buffer[i] = string[i];
+      // check for newlines embedded in the original input
+      // and reset the index
+      if (buffer[i] == '\n') {
+        counter = 1;
+      }
+      i++;
     }
-
-    if (pos > 0 && pos % llen == 0) {
-      // word wrap, move word to next line on word break
-      if (!isspace(*(t)) && !isspace(*(t+1))) {
-        tmppos = pos;
-        while (!isspace(*(t))) {
-          // sometimes mvwdelch does not work properly, to inspect later
-          mvwdelch(output, line, tmppos);
-          tmppos--;
-          t--;
-          len++;
-        };
+    // check for whitespace
+    if (isspace(string[i])) {
+      buffer[i] = '\n';
+      i++;
+    } else {
+      // check for nearest whitespace back in string
+      for (k = i; k > 0; k--) {
+        if (isspace(string[k])) {
+          buffer[k] = '\n';
+          // set string index back to character after this one
+          i = k + 1;
+          break;
+        }
       }
-    } else if (pos > 1 && pos % llen == 1) {
-      // got to next line if the new line has been reached
-      line++;
-      if (isspace(*(t))) {
-        t++;
-        pos++;
-      }
-      wmove(output, line, 1);
     }
-
-    char ch[2];
-    snprintf(ch, 2, "%s", t++); // workaround for unicode chars
-    waddstr(output, ch);
-    pos++;
   }
-  wrefresh(output);
+  buffer[i] = 0;
+
+  return buffer;
 }
 
 char *dsp_get_input(void) {
