@@ -1,5 +1,4 @@
 #define FILE_META "../def/meta.txt"
-#define FILE_DESCRIPTIONS "../def/descriptions.txt"
 
 struct meta {
   char title[256];
@@ -10,6 +9,16 @@ struct meta {
 
 void load_meta(struct meta *meta_data);
 
+struct command {
+  char in[24]; // internal
+  char ex[24]; // external
+};
+
+#define FILE_COMMANDS "../def/commands.txt"
+#define MAX_COMMANDS 12
+
+int load_commands(struct command commands[], int lmax);
+
 struct description {
   int id;
   int id_items[5];
@@ -18,5 +27,8 @@ struct description {
   int transitions[5]; // text transitions
   int items[10]; // text items
 };
+
+#define FILE_DESCRIPTIONS "../def/descriptions.txt"
+#define MAX_DESCRIPTIONS 1000
 
 int load_descriptions(struct description descriptions[], int lmax);

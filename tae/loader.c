@@ -30,6 +30,37 @@ void load_meta(struct meta *meta_data) {
   }
 }
 
+int load_commands(struct command *commands, int lmax) {
+  FILE *f = fopen(FILE_COMMANDS, "r");
+  int ch, entryidx = 0;
+  char line[1024] = "", chstr[2];
+  int loadin = 0, loadex = 0;
+
+  while ((ch = fgetc(f)) != EOF) {
+    if (ch != '\n' && loadin == 0 && loadex == 0) {
+      loadin = 1;
+    }
+    if ((loadin == 1 || loadex == 1) && ch != '\n' && ch != '=') {
+      snprintf(chstr, 2, "%c", ch);
+      strcat(line, chstr);
+    } else if (loadin == 1 && ch == '=') {
+      strncpy(commands[entryidx].in, line, sizeof(commands[entryidx].in));
+      strncpy(line, "", sizeof(line));
+      loadin = 0;
+      loadex = 1;
+    } else if (loadex == 1 && ch == '\n') {
+      strncpy(commands[entryidx].ex, line, sizeof(commands[entryidx].ex));
+      strncpy(line, "", sizeof(line));
+      loadex = 0;
+      entryidx++;
+      if (entryidx == lmax)
+        return lmax;
+    }
+  }
+
+  return entryidx;
+}
+
 /*
  Description definitions:
  #placeId$itemId...(optional)/verb(optional)
@@ -37,7 +68,6 @@ void load_meta(struct meta *meta_data) {
  #transitionID...$itemID...
 */
 int load_descriptions(struct description descriptions[], int lmax) {
-
   FILE *f = fopen(FILE_DESCRIPTIONS, "r");
   int ch, entryidx = 0;
   // load status values: main id, id items id, id verb, transition id, items id
@@ -153,14 +183,23 @@ int load_descriptions(struct description descriptions[], int lmax) {
 #ifdef DEBUG
 
 int main(void) {
+  int i;
 
   struct meta meta_data;
   load_meta(&meta_data);
   printf("meta title: %s\nversion: %s, author: %s, year: %d\n\n",
     meta_data.title, meta_data.version, meta_data.author, meta_data.cyear);
 
-  struct description descriptions[1000];
-  int i, desc_count = load_descriptions(descriptions, 1000);
+  struct command commands[MAX_COMMANDS];
+  int commands_count = load_commands(commands, MAX_COMMANDS);
+
+  for (i = 0; i < commands_count; i++) {
+    printf("command %s -> %s\n", commands[i].in, commands[i].ex);
+  }
+  printf("\n");
+
+  struct description descriptions[MAX_DESCRIPTIONS];
+  int desc_count = load_descriptions(descriptions, MAX_DESCRIPTIONS);
 
   for (i = 0; i < desc_count; i++) {
     printf("desc id %d:\n%s\n%d, %d\n\n",
