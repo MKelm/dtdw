@@ -32,6 +32,18 @@ struct area {
 
 int load_areas(struct area areas[], int lmax);
 
+// places
+#define FILE_PLACES "../def/places.txt"
+#define MAX_PLACES 200
+
+struct place {
+  int area_id;
+  int id;
+  char title[56];
+};
+
+int load_places(struct place places[], int lmax);
+
 // descriptions
 #define FILE_DESCRIPTIONS "../def/descriptions.txt"
 #define MAX_DESCRIPTIONS 1000

@@ -92,6 +92,42 @@ int load_areas(struct area *areas, int lmax) {
   return entryidx;
 }
 
+int load_places(struct place *places, int lmax) {
+  FILE *f = fopen(FILE_PLACES, "r");
+  int ch, entryidx = 0;
+  char line[1024] = "", chstr[2];
+  int loadareaid = 0, loadid = 0, loadtitle = 0;
+
+  while ((ch = fgetc(f)) != EOF) {
+    if (loadareaid == 0 && loadid == 0 && loadtitle == 0) {
+      loadareaid = 1;
+    }
+    if ((loadareaid == 1 || loadid == 1 || loadtitle == 1) && ch != '#' && ch != '\n') {
+      snprintf(chstr, 2, "%c", ch);
+      strcat(line, chstr);
+    } else if (loadareaid == 1 && ch == '#') {
+      places[entryidx].area_id = atoi(line);
+      strncpy(line, "", sizeof(line));
+      loadareaid = 0;
+      loadid = 1;
+    } else if (loadid == 1 && ch == '\n') {
+      places[entryidx].id = atoi(line);
+      strncpy(line, "", sizeof(line));
+      loadid = 0;
+      loadtitle = 1;
+    } else if (loadtitle == 1 &&  ch == '\n') {
+      strncpy(places[entryidx].title, line, sizeof(places[entryidx].title));
+      strncpy(line, "", sizeof(line));
+      loadtitle = 0;
+      entryidx++;
+      if (entryidx == lmax)
+        return lmax;
+    }
+  }
+
+  return entryidx;
+}
+
 /*
  Description definitions:
  #placeId$itemId...(optional)/verb(optional)
@@ -237,6 +273,15 @@ int main(void) {
 
   for (i = 0; i < areas_count; i++) {
     printf("area %d -> %s\n", areas[i].id, areas[i].title);
+  }
+  printf("\n");
+
+  // places
+  struct place places[MAX_PLACES];
+  int places_count = load_places(places, MAX_PLACES);
+
+  for (i = 0; i < places_count; i++) {
+    printf("place %d->#%d %s\n", places[i].area_id,  places[i].id, places[i].title);
   }
   printf("\n");
 
