@@ -9,7 +9,7 @@ struct inventory_item {
 int inventory_count = 0;
 
 int inventory_add_item(struct item *link) {
-  if (link->id > 0) {
+  if (link != NULL && link->id > 0) {
     inventory_items[inventory_count].link = link;
     inventory_count++;
     return 1;

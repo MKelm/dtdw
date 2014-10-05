@@ -66,6 +66,11 @@ int main(void) {
           dsp_set_output(action_get_output(&caction));
           current_place = caction.transition_id;
           location_change = 1;
+
+        } else if (strcmp(caction.in_command, "pickup") == 0 && caction.pitem_id > 0) {
+          // simple implementation to get inventory item
+          // todo: extended logic with definitions to handle item / description status
+          inventory_add_item(get_item(caction.pitem_id));
         }
         output_change = 1;
       } else if (strcasecmp(caction.in_command, "quit") == 0) {
@@ -161,6 +166,16 @@ int get_item_id(char *titem) {
     }
   }
   return 0;
+}
+
+struct item *get_item(int id) {
+  int i;
+  for (i = 0; i < data_counts[4]; i++) {
+    if (items_data[i].id == id) {
+      return &items_data[i];
+    }
+  }
+  return NULL;
 }
 
 int get_transition_id(char *ttransition) {
