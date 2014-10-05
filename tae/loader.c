@@ -126,8 +126,8 @@ int load_places(struct place *data, int lmax) {
   return entryidx;
 }
 
-int load_objects(struct object data[], int lmax) {
-  FILE *f = fopen(FILE_OBJECTS, "r");
+int load_items(struct item data[], int lmax) {
+  FILE *f = fopen(FILE_ITEMS, "r");
   int ch, entryidx = 0;
   char line[1024] = "", chstr[2];
   int loadid = 0, loadcombid = 0, loadfinalid = 0, loadtitle = 0;

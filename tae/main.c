@@ -8,13 +8,13 @@
 int current_area = 0;
 int current_place = 0;
 
-// dc: 0 == commands, 2 == areas, 3 == places, 4 == objects, 5 == descriptions
+// dc: 0 == commands, 2 == areas, 3 == places, 4 == items, 5 == descriptions
 int data_counts[5];
 struct meta meta_data;
 struct command commands_data[MAX_COMMANDS];
 struct area areas_data[MAX_AREAS];
 struct place places_data[MAX_PLACES];
-struct object objects_data[MAX_OBJECTS];
+struct item items_data[MAX_ITEMS];
 struct description descriptions_data[MAX_DESCRIPTIONS];
 
 int main(void) {
@@ -121,13 +121,13 @@ struct action get_input_action(char *input) {
           if (i == 2) {
             // more actions for action command
             strcpy(iaction.in_command, commandarr[0]);
-            iaction.pitem_id = get_object_id(inputarr[1]);
+            iaction.pitem_id = get_item_id(inputarr[1]);
             return iaction;
           } else if (i == 4) {
             // more actions for combinition action command
             strcpy(iaction.in_command, commandarr[0]);
-            iaction.pitem_id = get_object_id(inputarr[1]);
-            iaction.sitem_id = get_object_id(inputarr[3]);
+            iaction.pitem_id = get_item_id(inputarr[1]);
+            iaction.sitem_id = get_item_id(inputarr[3]);
             return iaction;
           }
         }
@@ -140,11 +140,11 @@ struct action get_input_action(char *input) {
   return iaction;
 }
 
-int get_object_id(char *tobject) {
+int get_item_id(char *titem) {
   int i;
   for (i = 0; i < data_counts[4]; i++) {
-    if (strcasecmp(objects_data[i].title, tobject) == 0) {
-      return objects_data[i].id;
+    if (strcasecmp(items_data[i].title, titem) == 0) {
+      return items_data[i].id;
     }
   }
   return 0;
@@ -271,8 +271,8 @@ void load_data(void) {
   data_counts[1] = load_areas(areas_data, MAX_AREAS);
   // places
   data_counts[2] = load_places(places_data, MAX_PLACES);
-  // objects
-  data_counts[3] = load_objects(objects_data, MAX_OBJECTS);
+  // items
+  data_counts[3] = load_items(items_data, MAX_ITEMS);
   // descriptions
   data_counts[4] = load_descriptions(descriptions_data, MAX_DESCRIPTIONS);
 }

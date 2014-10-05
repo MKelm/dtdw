@@ -31,10 +31,10 @@ struct place {
   char title[56];
 };
 
-struct object {
+struct item {
   int id;
-  int comb_id; // combination object id
-  int final_id; // final object id after combination
+  int comb_id; // combination item id
+  int final_id; // final item id after combination
   char title[56];
 };
 

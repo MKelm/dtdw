@@ -24,10 +24,10 @@ int load_areas(struct area data[], int lmax);
 int load_places(struct place data[], int lmax);
 
 // objects
-#define FILE_OBJECTS "../data/objects.txt"
-#define MAX_OBJECTS 500
+#define FILE_ITEMS "../data/items.txt"
+#define MAX_ITEMS 500
 
-int load_objects(struct object data[], int lmax);
+int load_items(struct item data[], int lmax);
 
 // descriptions
 #define FILE_DESCRIPTIONS "../data/descriptions.txt"
