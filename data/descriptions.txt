@@ -21,6 +21,9 @@ $2$3
 Auf der Kommode ist eine $Kerze$ die noch ungenutzt ist.
 $5
 
+#1$3/lookat
+Ein reinrassiges Holzbett der Marke Friöör Mikea, macht sich in jeder Lage gut.
+
 #2
 Du bist im Wohnzimmer. Es gibt eine #Treppe# die nach oben führt.
 #1
