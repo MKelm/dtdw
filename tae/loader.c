@@ -31,8 +31,12 @@ void load_meta(struct meta *data) {
         strncpy(data->version, line, sizeof(data->version));
       else if (linenum == 2)
         strncpy(data->author, line, sizeof(data->author));
-      else
+      else if (linenum == 3)
         data->cyear = atoi(line);
+      else if (linenum == 4)
+        strncpy(data->tinventory, line, sizeof(data->tinventory));
+      else
+        strncpy(data->noinvitems, line, sizeof(data->noinvitems));
       strncpy(line, "", sizeof(line));
       linenum++;
     }

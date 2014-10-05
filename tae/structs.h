@@ -13,6 +13,8 @@ struct meta {
   char version[24];
   char author[36];
   int cyear;
+  char tinventory[24];
+  char noinvitems[42];
 };
 
 struct command {
