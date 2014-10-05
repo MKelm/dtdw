@@ -237,6 +237,7 @@ int load_descriptions(struct description data[], int lmax) {
           data[entryidx].id = atoi(line);
           strncpy(line, "", sizeof(line));
           liditemidx = 0;
+          lidtransidx = 0;
           ltransidx = 0;
           litemidx = 0;
           if (ch == '\n')

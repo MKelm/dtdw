@@ -159,10 +159,12 @@ int get_item_id(char *titem) {
 }
 
 int get_transition_id(char *ttransition) {
-  int i;
+  int i, j;
   for (i = 0; i < data_counts[3]; i++) {
-    if (strcasecmp(places_data[i].title, ttransition) == 0) {
-      return places_data[i].id;
+    for (j = 0; j < MAX_PLACE_TRANSITIONS; j++) {
+      if (strcasecmp(places_data[i].transitions[j].title, ttransition) == 0) {
+        return places_data[i].id;
+      }
     }
   }
   return 0;
@@ -220,8 +222,10 @@ char *action_get_output(struct action *caction) {
           strcmp(descriptions_data[desc_idx].id_verb, caction->in_command) == 0) {
 
         for (i = 0; i < MAX_DESC_ID_EXTRAS; i++) {
-          if (descriptions_data[desc_idx].id_items[i] == caction->pitem_id ||
-              descriptions_data[desc_idx].id_transitions[i] == caction->transition_id) {
+          if ((caction->pitem_id > 0 &&
+               descriptions_data[desc_idx].id_items[i] == caction->pitem_id) ||
+              (caction->transition_id > 0 &&
+               descriptions_data[desc_idx].id_transitions[i] == caction->transition_id)) {
 
             snprintf(line, 1024, "%s\n\n", descriptions_data[desc_idx].text);
             strcat(output, line);

@@ -30,11 +30,13 @@ struct placetrans {
   char title[56];
 };
 
+#define MAX_PLACE_TRANSITIONS 5
+
 struct place {
   int area_id;
   int id;
   char title[56];
-  struct placetrans transitions[5];
+  struct placetrans transitions[MAX_PLACE_TRANSITIONS];
 };
 
 struct item {
