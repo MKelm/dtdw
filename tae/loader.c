@@ -4,6 +4,17 @@
 #include <ctype.h>
 #include "loader.h"
 
+void load_help(char *help) {
+  FILE *f = fopen(FILE_HELP, "r");
+  int ch;
+  char chstr[2];
+
+  while ((ch = fgetc(f)) != EOF) {
+    snprintf(chstr, 2, "%c", ch);
+    strcat(help, chstr);
+  }
+}
+
 void load_meta(struct meta *data) {
   FILE *f = fopen(FILE_META, "r");
   int ch, linenum = 0;

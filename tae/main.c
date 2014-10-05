@@ -8,6 +8,8 @@
 int current_area = 0;
 int current_place = 0;
 
+char help_text[2048];
+
 // dc: 0 == commands, 2 == areas, 3 == places, 4 == items, 5 == descriptions
 int data_counts[5];
 struct meta meta_data;
@@ -241,8 +243,11 @@ char *action_get_output(struct action *caction) {
     }
   } else if (strlen(caction->in_command) > 0) {
     // for simple actions commands
-    if (strcasecmp(caction->in_command, "description") == 0) {
+    if (strcmp(caction->in_command, "description") == 0) {
       strcat(output, desc_get_output());
+
+    } else if (strcmp(caction->in_command, "help") == 0) {
+      strcat(output, help_text);
     }
   }
 
@@ -287,6 +292,8 @@ char *desc_get_output() {
 }
 
 void load_data(void) {
+  // help text
+  load_help(help_text);
   // meta
   load_meta(&meta_data);
   // commands

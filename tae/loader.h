@@ -1,5 +1,11 @@
 #include "structs.h"
 
+// help
+#define FILE_HELP "../data/help.txt"
+
+void load_help(char *text);
+
+
 // meta
 #define FILE_META "../data/meta.txt"
 
