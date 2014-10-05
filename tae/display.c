@@ -69,7 +69,6 @@ void dsp_set_location(struct area *area_data, struct place *place_data) {
   wrefresh(header);
 }
 
-// todo: insert / wrap new input only to keep buffer size and to avoid crashes
 void dsp_set_output(char *str) {
   char buffer[2048];
   waddstr(output, dsp_word_wrap(buffer, str, maxx-2));
