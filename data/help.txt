@@ -1,0 +1,12 @@
+Basisbefehle:
+hilfe = Zeigt diesen Hilfetext an
+beschreibung = Zeigt die aktuelle Ortsbeschreibung erneut an
+inventar = Zeigt den Inhalt des Inventars an
+beenden = Beendet das Abenteuer
+
+Textmarkierungen:
+$Bezeichnung$ == Gegenstand, #Bezeichnung# == Übergang, &Bezeichnung& == Person
+
+Aktionsbefehle:
+gebe ?? zu ??, öffne ??, schließe ??, nimm ??, schauan ??, redemit ??, benutze ??, benutze ?? mit ??, drücke ??, ziehe ??
+?? == Bezeichnungen
