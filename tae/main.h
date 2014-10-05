@@ -1,13 +1,13 @@
 #include "structs.h"
 
 // define how many action descriptions will be visible at maximum
-#define MAX_ACTIONS 5
+#define MAX_ACTIONS 100
 
 void load_data(void);
 void actions_init(struct action actions[], int lmax);
 
 int *get_area_place_idx(void);
-char *get_output();
+char *desc_get_output();
 char *actions_get_output(struct action actions[], int lmax, char *output);
 
 struct action get_input_action(char *input);

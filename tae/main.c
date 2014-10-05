@@ -27,7 +27,7 @@ int main(void) {
   dsp_windows_init();
   dsp_set_meta(&meta_data);
 
-  int location_change = 1, output_change = 1;
+  int location_change = 1, output_change = 1, quit = 0;
   int *area_place_idx;
   char *output, *input;
 
@@ -46,7 +46,7 @@ int main(void) {
     }
     // check output change, change output display window if needed
     if (output_change == 1) {
-      output = get_output(actions, actions_count);
+      output = desc_get_output();
       output = actions_get_output(actions, actions_count, output);
       dsp_set_output(output);
       output_change = 0;
@@ -54,16 +54,19 @@ int main(void) {
     // input prompt
     input = dsp_get_input();
     // check input to set action flags
-    if (strlen(input) > 0 && strcmp(input, "~") != 0) {
+    if (strlen(input) > 0) {
       if (actions_count < MAX_ACTIONS) {
         actions[actions_count] = get_input_action(input);
-        if (strlen(actions[actions_count].in_command) > 0) {
-          actions_count++;
+        if (strlen(actions[actions_count].in_command) > 0 &&
+            strcasecmp(actions[actions_count].in_command, "quit") != 0) {
           output_change = 1;
+          actions_count++;
+        } else if (strcasecmp(actions[actions_count].in_command, "quit") == 0) {
+          quit = 1;
         }
       }
     }
-  } while (strcmp(input, "~") != 0);
+  } while (quit == 0);
 
   dsp_end();
   return 0;
@@ -95,42 +98,50 @@ struct action get_input_action(char *input) {
       i++;
     }
   }
-  if (i == 2 || i == 4) {
+  if (i == 1 || i == 2 || i == 4) {
     char *icommand; // internal command
     char ccommand[24];
-    if (i == 2) {
-      // action command
+    if (i == 1) {
+      // simple command
+      icommand = get_internal_command(inputarr[0]);
+    } else if (i == 2) {
+      // transition/item action command
       snprintf(ccommand, 24, "%s $$", inputarr[0]);
       icommand = get_internal_command(ccommand);
     } else if (i == 4) {
-      // combinition action command
+      // item combinition action command
       snprintf(ccommand, 24, "%s $$ %s $$", inputarr[0], inputarr[2]);
       icommand = get_internal_command(ccommand);
     }
-
     if (strlen(icommand) > 0) {
-      ptr = strtok(icommand, " ");
-      int j = 0;
-      while (ptr != NULL) {
-        if (j < 4) {
-          strcpy(commandarr[j], ptr);
-          ptr = strtok(NULL, " ");
-          j++;
+      if (i > 1) {
+        // for item/transition or combination actions
+        ptr = strtok(icommand, " ");
+        int j = 0;
+        while (ptr != NULL) {
+          if (j < 4) {
+            strcpy(commandarr[j], ptr);
+            ptr = strtok(NULL, " ");
+            j++;
+          }
         }
-      }
-      if (j > 0) {
-        if (i == 2) {
-          // more actions for action command
-          strcpy(iaction.in_command, commandarr[0]);
-          iaction.pobject_id = get_object_id(inputarr[1]);
-          return iaction;
-        } else if (i == 4) {
-          // more actions for combinition action command
-          strcpy(iaction.in_command, commandarr[0]);
-          iaction.pobject_id = get_object_id(inputarr[1]);
-          iaction.sobject_id = get_object_id(inputarr[3]);
-          return iaction;
+        if (j > 0) {
+          if (i == 2) {
+            // more actions for action command
+            strcpy(iaction.in_command, commandarr[0]);
+            iaction.pobject_id = get_object_id(inputarr[1]);
+            return iaction;
+          } else if (i == 4) {
+            // more actions for combinition action command
+            strcpy(iaction.in_command, commandarr[0]);
+            iaction.pobject_id = get_object_id(inputarr[1]);
+            iaction.sobject_id = get_object_id(inputarr[3]);
+            return iaction;
+          }
         }
+      } else if (i == 1) {
+        // for simple actions
+        strcpy(iaction.in_command, icommand);
       }
     }
   }
@@ -190,7 +201,8 @@ char *actions_get_output(struct action actions[], int lmax, char *output) {
   char line[1024];
 
   for (i = 0; i < lmax; i++) {
-    if (strlen(actions[i].in_command) > 0) {
+    if (strlen(actions[i].in_command) > 0 && actions[i].pobject_id > 0) {
+      // for item action commands
       desc_idx = 0;
       while (desc_idx < data_counts[4]) {
         if (descriptions_data[desc_idx].id == current_place &&
@@ -204,12 +216,18 @@ char *actions_get_output(struct action actions[], int lmax, char *output) {
         }
         desc_idx++;
       }
+    } else if (strlen(actions[i].in_command) > 0) {
+      // for simple actions commands
+      if (strcasecmp(actions[i].in_command, "description") == 0) {
+        snprintf(line, 1024, "\n\n%s", desc_get_output());
+        strcat(output, line);
+      }
     }
   }
   return output;
 }
 
-char *get_output() {
+char *desc_get_output() {
   // get first output with intro by using virtual description
   int desc_idx = 0, has_text = 0;
   static char line[1024], output[1024];
