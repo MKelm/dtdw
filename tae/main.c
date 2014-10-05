@@ -163,7 +163,7 @@ int get_transition_id(char *ttransition) {
   for (i = 0; i < data_counts[3]; i++) {
     for (j = 0; j < MAX_PLACE_TRANSITIONS; j++) {
       if (strcasecmp(places_data[i].transitions[j].title, ttransition) == 0) {
-        return places_data[i].id;
+        return places_data[i].transitions[j].id;
       }
     }
   }
