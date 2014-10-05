@@ -6,7 +6,7 @@ Du bist in deinem Zimmer. Es gibt eine #Tür# zum Flur der nach unten führt.
 #2$1$2$3
 
 #1#2/lookat
-Eine ganz normale Tür.
+Eine solide Holztür, auf der einen Seite ist ein Heavy Xettel-Poster.
 
 #1#2/use
 Du gehst durch die Tür nach unten ins Wohnzimmer.
@@ -34,5 +34,8 @@ Ein reinrassiges Holzbett der Marke Friöör Mikea, macht sich in jeder Lage gut
 Du bist im Wohnzimmer. Es gibt eine #Treppe# die nach oben führt.
 #1
 
+#2#1/lookat
+Eine Treppe mit 24 Stufen, um nicht auszurutschen ist sie aus Palmholz mit Rillen geschnitzt.
+
 #2#1/use
-Du gehst durch die Tür nach oben in dein Zimmer.
+Du gehst über die Treppe nach oben in dein Zimmer.
