@@ -34,10 +34,10 @@ int main(void) {
   struct action caction;
   init_action(&caction);
 
-  dsp_set_output(desc_get_output());
   do {
     // check location change, change header display output if needed
     if (location_change == 1) {
+      dsp_set_output(desc_get_output()); // output location description
       area_place_idx = get_area_place_idx();
       dsp_set_location(
         &areas_data[area_place_idx[0]], &places_data[area_place_idx[1]]
@@ -59,6 +59,8 @@ int main(void) {
           strcasecmp(caction.in_command, "quit") != 0) {
 
         if (strcmp(caction.in_command, "use") == 0 && caction.transition_id > 0) {
+          // output transition action description before location change
+          dsp_set_output(action_get_output(&caction));
           current_place = caction.transition_id;
           location_change = 1;
         }
