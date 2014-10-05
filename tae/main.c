@@ -31,10 +31,9 @@ int main(void) {
   int *area_place_idx;
   char *output, *input;
 
-  struct action caction;
-  strcpy(caction.in_command, "");
-  caction.pobject_id = 0;
-  caction.sobject_id = 0;
+  struct action actions[MAX_ACTIONS];
+  int actions_count = 0;
+  actions_init(actions, MAX_ACTIONS);
 
   do {
     // check location change, change header display output if needed
@@ -47,7 +46,8 @@ int main(void) {
     }
     // check output change, change output display window if needed
     if (output_change == 1) {
-      output = get_output(&caction);
+      output = get_output(actions, actions_count);
+      output = actions_get_output(actions, actions_count, output);
       dsp_set_output(output);
       output_change = 0;
     }
@@ -55,9 +55,12 @@ int main(void) {
     input = dsp_get_input();
     // check input to set action flags
     if (strlen(input) > 0 && strcmp(input, "~") != 0) {
-      check_input_command(input, &caction);
-      if (strlen(caction.in_command) > 0) {
-        output_change = 1;
+      if (actions_count < MAX_ACTIONS) {
+        actions[actions_count] = get_input_action(input);
+        if (strlen(actions[actions_count].in_command) > 0) {
+          actions_count++;
+          output_change = 1;
+        }
       }
     }
   } while (strcmp(input, "~") != 0);
@@ -66,7 +69,21 @@ int main(void) {
   return 0;
 }
 
-void check_input_command(char *input, struct action *caction) {
+void actions_init(struct action actions[], int lmax) {
+  int i;
+  for (i = 0; i < lmax; i++) {
+    strcpy(actions[i].in_command, "");
+    actions[i].pobject_id = 0;
+    actions[i].sobject_id = 0;
+  }
+}
+
+struct action get_input_action(char *input) {
+  static struct action iaction;
+  strcpy(iaction.in_command, "");
+  iaction.pobject_id = 0;
+  iaction.sobject_id = 0;
+
   char inputarr[4][24], commandarr[2][24];
   char *ptr;
   ptr = strtok(input, " ");
@@ -104,17 +121,20 @@ void check_input_command(char *input, struct action *caction) {
       if (j > 0) {
         if (i == 2) {
           // more actions for action command
-          strcpy(caction->in_command, commandarr[0]);
-          caction->pobject_id = get_object_id(inputarr[1]);
+          strcpy(iaction.in_command, commandarr[0]);
+          iaction.pobject_id = get_object_id(inputarr[1]);
+          return iaction;
         } else if (i == 4) {
           // more actions for combinition action command
-          strcpy(caction->in_command, commandarr[0]);
-          caction->pobject_id = get_object_id(inputarr[1]);
-          caction->sobject_id = get_object_id(inputarr[3]);
+          strcpy(iaction.in_command, commandarr[0]);
+          iaction.pobject_id = get_object_id(inputarr[1]);
+          iaction.sobject_id = get_object_id(inputarr[3]);
+          return iaction;
         }
       }
     }
   }
+  return iaction;
 }
 
 int get_object_id(char *tobject) {
@@ -164,9 +184,34 @@ int *get_area_place_idx(void) {
   return area_place_idx;
 }
 
-char *get_output(struct action *caction) {
+char *actions_get_output(struct action actions[], int lmax, char *output) {
+  // get action related output of the current area place
+  int desc_idx = 0, i;
+  char line[1024];
+
+  for (i = 0; i < lmax; i++) {
+    if (strlen(actions[i].in_command) > 0) {
+      desc_idx = 0;
+      while (desc_idx < data_counts[4]) {
+        if (descriptions_data[desc_idx].id == current_place &&
+            strcmp(descriptions_data[desc_idx].id_verb, actions[i].in_command) == 0 &&
+            descriptions_data[desc_idx].id_items[0] == actions[i].pobject_id) {
+
+          snprintf(line, 1024, "\n\n%s", descriptions_data[desc_idx].text);
+          strcat(output, line);
+        } else if (descriptions_data[desc_idx].id == current_place + 1) {
+          break;
+        }
+        desc_idx++;
+      }
+    }
+  }
+  return output;
+}
+
+char *get_output() {
   // get first output with intro by using virtual description
-  int desc_idx = 0, has_text = 0;;
+  int desc_idx = 0, has_text = 0;
   static char line[1024], output[1024];
   if (current_area == 1 && current_place == 1 && descriptions_data[desc_idx].id == 0) {
     snprintf(output, 1024, "%s\n\n", descriptions_data[desc_idx].text);
@@ -185,23 +230,6 @@ char *get_output(struct action *caction) {
       } else {
         snprintf(output, 1024, "%s ", descriptions_data[desc_idx].text);
       }
-    } else if (descriptions_data[desc_idx].id == current_place + 1) {
-      break;
-    }
-    desc_idx++;
-  }
-
-  // get action related data of the current area place
-  desc_idx = 0;
-  while (desc_idx < data_counts[4]) {
-
-    if (descriptions_data[desc_idx].id == current_place &&
-        strlen(caction->in_command) > 0 &&
-        strcmp(descriptions_data[desc_idx].id_verb, caction->in_command) == 0 &&
-        descriptions_data[desc_idx].id_items[0] == caction->pobject_id) {
-
-      snprintf(line, 1024, "\n\n%s", descriptions_data[desc_idx].text);
-      strcat(output, line);
     } else if (descriptions_data[desc_idx].id == current_place + 1) {
       break;
     }
