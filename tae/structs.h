@@ -3,8 +3,9 @@
 
 struct action {
   char in_command[256]; // internal command
-  int pobject_id; // primary object id
-  int sobject_id; // sub object id
+  int transition_id;
+  int pitem_id; // primary item id
+  int sitem_id; // sub item id
 };
 
 struct meta {
@@ -37,10 +38,12 @@ struct object {
   char title[56];
 };
 
+#define MAX_DESC_ID_EXTRAS 5
+
 struct description {
   int id;
-  int id_transitions[5];
-  int id_items[5];
+  int id_transitions[MAX_DESC_ID_EXTRAS];
+  int id_items[MAX_DESC_ID_EXTRAS];
   char id_verb[24];
   char text[1024];
   int transitions[5]; // text transitions

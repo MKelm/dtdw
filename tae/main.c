@@ -70,15 +70,14 @@ int main(void) {
 
 void init_action(struct action *caction) {
   strcpy(caction->in_command, "");
-  caction->pobject_id = 0;
-  caction->sobject_id = 0;
+  caction->transition_id = -1;
+  caction->pitem_id = -1;
+  caction->sitem_id = -1;
 }
 
 struct action get_input_action(char *input) {
   static struct action iaction;
-  strcpy(iaction.in_command, "");
-  iaction.pobject_id = 0;
-  iaction.sobject_id = 0;
+  init_action(&iaction);
 
   char inputarr[4][24], commandarr[2][24];
   char *ptr;
@@ -122,13 +121,13 @@ struct action get_input_action(char *input) {
           if (i == 2) {
             // more actions for action command
             strcpy(iaction.in_command, commandarr[0]);
-            iaction.pobject_id = get_object_id(inputarr[1]);
+            iaction.pitem_id = get_object_id(inputarr[1]);
             return iaction;
           } else if (i == 4) {
             // more actions for combinition action command
             strcpy(iaction.in_command, commandarr[0]);
-            iaction.pobject_id = get_object_id(inputarr[1]);
-            iaction.sobject_id = get_object_id(inputarr[3]);
+            iaction.pitem_id = get_object_id(inputarr[1]);
+            iaction.sitem_id = get_object_id(inputarr[3]);
             return iaction;
           }
         }
@@ -190,21 +189,27 @@ int *get_area_place_idx(void) {
 
 char *action_get_output(struct action *caction) {
   // get action related output of the current area place
-  int desc_idx = 0;
+  int desc_idx = 0, i;
   char line[1024];
   static char output[1024];
   strncpy(output, "", sizeof(output));
 
-  if (strlen(caction->in_command) > 0 && caction->pobject_id > 0) {
-    // for item action commands
+  if (strlen(caction->in_command) > 0 && (caction->pitem_id > 0 || caction->transition_id > 0)) {
+    // for transition / item action commands
     desc_idx = 0;
     while (desc_idx < data_counts[4]) {
       if (descriptions_data[desc_idx].id == current_place &&
-          strcmp(descriptions_data[desc_idx].id_verb, caction->in_command) == 0 &&
-          descriptions_data[desc_idx].id_items[0] == caction->pobject_id) {
+          strcmp(descriptions_data[desc_idx].id_verb, caction->in_command) == 0) {
 
-        snprintf(line, 1024, "%s\n\n", descriptions_data[desc_idx].text);
-        strcat(output, line);
+        for (i = 0; i < MAX_DESC_ID_EXTRAS; i++) {
+          if (descriptions_data[desc_idx].id_items[i] == caction->pitem_id ||
+              descriptions_data[desc_idx].id_transitions[i] == caction->transition_id) {
+
+            snprintf(line, 1024, "%s\n\n", descriptions_data[desc_idx].text);
+            strcat(output, line);
+          }
+        }
+
       } else if (descriptions_data[desc_idx].id == current_place + 1) {
         break;
       }
