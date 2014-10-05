@@ -5,6 +5,9 @@ Hallo Joara, du hast gerade eben deinen 23. Geburtstag gefeiert und bist eine an
 Du bist in deinem Zimmer. Es gibt eine #Tür# zum Flur der nach unten führt.
 #2$1$2$3
 
+#1#2/lookat
+Eine ganz normale Tür.
+
 #1#2/use
 Du gehst durch die Tür nach unten ins Wohnzimmer.
 

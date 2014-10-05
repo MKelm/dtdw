@@ -34,10 +34,10 @@ int main(void) {
   struct action caction;
   init_action(&caction);
 
+  dsp_set_output(desc_get_output());
   do {
     // check location change, change header display output if needed
     if (location_change == 1) {
-      dsp_set_output(desc_get_output());
       area_place_idx = get_area_place_idx();
       dsp_set_location(
         &areas_data[area_place_idx[0]], &places_data[area_place_idx[1]]
@@ -57,6 +57,11 @@ int main(void) {
       caction = get_input_action(input);
       if (strlen(caction.in_command) > 0 &&
           strcasecmp(caction.in_command, "quit") != 0) {
+
+        if (strcmp(caction.in_command, "use") == 0 && caction.transition_id > 0) {
+          current_place = caction.transition_id;
+          location_change = 1;
+        }
         output_change = 1;
       } else if (strcasecmp(caction.in_command, "quit") == 0) {
         quit = 1;
@@ -119,12 +124,15 @@ struct action get_input_action(char *input) {
         }
         if (j > 0) {
           if (i == 2) {
-            // more actions for action command
+            // more actions for item/transition action command
             strcpy(iaction.in_command, commandarr[0]);
             iaction.pitem_id = get_item_id(inputarr[1]);
+            if (iaction.pitem_id == 0) {
+              iaction.transition_id = get_transition_id(inputarr[1]);
+            }
             return iaction;
           } else if (i == 4) {
-            // more actions for combinition action command
+            // more actions for item combinition action command
             strcpy(iaction.in_command, commandarr[0]);
             iaction.pitem_id = get_item_id(inputarr[1]);
             iaction.sitem_id = get_item_id(inputarr[3]);
@@ -145,6 +153,16 @@ int get_item_id(char *titem) {
   for (i = 0; i < data_counts[4]; i++) {
     if (strcasecmp(items_data[i].title, titem) == 0) {
       return items_data[i].id;
+    }
+  }
+  return 0;
+}
+
+int get_transition_id(char *ttransition) {
+  int i;
+  for (i = 0; i < data_counts[3]; i++) {
+    if (strcasecmp(places_data[i].title, ttransition) == 0) {
+      return places_data[i].id;
     }
   }
   return 0;

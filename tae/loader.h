@@ -23,7 +23,7 @@ int load_areas(struct area data[], int lmax);
 
 int load_places(struct place data[], int lmax);
 
-// objects
+// items
 #define FILE_ITEMS "../data/items.txt"
 #define MAX_ITEMS 500
 
