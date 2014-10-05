@@ -105,11 +105,11 @@ struct action get_input_action(char *input) {
       icommand = get_internal_command(inputarr[0]);
     } else if (i == 2) {
       // transition/item action command
-      snprintf(ccommand, 24, "%s $$", inputarr[0]);
+      snprintf(ccommand, 24, "%s ??", inputarr[0]);
       icommand = get_internal_command(ccommand);
     } else if (i == 4) {
       // item combinition action command
-      snprintf(ccommand, 24, "%s $$ %s $$", inputarr[0], inputarr[2]);
+      snprintf(ccommand, 24, "%s ?? %s ??", inputarr[0], inputarr[2]);
       icommand = get_internal_command(ccommand);
     }
     if (strlen(icommand) > 0) {
