@@ -31,9 +31,8 @@ int main(void) {
   int *area_place_idx;
   char *input;
 
-  struct action actions[MAX_ACTIONS];
-  int actions_count = 0;
-  actions_init(actions, MAX_ACTIONS);
+  struct action caction;
+  init_action(&caction);
 
   do {
     // check location change, change header display output if needed
@@ -47,22 +46,20 @@ int main(void) {
     }
     // check output change, change output display window if needed
     if (output_change == 1) {
-      dsp_set_output(actions_get_output(actions, actions_count));
+      dsp_set_output(action_get_output(&caction));
       output_change = 0;
+      init_action(&caction);
     }
     // input prompt
     input = dsp_get_input();
     // check input to set action flags
     if (strlen(input) > 0) {
-      if (actions_count < MAX_ACTIONS) {
-        actions[actions_count] = get_input_action(input);
-        if (strlen(actions[actions_count].in_command) > 0 &&
-            strcasecmp(actions[actions_count].in_command, "quit") != 0) {
-          output_change = 1;
-          actions_count++;
-        } else if (strcasecmp(actions[actions_count].in_command, "quit") == 0) {
-          quit = 1;
-        }
+      caction = get_input_action(input);
+      if (strlen(caction.in_command) > 0 &&
+          strcasecmp(caction.in_command, "quit") != 0) {
+        output_change = 1;
+      } else if (strcasecmp(caction.in_command, "quit") == 0) {
+        quit = 1;
       }
     }
   } while (quit == 0);
@@ -71,13 +68,10 @@ int main(void) {
   return 0;
 }
 
-void actions_init(struct action actions[], int lmax) {
-  int i;
-  for (i = 0; i < lmax; i++) {
-    strcpy(actions[i].in_command, "");
-    actions[i].pobject_id = 0;
-    actions[i].sobject_id = 0;
-  }
+void init_action(struct action *caction) {
+  strcpy(caction->in_command, "");
+  caction->pobject_id = 0;
+  caction->sobject_id = 0;
 }
 
 struct action get_input_action(char *input) {
@@ -194,35 +188,35 @@ int *get_area_place_idx(void) {
   return area_place_idx;
 }
 
-char *actions_get_output(struct action actions[], int lmax) {
+char *action_get_output(struct action *caction) {
   // get action related output of the current area place
-  int desc_idx = 0, i;
+  int desc_idx = 0;
   char line[1024];
   static char output[1024];
+  strncpy(output, "", sizeof(output));
 
-  for (i = 0; i < lmax; i++) {
-    if (strlen(actions[i].in_command) > 0 && actions[i].pobject_id > 0) {
-      // for item action commands
-      desc_idx = 0;
-      while (desc_idx < data_counts[4]) {
-        if (descriptions_data[desc_idx].id == current_place &&
-            strcmp(descriptions_data[desc_idx].id_verb, actions[i].in_command) == 0 &&
-            descriptions_data[desc_idx].id_items[0] == actions[i].pobject_id) {
+  if (strlen(caction->in_command) > 0 && caction->pobject_id > 0) {
+    // for item action commands
+    desc_idx = 0;
+    while (desc_idx < data_counts[4]) {
+      if (descriptions_data[desc_idx].id == current_place &&
+          strcmp(descriptions_data[desc_idx].id_verb, caction->in_command) == 0 &&
+          descriptions_data[desc_idx].id_items[0] == caction->pobject_id) {
 
-          snprintf(line, 1024, "%s\n\n", descriptions_data[desc_idx].text);
-          strcat(output, line);
-        } else if (descriptions_data[desc_idx].id == current_place + 1) {
-          break;
-        }
-        desc_idx++;
+        snprintf(line, 1024, "%s\n\n", descriptions_data[desc_idx].text);
+        strcat(output, line);
+      } else if (descriptions_data[desc_idx].id == current_place + 1) {
+        break;
       }
-    } else if (strlen(actions[i].in_command) > 0) {
-      // for simple actions commands
-      if (strcasecmp(actions[i].in_command, "description") == 0) {
-        strcat(output, desc_get_output());
-      }
+      desc_idx++;
+    }
+  } else if (strlen(caction->in_command) > 0) {
+    // for simple actions commands
+    if (strcasecmp(caction->in_command, "description") == 0) {
+      strcat(output, desc_get_output());
     }
   }
+
   return output;
 }
 
@@ -231,6 +225,8 @@ char *desc_get_output() {
   int desc_idx = 0, has_text = 0;
   char line[1024];
   static char output[1024];
+  strncpy(output, "", sizeof(output));
+
   if (current_area == 0 && descriptions_data[desc_idx].id == 0) {
     snprintf(output, 1024, "%s\n\n", descriptions_data[desc_idx].text);
     current_area = 1;
@@ -249,6 +245,7 @@ char *desc_get_output() {
         strcat(output, line);
       } else {
         snprintf(output, 1024, "%s ", descriptions_data[desc_idx].text);
+        has_text = 1;
       }
     } else if (descriptions_data[desc_idx].id == current_place + 1) {
       break;
