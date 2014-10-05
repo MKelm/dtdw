@@ -41,6 +41,7 @@ void dsp_windows_init(void) {
 
   wbkgd(output, COLOR_PAIR(2));
   wattrset(output, A_BOLD);
+  scrollok(output, TRUE);
   wrefresh(output);
 
   wbkgd(input, COLOR_PAIR(5));
