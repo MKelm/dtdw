@@ -3,6 +3,7 @@
 #include <locale.h>
 #include "main.h"
 #include "loader.h"
+#include "inventory.h"
 #include "display.h"
 
 int current_area = 0;
@@ -251,19 +252,10 @@ char *action_get_output(struct action *caction) {
       strcat(output, "\n");
 
     } else if (strcmp(caction->in_command, "inventory") == 0) {
-      strcat(output, inventory_get_output());
+      strcat(output, inventory_get_output(&meta_data));
     }
   }
 
-  return output;
-}
-
-char *inventory_get_output(void) {
-  static char output[1024];
-  snprintf(
-    output, 1024, "%s%s:\n%s\n\n", output,
-    meta_data.tinventory, meta_data.noinvitems
-  );
   return output;
 }
 
