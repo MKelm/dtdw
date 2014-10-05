@@ -39,6 +39,7 @@ struct object {
 
 struct description {
   int id;
+  int id_transitions[5];
   int id_items[5];
   char id_verb[24];
   char text[1024];

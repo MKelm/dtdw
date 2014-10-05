@@ -177,10 +177,10 @@ int load_objects(struct object data[], int lmax) {
 int load_descriptions(struct description data[], int lmax) {
   FILE *f = fopen(FILE_DESCRIPTIONS, "r");
   int ch, entryidx = 0;
-  // load status values: main id, id items id, id verb, transition id, items id
-  int loadid = 0, liditemsid = 0, lidverb = 0, ltransid = 0, litemsid = 0;
+  // load status values: main id, id trans id, id items id, id verb, transition id, items id
+  int loadid = 0, lidtransid = 0, liditemsid = 0, lidverb = 0, ltransid = 0, litemsid = 0;
   // transition / item ids indexes
-  int liditemidx = 0, ltransidx = 0, litemidx = 0;
+  int lidtransidx = 0, liditemidx = 0, ltransidx = 0, litemidx = 0;
   // temporary characters
   char line[1024] = "", chstr[2];
   // load modes: 0 = id (+ desc items) (+ verb), 1 = text, 2 = transitions and items
@@ -190,18 +190,32 @@ int load_descriptions(struct description data[], int lmax) {
     switch (loadmode) {
       case 0:
         // load desc id
-        if (ch == '#' && loadid == 0) {
+        if (ch == '#' && loadid == 0 && lidtransid == 0) {
           loadid = 1;
-        } else if (loadid == 1 && ch != '\n' && ch != '$' && ch != '/') {
+        } else if (loadid == 1 && ch != '\n' && ch != '#' && ch != '$' && ch != '/') {
           snprintf(chstr, 2, "%c", ch);
           strcat(line, chstr);
-        } else if (loadid == 1 && (ch == '\n' || ch == '$' || ch == '/')) {
+        } else if (loadid == 1 && (ch == '\n' || ch == '#' || ch == '$' || ch == '/')) {
           loadid = 0;
           data[entryidx].id = atoi(line);
           strncpy(line, "", sizeof(line));
           liditemidx = 0;
           ltransidx = 0;
           litemidx = 0;
+          if (ch == '\n')
+            loadmode = 1;
+        }
+        // load id transition ids
+        if (ch == '#' && loadid == 0 && lidtransid == 0) {
+          lidtransid = 1;
+        } else if (lidtransid == 1 && ch != '\n' && ch != '#' && ch != '$' && ch != '/') {
+          snprintf(chstr, 2, "%c", ch);
+          strcat(line, chstr);
+        } else if (lidtransid == 1 && (ch == '\n' || ch == '#' || ch == '$' || ch == '/')) {
+          data[entryidx].id_transitions[lidtransidx] = atoi(line);
+          strncpy(line, "", sizeof(line));
+          lidtransidx++;
+          lidtransid = (ch == '#') ? 1 : 0;
           if (ch == '\n')
             loadmode = 1;
         }
@@ -271,12 +285,16 @@ int load_descriptions(struct description data[], int lmax) {
         // jump to next room description after transitions / items
         if (ch == '\n') {
           entryidx++;
-          if (entryidx == lmax)
+          if (entryidx == lmax) {
             return entryidx;
+          }
           loadmode = 0;
         }
         break;
     }
+  }
+  if (data[entryidx].id > 0) {
+    entryidx++;
   }
 
   return entryidx; // returns entries count
