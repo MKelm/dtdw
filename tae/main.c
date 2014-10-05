@@ -5,8 +5,8 @@
 #include "loader.h"
 #include "display.h"
 
-int current_area = 1;
-int current_place = 1;
+int current_area = 0;
+int current_place = 0;
 
 // dc: 0 == commands, 2 == areas, 3 == places, 4 == objects, 5 == descriptions
 int data_counts[5];
@@ -27,9 +27,9 @@ int main(void) {
   dsp_windows_init();
   dsp_set_meta(&meta_data);
 
-  int location_change = 1, output_change = 1, quit = 0;
+  int location_change = 1, output_change = 0, quit = 0;
   int *area_place_idx;
-  char *output, *input;
+  char *input;
 
   struct action actions[MAX_ACTIONS];
   int actions_count = 0;
@@ -38,6 +38,7 @@ int main(void) {
   do {
     // check location change, change header display output if needed
     if (location_change == 1) {
+      dsp_set_output(desc_get_output());
       area_place_idx = get_area_place_idx();
       dsp_set_location(
         &areas_data[area_place_idx[0]], &places_data[area_place_idx[1]]
@@ -46,9 +47,7 @@ int main(void) {
     }
     // check output change, change output display window if needed
     if (output_change == 1) {
-      output = desc_get_output();
-      output = actions_get_output(actions, actions_count, output);
-      dsp_set_output(output);
+      dsp_set_output(actions_get_output(actions, actions_count));
       output_change = 0;
     }
     // input prompt
@@ -195,10 +194,11 @@ int *get_area_place_idx(void) {
   return area_place_idx;
 }
 
-char *actions_get_output(struct action actions[], int lmax, char *output) {
+char *actions_get_output(struct action actions[], int lmax) {
   // get action related output of the current area place
   int desc_idx = 0, i;
   char line[1024];
+  static char output[1024];
 
   for (i = 0; i < lmax; i++) {
     if (strlen(actions[i].in_command) > 0 && actions[i].pobject_id > 0) {
@@ -209,7 +209,7 @@ char *actions_get_output(struct action actions[], int lmax, char *output) {
             strcmp(descriptions_data[desc_idx].id_verb, actions[i].in_command) == 0 &&
             descriptions_data[desc_idx].id_items[0] == actions[i].pobject_id) {
 
-          snprintf(line, 1024, "\n\n%s", descriptions_data[desc_idx].text);
+          snprintf(line, 1024, "%s\n\n", descriptions_data[desc_idx].text);
           strcat(output, line);
         } else if (descriptions_data[desc_idx].id == current_place + 1) {
           break;
@@ -219,8 +219,7 @@ char *actions_get_output(struct action actions[], int lmax, char *output) {
     } else if (strlen(actions[i].in_command) > 0) {
       // for simple actions commands
       if (strcasecmp(actions[i].in_command, "description") == 0) {
-        snprintf(line, 1024, "\n\n%s", desc_get_output());
-        strcat(output, line);
+        strcat(output, desc_get_output());
       }
     }
   }
@@ -230,9 +229,12 @@ char *actions_get_output(struct action actions[], int lmax, char *output) {
 char *desc_get_output() {
   // get first output with intro by using virtual description
   int desc_idx = 0, has_text = 0;
-  static char line[1024], output[1024];
-  if (current_area == 1 && current_place == 1 && descriptions_data[desc_idx].id == 0) {
+  char line[1024];
+  static char output[1024];
+  if (current_area == 0 && descriptions_data[desc_idx].id == 0) {
     snprintf(output, 1024, "%s\n\n", descriptions_data[desc_idx].text);
+    current_area = 1;
+    current_place = 1;
     has_text = 1;
     desc_idx++;
   }
@@ -253,6 +255,7 @@ char *desc_get_output() {
     }
     desc_idx++;
   }
+  strcat(output, "\n\n");
 
   return output;
 }
