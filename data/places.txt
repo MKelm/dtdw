@@ -1,5 +1,7 @@
 1#1
 Joara's Zimmer (oben)
+#2Tür
 
 1#2
 Wohnzimmer (unten)
+#1Treppe

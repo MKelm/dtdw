@@ -95,12 +95,15 @@ int load_places(struct place *data, int lmax) {
   int ch, entryidx = 0;
   char line[1024] = "", chstr[2];
   int loadareaid = 0, loadid = 0, loadtitle = 0;
+  int loadtransitions = 0, loadtransid = 0, loadtranstitle = 0;
+  int transitionidx = 0;
 
   while ((ch = fgetc(f)) != EOF) {
-    if (loadareaid == 0 && loadid == 0 && loadtitle == 0) {
+    if (loadareaid == 0 && loadid == 0 && loadtitle == 0 && loadtransitions == 0) {
       loadareaid = 1;
     }
-    if ((loadareaid == 1 || loadid == 1 || loadtitle == 1) && ch != '#' && ch != '\n') {
+    if ((loadareaid == 1 || loadid == 1 || loadtitle == 1 || loadtranstitle == 1) &&
+        ch != '#' && ch != '\n') {
       snprintf(chstr, 2, "%c", ch);
       strcat(line, chstr);
     } else if (loadareaid == 1 && ch == '#') {
@@ -117,9 +120,43 @@ int load_places(struct place *data, int lmax) {
       strncpy(data[entryidx].title, line, sizeof(data[entryidx].title));
       strncpy(line, "", sizeof(line));
       loadtitle = 0;
-      entryidx++;
-      if (entryidx == lmax)
-        return lmax;
+      loadtransitions = 1;
+
+    } else if (loadtransitions == 1) {
+      if (loadtransid == 0 && loadtranstitle == 0 && ch != '#') {
+        loadtransitions = 0;
+        entryidx++;
+        if (entryidx == lmax)
+          return entryidx;
+      } else if (loadtransid == 0 && loadtranstitle == 0 && ch == '#') {
+        loadtransid = 1;
+      } else if ((loadtransid == 1 && isdigit(ch)) ||
+                 (loadtranstitle == 1 && ch != '#' && ch != '\n')) {
+        snprintf(chstr, 2, "%c", ch);
+        strcat(line, chstr);
+      } else if (loadtransid == 1 && !isdigit(ch)) {
+        data[entryidx].transitions[transitionidx].id = atoi(line);
+        strncpy(line, "", sizeof(line));
+        loadtransid = 0;
+        loadtranstitle = 1;
+        snprintf(chstr, 2, "%c", ch);
+        strcat(line, chstr);
+      } else if (loadtranstitle == 1 && (ch == '#' || ch == '\n')) {
+        strncpy(data[entryidx].transitions[transitionidx].title, line,
+          sizeof(data[entryidx].transitions[transitionidx].title));
+        strncpy(line, "", sizeof(line));
+        loadtranstitle = 0;
+        if (ch == '#') {
+          loadtransid = 1;
+          transitionidx++;
+        } else {
+          loadtransitions = 0;
+          transitionidx = 0;
+          entryidx++;
+          if (entryidx == lmax)
+            return entryidx;
+        }
+      }
     }
   }
 

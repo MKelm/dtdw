@@ -25,10 +25,16 @@ struct area {
   char title[56];
 };
 
+struct placetrans {
+  int id;
+  char title[56];
+};
+
 struct place {
   int area_id;
   int id;
   char title[56];
+  struct placetrans transitions[5];
 };
 
 struct item {
