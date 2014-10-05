@@ -19,6 +19,12 @@ $1
 Die Holzbank hat dir Marunix dein Vater mit 3 Jahren geschenkt, auf ihr liegt ein gelber $Zettel$.
 $4
 
+#1$4/lookat
+Es ist ein gelber Zettel, auf diesem stehen die Zugangscodes für die Portaladministration.
+
+#1$4/pickup
+Du nimmst den Zettel von der Holzbank und steckst ihn in deine Tasche.
+
 #1$2$3
 In der rechten Ecke steht eine $Kommode$ und auf der rechten Seite ein $Bett$.
 $2$3
