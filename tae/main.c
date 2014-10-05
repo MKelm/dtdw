@@ -248,6 +248,8 @@ char *action_get_output(struct action *caction) {
 
     } else if (strcmp(caction->in_command, "help") == 0) {
       strcat(output, help_text);
+      strcat(output, "\n");
+
     } else if (strcmp(caction->in_command, "inventory") == 0) {
       strcat(output, inventory_get_output());
     }
