@@ -85,6 +85,7 @@ struct action {
   struct placetrans *transition;
   struct item *pitem; // primary item
   struct item *sitem; // sub item
+  struct npc *c_npc; // current npc
 };
 
 #endif

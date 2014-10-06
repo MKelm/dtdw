@@ -100,6 +100,7 @@ void init_action(struct action *caction) {
   caction->transition = NULL;
   caction->pitem = NULL;
   caction->sitem = NULL;
+  caction->c_npc = NULL;
 }
 
 struct action get_input_action(char *input) {
@@ -152,6 +153,10 @@ struct action get_input_action(char *input) {
             if (iaction.pitem == NULL) {
               iaction.transition = get_transition(inputarr[1]);
             }
+
+            if (iaction.pitem == NULL && iaction.transition == NULL) {
+              iaction.c_npc = get_npc(inputarr[1]);
+            }
             return iaction;
           } else if (i == 4) {
             // more actions for item combinition action command
@@ -190,11 +195,21 @@ struct item *get_item_by_id(int id) {
   return NULL;
 }
 
-struct placetrans *get_transition(char *ttransition) {
+struct placetrans *get_transition(char *title) {
   int i;
   for (i = 0; i < data_counts[5]; i++) {
-    if (strcasecmp(transitions_data[i].title, ttransition) == 0) {
+    if (strcasecmp(transitions_data[i].title, title) == 0) {
       return &transitions_data[i];
+    }
+  }
+  return NULL;
+}
+
+struct npc *get_npc(char *title) {
+  int i;
+  for (i = 0; i < data_counts[6]; i++) {
+    if (strcasecmp(npcs_data[i].title, title) == 0) {
+      return &npcs_data[i];
     }
   }
   return NULL;
@@ -239,23 +254,26 @@ int *get_area_place_idx(void) {
 
 char *action_get_output(struct action *caction) {
   // get action related output of the current area place
-  int desc_idx = 0, i, has_text = 0, has_item, has_transition;
+  int desc_idx = 0, i, has_text = 0, has_item, has_transition, has_npc;
   char line[1024];
   static char output[1024];
   strncpy(output, "", sizeof(output));
 
   if (strlen(caction->in_command) > 0 &&
       ((caction->pitem != NULL && caction->pitem->id > 0) ||
-       (caction->transition != NULL && caction->transition->id > 0))) {
-    // for transition / item action commands
+       (caction->transition != NULL && caction->transition->id > 0) ||
+       (caction->c_npc != NULL && caction->c_npc->id > 0))) {
+
+    // for transition / item / npc action commands
     desc_idx = 0;
     while (desc_idx < data_counts[4]) {
       if (descriptions_data[desc_idx].id == current_place &&
           strcmp(descriptions_data[desc_idx].id_verb, caction->in_command) == 0) {
 
-        // check status of id item / transition
+        // check status of id item / transition / npc
         has_item = 0;
         has_transition = 0;
+        has_npc = 0;
         if (caction->pitem != NULL && caction->pitem->id > 0 &&
             descriptions_data[desc_idx].id_items[0] == caction->pitem->id) {
           has_item = 1;
@@ -263,19 +281,24 @@ char *action_get_output(struct action *caction) {
         } else if (caction->transition != NULL && caction->transition->id > 0 &&
                    descriptions_data[desc_idx].id_transitions[0] == caction->transition->id) {
           has_transition = 1;
+
+        } else if (caction->c_npc != NULL && caction->c_npc->id > 0 &&
+                   descriptions_data[desc_idx].id_npcs[0] == caction->c_npc->id) {
+          has_npc = 1;
         }
 
-        if (has_item == 1 || has_transition == 1) {
+        if (has_item == 1 || has_transition == 1 || has_npc == 1) {
           // check status of available text items to hide descs with non existent items
           for (i = 0; i < MAX_DESC_TEXT_ITEMS; i++) {
             struct item *citem = get_item_by_id(descriptions_data[desc_idx].items[i]);
             if (citem != NULL && citem->status != 0) {
               has_item = 0;
               has_transition = 0;
+              has_npc = 0;
             }
           }
 
-          if (has_item == 1 || has_transition == 1) {
+          if (has_item == 1 || has_transition == 1 || has_npc == 1) {
             snprintf(line, 1024, "%s ", descriptions_data[desc_idx].text);
             strcat(output, line);
             has_text = 1;

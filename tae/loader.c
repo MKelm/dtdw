@@ -351,6 +351,8 @@ int load_dialogs(struct npc npcs_data[], int nlmax, struct dialog data[], int lm
       elementidx++;
     elementcount += elementidx;
     fclose(f);
+    // link dialog to npc
+    npcs_data[npcidx].cdialog = &data[npcidx];
   }
   return elementcount;
 }

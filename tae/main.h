@@ -10,6 +10,7 @@ char *action_get_output(struct action *caction);
 struct action get_input_action(char *input);
 char *get_internal_command(char *ccommand);
 
-struct item *get_item(char *titem);
+struct item *get_item(char *titel);
 struct item *get_item_by_id(int id);
-struct placetrans *get_transition(char *ttransition);
+struct placetrans *get_transition(char *title);
+struct npc *get_npc(char *title);
