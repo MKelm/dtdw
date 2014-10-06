@@ -67,10 +67,11 @@ int main(void) {
           current_place = caction.transition_id;
           location_change = 1;
 
-        } else if (strcmp(caction.in_command, "pickup") == 0 && caction.pitem_id > 0) {
+        } else if (strcmp(caction.in_command, "pickup") == 0 &&
+                   (caction.pitem != NULL && caction.pitem->id > 0)) {
           // simple implementation to get inventory item
           // todo: extended logic with definitions to handle item / description status
-          inventory_add_item(get_item(caction.pitem_id));
+          inventory_add_item(caction.pitem);
         }
         output_change = 1;
       } else if (strcasecmp(caction.in_command, "quit") == 0) {
@@ -86,8 +87,8 @@ int main(void) {
 void init_action(struct action *caction) {
   strcpy(caction->in_command, "");
   caction->transition_id = -1;
-  caction->pitem_id = -1;
-  caction->sitem_id = -1;
+  caction->pitem = NULL;
+  caction->sitem = NULL;
 }
 
 struct action get_input_action(char *input) {
@@ -136,16 +137,16 @@ struct action get_input_action(char *input) {
           if (i == 2) {
             // more actions for item/transition action command
             strcpy(iaction.in_command, commandarr[0]);
-            iaction.pitem_id = get_item_id(inputarr[1]);
-            if (iaction.pitem_id == 0) {
+            iaction.pitem = get_item(inputarr[1]);
+            if (iaction.pitem == NULL) {
               iaction.transition_id = get_transition_id(inputarr[1]);
             }
             return iaction;
           } else if (i == 4) {
             // more actions for item combinition action command
             strcpy(iaction.in_command, commandarr[0]);
-            iaction.pitem_id = get_item_id(inputarr[1]);
-            iaction.sitem_id = get_item_id(inputarr[3]);
+            iaction.pitem = get_item(inputarr[1]);
+            iaction.sitem = get_item(inputarr[3]);
             return iaction;
           }
         }
@@ -158,24 +159,14 @@ struct action get_input_action(char *input) {
   return iaction;
 }
 
-int get_item_id(char *titem) {
+struct item *get_item(char *title) {
   int i;
   for (i = 0; i < data_counts[4]; i++) {
-    if (strcasecmp(items_data[i].title, titem) == 0) {
-      return items_data[i].id;
-    }
-  }
-  return 0;
-}
-
-struct item *get_item(int id) {
-  int i;
-  for (i = 0; i < data_counts[4]; i++) {
-    if (items_data[i].id == id) {
+    if (strcasecmp(items_data[i].title, title) == 0) {
       return &items_data[i];
     }
   }
-  return NULL;
+  return 0;
 }
 
 int get_transition_id(char *ttransition) {
@@ -234,7 +225,8 @@ char *action_get_output(struct action *caction) {
   static char output[1024];
   strncpy(output, "", sizeof(output));
 
-  if (strlen(caction->in_command) > 0 && (caction->pitem_id > 0 || caction->transition_id > 0)) {
+  if (strlen(caction->in_command) > 0 &&
+      ((caction->pitem != NULL && caction->pitem->id > 0) || caction->transition_id > 0)) {
     // for transition / item action commands
     desc_idx = 0;
     while (desc_idx < data_counts[4]) {
@@ -242,8 +234,8 @@ char *action_get_output(struct action *caction) {
           strcmp(descriptions_data[desc_idx].id_verb, caction->in_command) == 0) {
 
         for (i = 0; i < MAX_DESC_ID_EXTRAS; i++) {
-          if ((caction->pitem_id > 0 &&
-               descriptions_data[desc_idx].id_items[i] == caction->pitem_id) ||
+          if ((caction->pitem != NULL && caction->pitem->id > 0 &&
+               descriptions_data[desc_idx].id_items[i] == caction->pitem->id) ||
               (caction->transition_id > 0 &&
                descriptions_data[desc_idx].id_transitions[i] == caction->transition_id)) {
 

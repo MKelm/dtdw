@@ -1,13 +1,6 @@
 #ifndef STRUCTS_DEFINITION
 #define STRUCTS_DEFINITION
 
-struct action {
-  char in_command[256]; // internal command
-  int transition_id;
-  int pitem_id; // primary item id
-  int sitem_id; // sub item id
-};
-
 struct meta {
   char title[256];
   char version[24];
@@ -58,6 +51,13 @@ struct description {
   char text[1024];
   int transitions[5]; // text transitions
   int items[10]; // text items
+};
+
+struct action {
+  char in_command[256]; // internal command
+  int transition_id;
+  struct item *pitem; // primary item
+  struct item *sitem; // sub item
 };
 
 #endif
