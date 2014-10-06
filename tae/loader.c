@@ -313,9 +313,43 @@ int load_dialogs(struct npc npcs_data[], int nlmax, struct dialog data[], int lm
 
     // loadmode 0 = nothing, 1 = id, 2 = text, 3 = next ids
     while ((ch = fgetc(f)) != EOF) {
-      // todo
+      if (loadmode == 0 && ch == '!') {
+        loadmode = 1;
+      } else if (loadmode == 1 && ch == '\n') {
+        data[npcidx].elements[elementidx].id = atoi(line);
+        strncpy(line, "", sizeof(line));
+        loadmode = 2;
+      } else if (loadmode == 2 && ch == '\n') {
+        strncpy(data[npcidx].elements[elementidx].text, line,
+          sizeof(data[npcidx].elements[elementidx].text));
+        strncpy(line, "", sizeof(line));
+        loadmode = 3;
+      } else if (loadmode == 3 && (ch == '!' || ch == '?' || ch == '\n')) {
+        if (nextididx == -1 && ch != '\n') {
+          nextididx++;
+        } else if (nextididx == -1 && ch == '\n') {
+          loadmode = 0;
+          elementidx++;
+        } else {
+          data[npcidx].elements[elementidx].next_ids[nextididx] = atoi(line);
+          if (ch != '\n')
+            data[npcidx].elements[elementidx].next_mchoice = (ch == '?') ? 1 : 0;
+          strncpy(line, "", sizeof(line));
+          nextididx++;
+          if (ch == '\n') {
+            loadmode = 0;
+            nextididx = -1;
+            elementidx++;
+          }
+        }
+      } else if (loadmode == 1 || loadmode == 2 || loadmode == 3) {
+        snprintf(chstr, 2, "%c", ch);
+        strcat(line, chstr);
+      }
     }
-    elementcount = elementcount + elementidx;
+    if (data[npcidx].elements[elementidx].id > 0)
+      elementidx++;
+    elementcount += elementidx;
     fclose(f);
   }
   return elementcount;
