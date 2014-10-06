@@ -43,6 +43,26 @@ struct item {
   int status; // 0 == in place, 1 == in inventory, -1 == exists no longer
 };
 
+struct dialogelement {
+  int id;
+  int text[1024];
+  int next_ids[10];
+  int next_mchoice; // status are next ids multiple choice
+};
+
+struct dialog {
+  int npc_id;
+  struct dialogelement elements[100];
+};
+
+struct npc {
+  int id;
+  char title[56];
+  int area_id;
+  int place_id;
+  struct dialog *cdialog;
+};
+
 #define MAX_DESC_ID_EXTRAS 5
 #define MAX_DESC_TEXT_TRANS 5
 #define MAX_DESC_TEXT_ITEMS 10

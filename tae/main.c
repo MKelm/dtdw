@@ -11,9 +11,9 @@ int current_place = 0;
 
 char help_text[2048];
 
-// dc: 0 == commands, 2 == areas, 3 == places, 4 == items,
-//     5 == descriptions, 6 = transitions
-int data_counts[6];
+// dc: 0 == commands, 1 == areas, 2 == places, 3 == items,
+//     4 == descriptions, 5 = transitions, 6 = npcs
+int data_counts[7];
 struct meta meta_data;
 struct command commands_data[MAX_COMMANDS];
 struct area areas_data[MAX_AREAS];
@@ -21,6 +21,7 @@ struct place places_data[MAX_PLACES];
 struct item items_data[MAX_ITEMS];
 struct description descriptions_data[MAX_DESCRIPTIONS];
 struct placetrans transitions_data[MAX_PLACETRANS];
+struct npc npcs_data[MAX_NPCS];
 
 int main(void) {
   setlocale (LC_ALL, "");
@@ -169,7 +170,7 @@ struct action get_input_action(char *input) {
 
 struct item *get_item(char *title) {
   int i;
-  for (i = 0; i < data_counts[4]; i++) {
+  for (i = 0; i < data_counts[3]; i++) {
     if (strcasecmp(items_data[i].title, title) == 0) {
       return &items_data[i];
     }
@@ -179,7 +180,7 @@ struct item *get_item(char *title) {
 
 struct item *get_item_by_id(int id) {
   int i;
-  for (i = 0; i < data_counts[4]; i++) {
+  for (i = 0; i < data_counts[3]; i++) {
     if (items_data[i].id == id) {
       return &items_data[i];
     }
@@ -360,4 +361,6 @@ void load_data(void) {
   data_counts[5] = load_transitions(
     transitions_data, MAX_PLACETRANS, places_data, data_counts[2], MAX_PLACE_TRANSITIONS
   );
+  // npcs
+  data_counts[6] = load_npcs(npcs_data, MAX_NPCS);
 }

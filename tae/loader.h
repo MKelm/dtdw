@@ -34,6 +34,14 @@ int load_places(struct place data[], int lmax);
 
 int load_items(struct item data[], int lmax);
 
+// npcs
+#define FILE_NPCS "../data/npcs.txt"
+#define MAX_NPCS 500
+
+int load_npcs(struct npc data[], int lmax);
+
+int load_dialogs(struct npc npcs_data[], int nlmax, struct dialog data[], int lmax);
+
 // descriptions
 #define FILE_DESCRIPTIONS "../data/descriptions.txt"
 #define MAX_DESCRIPTIONS 1000
