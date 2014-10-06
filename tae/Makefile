@@ -3,8 +3,8 @@ CC = gcc
 CFLAGS = -Wall -ggdb
 LDFLAGS = -lncursesw -lm
 
-dtdw : main.o loader.o inventory.o dialog.o display.o
-	$(CC) main.o loader.o inventory.o dialog.o display.o -o dtdw $(LDFLAGS)
+tae : main.o loader.o inventory.o dialog.o display.o
+	$(CC) main.o loader.o inventory.o dialog.o display.o -o run $(LDFLAGS)
 
 main.o : main.c loader.h inventory.h dialog.h display.h
 	$(CC) $(CFLAGS) -c main.c $(LDFLAGS)
