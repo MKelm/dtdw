@@ -261,7 +261,7 @@ char *action_get_output(struct action *caction) {
           // check status of available text items to hide descs with non existent items
           for (i = 0; i < MAX_DESC_TEXT_ITEMS; i++) {
             struct item *citem = get_item_by_id(descriptions_data[desc_idx].items[i]);
-            if (citem->status != 0) {
+            if (citem != NULL && citem->status != 0) {
               has_item = 0;
               has_transition = 0;
             }
