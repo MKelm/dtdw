@@ -3,10 +3,10 @@ CC = gcc
 CFLAGS = -Wall -ggdb
 LDFLAGS = -lncursesw -lm
 
-dtdw : main.o loader.o inventory.o display.o
-	$(CC) main.o loader.o inventory.o display.o -o dtdw $(LDFLAGS)
+dtdw : main.o loader.o inventory.o dialog.o display.o
+	$(CC) main.o loader.o inventory.o dialog.o display.o -o dtdw $(LDFLAGS)
 
-main.o : main.c loader.h inventory.h display.h
+main.o : main.c loader.h inventory.h dialog.h display.h
 	$(CC) $(CFLAGS) -c main.c $(LDFLAGS)
 
 loader.o : loader.c loader.h
@@ -14,6 +14,9 @@ loader.o : loader.c loader.h
 
 inventory.o : inventory.c inventory.h
 	$(CC) $(CFLAGS) -c inventory.c $(LDFLAGS)
+
+dialog.o : dialog.c dialog.h
+	$(CC) $(CFLAGS) -c dialog.c $(LDFLAGS)
 
 display.o : display.c display.h
 	$(CC) $(CFLAGS) -c display.c $(LDFLAGS)

@@ -268,7 +268,7 @@ int load_npcs(struct npc data[], int lmax) {
         loadareaid = 1;
       } else if (loadid == 1) {
         data[entryidx].id = atoi(line);
-        data[entryidx].cdialog = NULL;
+        data[entryidx].c_dialog = NULL;
         loadid = 0;
         loadtitle = 1;
       } else if (loadareaid == 1) {
@@ -352,7 +352,7 @@ int load_dialogs(struct npc npcs_data[], int nlmax, struct dialog data[], int lm
     elementcount += elementidx;
     fclose(f);
     // link dialog to npc
-    npcs_data[npcidx].cdialog = &data[npcidx];
+    npcs_data[npcidx].c_dialog = &data[npcidx];
   }
   return elementcount;
 }

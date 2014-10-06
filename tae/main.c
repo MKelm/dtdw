@@ -4,6 +4,7 @@
 #include "main.h"
 #include "loader.h"
 #include "inventory.h"
+#include "dialog.h"
 #include "display.h"
 
 int current_area = 0;
@@ -83,6 +84,11 @@ int main(void) {
             output_change = 0;
             init_action(&caction);
           }
+
+        } else if (strcmp(caction.in_command, "talkto") == 0 &&
+                   caction.c_npc != NULL && caction.c_npc->id > 0) {
+
+          dialog_set_current(caction.c_npc->c_dialog);
         }
 
       } else if (strcasecmp(caction.in_command, "quit") == 0) {
