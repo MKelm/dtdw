@@ -12,4 +12,3 @@ char *get_internal_command(char *ccommand);
 
 struct item *get_item(char *titem);
 struct placetrans *get_transition(char *ttransition);
-int get_transition_id(char *ttransition);

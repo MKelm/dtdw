@@ -63,10 +63,11 @@ int main(void) {
       if (strlen(caction.in_command) > 0 &&
           strcasecmp(caction.in_command, "quit") != 0) {
 
-        if (strcmp(caction.in_command, "use") == 0 && caction.transition_id > 0) {
+        if (strcmp(caction.in_command, "use") == 0 &&
+            caction.transition != NULL && caction.transition->id > 0) {
           // output transition action description before location change
           dsp_set_output(action_get_output(&caction));
-          current_place = caction.transition_id;
+          current_place = caction.transition->id;
           location_change = 1;
 
         } else if (strcmp(caction.in_command, "pickup") == 0 &&
@@ -88,7 +89,7 @@ int main(void) {
 
 void init_action(struct action *caction) {
   strcpy(caction->in_command, "");
-  caction->transition_id = -1;
+  caction->transition = NULL;
   caction->pitem = NULL;
   caction->sitem = NULL;
 }
@@ -141,7 +142,7 @@ struct action get_input_action(char *input) {
             strcpy(iaction.in_command, commandarr[0]);
             iaction.pitem = get_item(inputarr[1]);
             if (iaction.pitem == NULL) {
-              iaction.transition_id = get_transition_id(inputarr[1]);
+              iaction.transition = get_transition(inputarr[1]);
             }
             return iaction;
           } else if (i == 4) {
@@ -179,18 +180,6 @@ struct placetrans *get_transition(char *ttransition) {
     }
   }
   return NULL;
-}
-
-int get_transition_id(char *ttransition) {
-  int i, j;
-  for (i = 0; i < data_counts[3]; i++) {
-    for (j = 0; j < MAX_PLACE_TRANSITIONS; j++) {
-      if (strcasecmp(places_data[i].transitions[j].title, ttransition) == 0) {
-        return places_data[i].transitions[j].id;
-      }
-    }
-  }
-  return 0;
 }
 
 char *get_internal_command(char *ccommand) {
@@ -238,7 +227,8 @@ char *action_get_output(struct action *caction) {
   strncpy(output, "", sizeof(output));
 
   if (strlen(caction->in_command) > 0 &&
-      ((caction->pitem != NULL && caction->pitem->id > 0) || caction->transition_id > 0)) {
+      ((caction->pitem != NULL && caction->pitem->id > 0) ||
+       (caction->transition != NULL && caction->transition->id > 0))) {
     // for transition / item action commands
     desc_idx = 0;
     while (desc_idx < data_counts[4]) {
@@ -252,8 +242,8 @@ char *action_get_output(struct action *caction) {
               descriptions_data[desc_idx].id_items[i] == caction->pitem->id) {
             has_item = 1;
 
-          } else if (caction->transition_id > 0 &&
-                     descriptions_data[desc_idx].id_transitions[i] == caction->transition_id) {
+          } else if (caction->transition != NULL && caction->transition->id > 0 &&
+                     descriptions_data[desc_idx].id_transitions[i] == caction->transition->id) {
             has_transition = 1;
           }
 

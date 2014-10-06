@@ -56,7 +56,7 @@ struct description {
 
 struct action {
   char in_command[256]; // internal command
-  int transition_id;
+  struct placetrans *transition;
   struct item *pitem; // primary item
   struct item *sitem; // sub item
 };
