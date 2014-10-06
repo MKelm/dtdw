@@ -220,7 +220,7 @@ int *get_area_place_idx(void) {
 
 char *action_get_output(struct action *caction) {
   // get action related output of the current area place
-  int desc_idx = 0, i, has_text = 0;
+  int desc_idx = 0, i, has_text = 0, has_item, has_transition;
   char line[1024];
   static char output[1024];
   strncpy(output, "", sizeof(output));
@@ -234,11 +234,18 @@ char *action_get_output(struct action *caction) {
           strcmp(descriptions_data[desc_idx].id_verb, caction->in_command) == 0) {
 
         for (i = 0; i < MAX_DESC_ID_EXTRAS; i++) {
-          if ((caction->pitem != NULL && caction->pitem->id > 0 &&
-               descriptions_data[desc_idx].id_items[i] == caction->pitem->id) ||
-              (caction->transition_id > 0 &&
-               descriptions_data[desc_idx].id_transitions[i] == caction->transition_id)) {
+          has_item = 0;
+          has_transition = 0;
+          if (caction->pitem != NULL && caction->pitem->id > 0 &&
+              descriptions_data[desc_idx].id_items[i] == caction->pitem->id) {
+            has_item = 1;
 
+          } else if (caction->transition_id > 0 &&
+                     descriptions_data[desc_idx].id_transitions[i] == caction->transition_id) {
+            has_transition = 1;
+          }
+
+          if (has_item == 1 || has_transition == 1) {
             snprintf(line, 1024, "%s ", descriptions_data[desc_idx].text);
             strcat(output, line);
             has_text = 1;
