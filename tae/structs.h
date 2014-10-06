@@ -44,6 +44,8 @@ struct item {
 };
 
 #define MAX_DESC_ID_EXTRAS 5
+#define MAX_DESC_TEXT_TRANS 5
+#define MAX_DESC_TEXT_ITEMS 10
 
 struct description {
   int id;
@@ -51,8 +53,8 @@ struct description {
   int id_items[MAX_DESC_ID_EXTRAS];
   char id_verb[24];
   char text[1024];
-  int transitions[5]; // text transitions
-  int items[10]; // text items
+  int transitions[MAX_DESC_TEXT_TRANS]; // text transitions
+  int items[MAX_DESC_TEXT_ITEMS]; // text items
 };
 
 struct action {

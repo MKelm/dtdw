@@ -172,6 +172,16 @@ struct item *get_item(char *title) {
   return NULL;
 }
 
+struct item *get_item_by_id(int id) {
+  int i;
+  for (i = 0; i < data_counts[4]; i++) {
+    if (items_data[i].id == id) {
+      return &items_data[i];
+    }
+  }
+  return NULL;
+}
+
 struct placetrans *get_transition(char *ttransition) {
   int i;
   for (i = 0; i < data_counts[5]; i++) {
@@ -235,16 +245,26 @@ char *action_get_output(struct action *caction) {
       if (descriptions_data[desc_idx].id == current_place &&
           strcmp(descriptions_data[desc_idx].id_verb, caction->in_command) == 0) {
 
-        for (i = 0; i < MAX_DESC_ID_EXTRAS; i++) {
-          has_item = 0;
-          has_transition = 0;
-          if (caction->pitem != NULL && caction->pitem->id > 0 &&
-              descriptions_data[desc_idx].id_items[i] == caction->pitem->id) {
-            has_item = 1;
+        // check status of id item / transition
+        has_item = 0;
+        has_transition = 0;
+        if (caction->pitem != NULL && caction->pitem->id > 0 &&
+            descriptions_data[desc_idx].id_items[0] == caction->pitem->id) {
+          has_item = 1;
 
-          } else if (caction->transition != NULL && caction->transition->id > 0 &&
-                     descriptions_data[desc_idx].id_transitions[i] == caction->transition->id) {
-            has_transition = 1;
+        } else if (caction->transition != NULL && caction->transition->id > 0 &&
+                   descriptions_data[desc_idx].id_transitions[0] == caction->transition->id) {
+          has_transition = 1;
+        }
+
+        if (has_item == 1 || has_transition == 1) {
+          // check status of available text items to hide descs with non existent items
+          for (i = 0; i < MAX_DESC_TEXT_ITEMS; i++) {
+            struct item *citem = get_item_by_id(descriptions_data[desc_idx].items[i]);
+            if (citem->status != 0) {
+              has_item = 0;
+              has_transition = 0;
+            }
           }
 
           if (has_item == 1 || has_transition == 1) {
