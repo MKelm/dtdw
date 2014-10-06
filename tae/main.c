@@ -166,7 +166,7 @@ struct item *get_item(char *title) {
       return &items_data[i];
     }
   }
-  return 0;
+  return NULL;
 }
 
 int get_transition_id(char *ttransition) {
