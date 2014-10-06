@@ -16,7 +16,10 @@ In der linken Ecke steht eine alte $Holzbank$.
 $1
 
 #1$1/lookat
-Die Holzbank hat dir Marunix dein Vater mit 3 Jahren geschenkt, auf ihr liegt ein gelber $Zettel$.
+Die Holzbank hat dir Marunix dein Vater mit 3 Jahren geschenkt.
+
+#1$1/lookat
+Auf ihr liegt ein gelber $Zettel$.
 $4
 
 #1$4/lookat
@@ -30,8 +33,14 @@ In der rechten Ecke steht eine $Kommode$ und auf der rechten Seite ein $Bett$.
 $2$3
 
 #1$2/lookat
-Auf der Kommode ist eine $Kerze$ die noch ungenutzt ist.
+Die Kommode ist ein altes Relikt das von Großmutter stammt.
+
+#1$2/lookat
+Auf ihr steht eine $Kerze$ die noch ungenutzt ist.
 $5
+
+#1$5/pickup
+Du nimmst die Kerze von der Kommode und steckst sie in deine Tasche.
 
 #1$3/lookat
 Ein reinrassiges Holzbett der Marke Friöör Mikea, macht sich in jeder Lage gut.
