@@ -23,6 +23,7 @@ struct area {
 struct placetrans {
   int id;
   char title[56];
+  int locked;
 };
 
 #define MAX_PLACE_TRANSITIONS 5

@@ -151,6 +151,7 @@ int load_places(struct place *data, int lmax) {
         strcat(line, chstr);
       } else if (loadtransid == 1 && !isdigit(ch)) {
         data[entryidx].transitions[transitionidx].id = atoi(line);
+        data[entryidx].transitions[transitionidx].locked = 0;
         strncpy(line, "", sizeof(line));
         loadtransid = 0;
         loadtranstitle = 1;
@@ -176,6 +177,24 @@ int load_places(struct place *data, int lmax) {
   }
 
   return entryidx;
+}
+
+int load_transitions(struct placetrans transitions_data[], int transitions_lmax,
+                     struct place places_data[], int places_lmax, int placetrans_lmax) {
+  int pidx, ptidx, tidx = 0;
+  for (pidx = 0; pidx < places_lmax; pidx++) {
+    ptidx = 0;
+    for (ptidx = 0; ptidx < placetrans_lmax; ptidx++) {
+      if (places_data[pidx].transitions[ptidx].id > 0) {
+        transitions_data[tidx] = places_data[pidx].transitions[ptidx];
+        ptidx++;
+        tidx++;
+        if (tidx == transitions_lmax)
+          return tidx;
+      }
+    }
+  }
+  return tidx;
 }
 
 int load_items(struct item data[], int lmax) {

@@ -39,3 +39,9 @@ int load_items(struct item data[], int lmax);
 #define MAX_DESCRIPTIONS 1000
 
 int load_descriptions(struct description data[], int lmax);
+
+// transitions
+#define MAX_PLACETRANS 1000
+
+int load_transitions(struct placetrans transitions_data[], int transitions_lmax,
+                     struct place places_data[], int places_lmax, int placetrans_lmax);

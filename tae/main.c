@@ -11,14 +11,16 @@ int current_place = 0;
 
 char help_text[2048];
 
-// dc: 0 == commands, 2 == areas, 3 == places, 4 == items, 5 == descriptions
-int data_counts[5];
+// dc: 0 == commands, 2 == areas, 3 == places, 4 == items,
+//     5 == descriptions, 6 = transitions
+int data_counts[6];
 struct meta meta_data;
 struct command commands_data[MAX_COMMANDS];
 struct area areas_data[MAX_AREAS];
 struct place places_data[MAX_PLACES];
 struct item items_data[MAX_ITEMS];
 struct description descriptions_data[MAX_DESCRIPTIONS];
+struct placetrans transitions_data[MAX_PLACETRANS];
 
 int main(void) {
   setlocale (LC_ALL, "");
@@ -164,6 +166,16 @@ struct item *get_item(char *title) {
   for (i = 0; i < data_counts[4]; i++) {
     if (strcasecmp(items_data[i].title, title) == 0) {
       return &items_data[i];
+    }
+  }
+  return NULL;
+}
+
+struct placetrans *get_transition(char *ttransition) {
+  int i;
+  for (i = 0; i < data_counts[5]; i++) {
+    if (strcasecmp(transitions_data[i].title, ttransition) == 0) {
+      return &transitions_data[i];
     }
   }
   return NULL;
@@ -329,4 +341,8 @@ void load_data(void) {
   data_counts[3] = load_items(items_data, MAX_ITEMS);
   // descriptions
   data_counts[4] = load_descriptions(descriptions_data, MAX_DESCRIPTIONS);
+  // transitions
+  data_counts[5] = load_transitions(
+    transitions_data, MAX_PLACETRANS, places_data, data_counts[2], MAX_PLACE_TRANSITIONS
+  );
 }
