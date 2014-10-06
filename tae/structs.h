@@ -66,15 +66,18 @@ struct npc {
 #define MAX_DESC_ID_EXTRAS 5
 #define MAX_DESC_TEXT_TRANS 5
 #define MAX_DESC_TEXT_ITEMS 10
+#define MAX_DESC_TEXT_NPCS 10
 
 struct description {
   int id;
   int id_transitions[MAX_DESC_ID_EXTRAS];
   int id_items[MAX_DESC_ID_EXTRAS];
+  int id_npcs[MAX_DESC_ID_EXTRAS];
   char id_verb[24];
   char text[1024];
   int transitions[MAX_DESC_TEXT_TRANS]; // text transitions
   int items[MAX_DESC_TEXT_ITEMS]; // text items
+  int npcs[MAX_DESC_TEXT_NPCS];
 };
 
 struct action {

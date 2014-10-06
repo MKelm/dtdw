@@ -75,10 +75,11 @@ int main(void) {
 
         } else if (strcmp(caction.in_command, "pickup") == 0 &&
                    caction.pitem != NULL && caction.pitem->id > 0) {
-          // get inventory item if it exists in the current place
+          // get inventory item if it exists at the current place
           if (caction.pitem->status == 0) {
             inventory_add_item(caction.pitem);
           } else {
+            // no valid item selection / output
             output_change = 0;
             init_action(&caction);
           }

@@ -363,10 +363,10 @@ int load_dialogs(struct npc npcs_data[], int nlmax, struct dialog data[], int lm
 int load_descriptions(struct description data[], int lmax) {
   FILE *f = fopen(FILE_DESCRIPTIONS, "r");
   int ch, entryidx = 0;
-  // load status values: main id, id trans id, id items id, id verb, transition id, items id
-  int loadid = 0, lidtransid = 0, liditemsid = 0, lidverb = 0, ltransid = 0, litemsid = 0;
+  // load status values: main id, id trans id, id items id, id npcs id, id verb, transition id, items id
+  int loadid = 0, lidtransid = 0, liditemsid = 0, lidnpcsid = 0, lidverb = 0, ltransid = 0, litemsid = 0, lnpcsid = 0;
   // transition / item ids indexes
-  int lidtransidx = 0, liditemidx = 0, ltransidx = 0, litemidx = 0;
+  int lidtransidx = 0, liditemidx = 0, lidnpcidx = 0, ltransidx = 0, litemidx = 0, lnpcidx = 0;
   // temporary characters
   char line[1024] = "", chstr[2];
   // load modes: 0 = id (+ desc items) (+ verb), 1 = text, 2 = transitions and items
@@ -378,27 +378,29 @@ int load_descriptions(struct description data[], int lmax) {
         // load desc id
         if (ch == '#' && loadid == 0 && lidtransid == 0) {
           loadid = 1;
-        } else if (loadid == 1 && ch != '\n' && ch != '#' && ch != '$' && ch != '/') {
+        } else if (loadid == 1 && ch != '\n' && ch != '#' && ch != '$' && ch != '/' && ch != '&') {
           snprintf(chstr, 2, "%c", ch);
           strcat(line, chstr);
-        } else if (loadid == 1 && (ch == '\n' || ch == '#' || ch == '$' || ch == '/')) {
+        } else if (loadid == 1 && (ch == '\n' || ch == '#' || ch == '$' || ch == '/' || ch == '&')) {
           loadid = 0;
           data[entryidx].id = atoi(line);
           strncpy(line, "", sizeof(line));
           liditemidx = 0;
+          lidnpcidx = 0;
           lidtransidx = 0;
           ltransidx = 0;
           litemidx = 0;
+          lnpcidx = 0;
           if (ch == '\n')
             loadmode = 1;
         }
         // load id transition ids
         if (ch == '#' && loadid == 0 && lidtransid == 0) {
           lidtransid = 1;
-        } else if (lidtransid == 1 && ch != '\n' && ch != '#' && ch != '$' && ch != '/') {
+        } else if (lidtransid == 1 && ch != '\n' && ch != '#' && ch != '$' && ch != '/' && ch != '&') {
           snprintf(chstr, 2, "%c", ch);
           strcat(line, chstr);
-        } else if (lidtransid == 1 && (ch == '\n' || ch == '#' || ch == '$' || ch == '/')) {
+        } else if (lidtransid == 1 && (ch == '\n' || ch == '#' || ch == '$' || ch == '/' || ch == '&')) {
           data[entryidx].id_transitions[lidtransidx] = atoi(line);
           strncpy(line, "", sizeof(line));
           lidtransidx++;
@@ -409,14 +411,28 @@ int load_descriptions(struct description data[], int lmax) {
         // load id item ids
         if (ch == '$' && liditemsid == 0) {
           liditemsid = 1;
-        } else if (liditemsid == 1 && ch != '\n' && ch != '$' && ch != '/') {
+        } else if (liditemsid == 1 && ch != '\n' && ch != '$' && ch != '/' && ch != '&') {
           snprintf(chstr, 2, "%c", ch);
           strcat(line, chstr);
-        } else if (liditemsid == 1 && (ch == '\n' || ch == '$' || ch == '/')) {
+        } else if (liditemsid == 1 && (ch == '\n' || ch == '$' || ch == '/' || ch == '&')) {
           data[entryidx].id_items[liditemidx] = atoi(line);
           strncpy(line, "", sizeof(line));
           liditemidx++;
           liditemsid = (ch == '$') ? 1 : 0;
+          if (ch == '\n')
+            loadmode = 1;
+        }
+        // load id npcs ids
+        if (ch == '&' && lidnpcsid == 0) {
+          lidnpcsid = 1;
+        } else if (lidnpcsid == 1 && ch != '\n' && ch != '$' && ch != '/' && ch != '&') {
+          snprintf(chstr, 2, "%c", ch);
+          strcat(line, chstr);
+        } else if (lidnpcsid == 1 && (ch == '\n' || ch == '$' || ch == '/' || ch == '&')) {
+          data[entryidx].id_npcs[lidnpcidx] = atoi(line);
+          strncpy(line, "", sizeof(line));
+          lidnpcidx++;
+          lidnpcsid = (ch == '&') ? 1 : 0;
           if (ch == '\n')
             loadmode = 1;
         }
@@ -448,10 +464,10 @@ int load_descriptions(struct description data[], int lmax) {
         // load transition ids
         if (ch == '#' && ltransid == 0) {
           ltransid = 1;
-        } else if (ltransid == 1 && ch != '\n' && ch != '#' && ch != '$') {
+        } else if (ltransid == 1 && ch != '\n' && ch != '#' && ch != '$' && ch != '&') {
           snprintf(chstr, 2, "%c", ch);
           strcat(line, chstr);
-        } else if (ltransid == 1 && (ch == '\n' || ch == '#' || ch == '$')) {
+        } else if (ltransid == 1 && (ch == '\n' || ch == '#' || ch == '$' || ch == '&')) {
           data[entryidx].transitions[ltransidx] = atoi(line);
           strncpy(line, "", sizeof(line));
           ltransidx++;
@@ -460,14 +476,26 @@ int load_descriptions(struct description data[], int lmax) {
         // load item ids
         if (ch == '$' && litemsid == 0) {
           litemsid = 1;
-        } else if (litemsid == 1 && ch != '\n' && ch != '$') {
+        } else if (litemsid == 1 && ch != '\n' && ch != '$' && ch != '&') {
           snprintf(chstr, 2, "%c", ch);
           strcat(line, chstr);
-        } else if (litemsid == 1 && (ch == '\n' || ch == '$')) {
+        } else if (litemsid == 1 && (ch == '\n' || ch == '$' || ch != '&')) {
           data[entryidx].items[litemidx] = atoi(line);
           strncpy(line, "", sizeof(line));
           litemidx++;
           litemsid = (ch == '$') ? 1 : 0;
+        }
+        // load npcs ids
+        if (ch == '&' && lnpcsid == 0) {
+          lnpcsid = 1;
+        } else if (lnpcsid == 1 && ch != '\n' && ch != '$' && ch != '&') {
+          snprintf(chstr, 2, "%c", ch);
+          strcat(line, chstr);
+        } else if (lnpcsid == 1 && (ch == '\n' || ch == '$' || ch != '&')) {
+          data[entryidx].npcs[lnpcidx] = atoi(line);
+          strncpy(line, "", sizeof(line));
+          lnpcidx++;
+          lnpcsid = (ch == '&') ? 1 : 0;
         }
         // jump to next room description after transitions / items
         if (ch == '\n') {
