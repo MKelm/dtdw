@@ -10,6 +10,7 @@ int inventory_count = 0;
 
 int inventory_add_item(struct item *link) {
   if (link != NULL && link->id > 0) {
+    link->status = 1; // set status to "in inventory"
     inventory_items[inventory_count].link = link;
     inventory_count++;
     return 1;
@@ -21,6 +22,7 @@ int inventory_rm_item(struct item *link) {
   int i = 0, removed = 0;
   for (i = 0; i < inventory_count; i++) {
     if (inventory_items[i].link->id == link->id) {
+      link->status = -1; // set status to "exists no longer"
       removed = 1;
     }
     if (removed == 1) {

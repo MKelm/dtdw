@@ -220,6 +220,7 @@ int load_items(struct item data[], int lmax) {
       } else {
         if (loadid == 1) {
           data[entryidx].id = atoi(line);
+          data[entryidx].status = 0;
           loadid = 0;
           loadcombid = 1;
         } else if (loadcombid == 1) {

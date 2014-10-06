@@ -40,6 +40,7 @@ struct item {
   int comb_id; // combination item id
   int final_id; // final item id after combination
   char title[56];
+  int status; // 0 == in place, 1 == in inventory, -1 == exists no longer
 };
 
 #define MAX_DESC_ID_EXTRAS 5
