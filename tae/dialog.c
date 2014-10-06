@@ -13,22 +13,24 @@ void dialog_set_current(struct dialog *ptr_dialog) {
 }
 
 char *dialog_get_next_output(void) {
+  static char output[1024];
   int has_next_ids = 0;
   if (dialog_element_idx == 0) {
-    // first output
-    return c_dialog->elements[dialog_element_idx].text;
+    // first output, todo change logic to handle next ids directly
+    snprintf(output, 1024, "\"%s\"\n\n", c_dialog->elements[dialog_element_idx].text);
+    return output;
   } else if (dialog_element_idx > 0 &&
              c_dialog->elements[dialog_element_idx-1].next_mchoice == 1) {
     // multiple choice output
     is_multiple_choice = 1; // flag for input mode
     has_next_ids = 1;
   } else if (c_dialog->elements[dialog_element_idx-1].next_ids[0] > 0) {
+    // regular output
     is_multiple_choice = 0;
     has_next_ids = 1;
   }
   if (has_next_ids == 1) {
     int i;
-    static char output[1024];
     for (i = 0; i < DIALOG_ELEMENT_MAX_NEXT_IDS; i++) {
       if (c_dialog->elements[dialog_element_idx-1].next_ids[i] > 0) {
 
@@ -36,12 +38,13 @@ char *dialog_get_next_output(void) {
           c_dialog->elements[dialog_element_idx-1].next_ids[i]
         );
         if (is_multiple_choice == 1) {
-          snprintf(output, 1024, "* %s (%d)\n", c_element->text, i+1);
+          snprintf(output, 1024, "*  \"%s\" (%d)\n", c_element->text, i+1);
         } else {
-          snprintf(output, 1024, "%s\n", c_element->text);
+          snprintf(output, 1024, "\"%s\"\n", c_element->text);
         }
       }
     }
+    strcat(output, "\n");
     return output;
   }
   return "";
