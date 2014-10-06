@@ -220,7 +220,7 @@ int *get_area_place_idx(void) {
 
 char *action_get_output(struct action *caction) {
   // get action related output of the current area place
-  int desc_idx = 0, i;
+  int desc_idx = 0, i, has_text = 0;
   char line[1024];
   static char output[1024];
   strncpy(output, "", sizeof(output));
@@ -239,8 +239,9 @@ char *action_get_output(struct action *caction) {
               (caction->transition_id > 0 &&
                descriptions_data[desc_idx].id_transitions[i] == caction->transition_id)) {
 
-            snprintf(line, 1024, "%s\n\n", descriptions_data[desc_idx].text);
+            snprintf(line, 1024, "%s ", descriptions_data[desc_idx].text);
             strcat(output, line);
+            has_text = 1;
           }
         }
 
@@ -249,6 +250,9 @@ char *action_get_output(struct action *caction) {
       }
       desc_idx++;
     }
+    if (has_text == 1)
+      strcat(output, "\n\n");
+
   } else if (strlen(caction->in_command) > 0) {
     // for simple actions commands
     if (strcmp(caction->in_command, "description") == 0) {
