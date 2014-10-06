@@ -324,7 +324,7 @@ int load_dialogs(struct npc npcs_data[], int nlmax, struct dialog data[], int lm
           sizeof(data[npcidx].elements[elementidx].text));
         strncpy(line, "", sizeof(line));
         loadmode = 3;
-      } else if (loadmode == 3 && (ch == '!' || ch == '?' || ch == '\n')) {
+      } else if (loadmode == 3 && (ch == '>' || ch == '?' || ch == '\n')) {
         if (nextididx == -1 && ch != '\n') {
           nextididx++;
         } else if (nextididx == -1 && ch == '\n') {
