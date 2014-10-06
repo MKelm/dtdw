@@ -63,6 +63,7 @@ int main(void) {
       if (strlen(caction.in_command) > 0 &&
           strcasecmp(caction.in_command, "quit") != 0) {
 
+        output_change = 1;
         if (strcmp(caction.in_command, "use") == 0 &&
             caction.transition != NULL && caction.transition->id > 0) {
           // output transition action description before location change
@@ -71,12 +72,16 @@ int main(void) {
           location_change = 1;
 
         } else if (strcmp(caction.in_command, "pickup") == 0 &&
-                   (caction.pitem != NULL && caction.pitem->id > 0)) {
-          // simple implementation to get inventory item
-          // todo: extended logic with definitions to handle item / description status
-          inventory_add_item(caction.pitem);
+                   caction.pitem != NULL && caction.pitem->id > 0) {
+          // get inventory item if it exists in the current place
+          if (caction.pitem->status == 0) {
+            inventory_add_item(caction.pitem);
+          } else {
+            output_change = 0;
+            init_action(&caction);
+          }
         }
-        output_change = 1;
+
       } else if (strcasecmp(caction.in_command, "quit") == 0) {
         quit = 1;
       }
