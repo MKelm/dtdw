@@ -16,7 +16,7 @@ In der linken Ecke steht eine alte $Holzbank$.
 $1
 
 #1$1/lookat
-Die Holzbank hat dir Marunix dein Vater mit 3 Jahren geschenkt.
+Die Holzbank hat dir dein Vater Marunix mit 3 Jahren geschenkt.
 
 #1$1/lookat
 Auf ihr liegt ein gelber $Zettel$.
@@ -46,11 +46,17 @@ Du nimmst die Kerze von der Kommode und steckst sie in deine Tasche.
 Ein reinrassiges Holzbett der Marke Friöör Mikea, macht sich in jeder Lage gut.
 
 #2
-Du bist im Wohnzimmer. Es gibt eine #Treppe# die nach oben führt.
-#1
+Du bist im Wohnzimmer. Es gibt eine #Treppe# die nach oben führt. In der Mitte steht eine Couch auf der &Marunix& sitzt.
+#1&1
 
 #2#1/lookat
 Eine Treppe mit 24 Stufen, um nicht auszurutschen ist sie aus Palmholz mit Rillen geschnitzt.
 
 #2#1/use
 Du gehst über die Treppe nach oben in dein Zimmer.
+
+#2&1/lookat
+Marunix ließt gerade die Hazard Times, eine lokel Zeitung mit allerlei Tratsch und Klatsch.
+
+#2&1/talkto
+Du näherst dich Marunix und beginnst ein Gespräch.
