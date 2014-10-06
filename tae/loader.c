@@ -13,6 +13,7 @@ void load_help(char *help) {
     snprintf(chstr, 2, "%c", ch);
     strcat(help, chstr);
   }
+  fclose(f);
 }
 
 void load_meta(struct meta *data) {
@@ -41,6 +42,7 @@ void load_meta(struct meta *data) {
       linenum++;
     }
   }
+  fclose(f);
 }
 
 int load_commands(struct command *data, int lmax) {
@@ -70,7 +72,7 @@ int load_commands(struct command *data, int lmax) {
         return lmax;
     }
   }
-
+  fclose(f);
   return entryidx;
 }
 
@@ -101,7 +103,7 @@ int load_areas(struct area *data, int lmax) {
         return lmax;
     }
   }
-
+  fclose(f);
   return entryidx;
 }
 
@@ -175,7 +177,7 @@ int load_places(struct place *data, int lmax) {
       }
     }
   }
-
+  fclose(f);
   return entryidx;
 }
 
@@ -236,7 +238,7 @@ int load_items(struct item data[], int lmax) {
       }
     }
   }
-
+  fclose(f);
   return entryidx;
 }
 
@@ -283,15 +285,40 @@ int load_npcs(struct npc data[], int lmax) {
       strncpy(line, "", sizeof(line));
     }
   }
-
+  fclose(f);
   return entryidx;
 }
 
-int load_dialogs(
-      struct npc npcs_data[], int nlmax, struct dialog data[], int lmax
-    ) {
-  // todo
-  return 0;
+int load_dialogs(struct npc npcs_data[], int nlmax, struct dialog data[], int lmax) {
+  int npcidx, titleidx, elementcount, elementidx, nextididx, ch, loadmode = 0;
+  FILE *f;
+  char line[1024] = "", title[56] = "", chstr[2];
+
+  elementcount = 0;
+  for (npcidx = 0; npcidx < nlmax; npcidx++) {
+    strncpy(title, "", 56);
+    if (npcidx == lmax)
+      return npcidx;
+
+    data[npcidx].npc_id = npcs_data[npcidx].id;
+    for (titleidx = 0; npcs_data[npcidx].title[titleidx]; titleidx++){
+      title[titleidx] = tolower(npcs_data[npcidx].title[titleidx]);
+    }
+    snprintf(line, 1024, "%s%s%s", FILE_DIALOGS_FOLDER, title, FILE_DIALOGS_POSTFIX);
+
+    elementidx = 0;
+    nextididx = -1;
+    f = fopen(line, "r");
+    strncpy(line, "", 1024);
+
+    // loadmode 0 = nothing, 1 = id, 2 = text, 3 = next ids
+    while ((ch = fgetc(f)) != EOF) {
+      // todo
+    }
+    elementcount = elementcount + elementidx;
+    fclose(f);
+  }
+  return elementcount;
 }
 /*
  Description definitions:
@@ -422,6 +449,6 @@ int load_descriptions(struct description data[], int lmax) {
   if (data[entryidx].id > 0) {
     entryidx++;
   }
-
+  fclose(f);
   return entryidx; // returns entries count
 }

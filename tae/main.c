@@ -12,8 +12,8 @@ int current_place = 0;
 char help_text[2048];
 
 // dc: 0 == commands, 1 == areas, 2 == places, 3 == items,
-//     4 == descriptions, 5 = transitions, 6 = npcs
-int data_counts[7];
+//     4 == descriptions, 5 = transitions, 6 = npcs, 7 = dialogs
+int data_counts[8];
 struct meta meta_data;
 struct command commands_data[MAX_COMMANDS];
 struct area areas_data[MAX_AREAS];
@@ -22,6 +22,7 @@ struct item items_data[MAX_ITEMS];
 struct description descriptions_data[MAX_DESCRIPTIONS];
 struct placetrans transitions_data[MAX_PLACETRANS];
 struct npc npcs_data[MAX_NPCS];
+struct dialog dialogs_data[MAX_DIALOGS];
 
 int main(void) {
   setlocale (LC_ALL, "");
@@ -357,10 +358,14 @@ void load_data(void) {
   data_counts[3] = load_items(items_data, MAX_ITEMS);
   // descriptions
   data_counts[4] = load_descriptions(descriptions_data, MAX_DESCRIPTIONS);
-  // transitions
+  // transitions related to places
   data_counts[5] = load_transitions(
     transitions_data, MAX_PLACETRANS, places_data, data_counts[2], MAX_PLACE_TRANSITIONS
   );
   // npcs
   data_counts[6] = load_npcs(npcs_data, MAX_NPCS);
+  // dialogs related to npcs
+  data_counts[7] = load_dialogs(
+    npcs_data, data_counts[6], dialogs_data, MAX_DIALOGS
+  );
 }

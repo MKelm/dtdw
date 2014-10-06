@@ -40,6 +40,10 @@ int load_items(struct item data[], int lmax);
 
 int load_npcs(struct npc data[], int lmax);
 
+#define FILE_DIALOGS_FOLDER "../data/dialogs/"
+#define FILE_DIALOGS_POSTFIX ".txt"
+#define MAX_DIALOGS 500
+
 int load_dialogs(struct npc npcs_data[], int nlmax, struct dialog data[], int lmax);
 
 // descriptions

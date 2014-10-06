@@ -45,7 +45,7 @@ struct item {
 
 struct dialogelement {
   int id;
-  int text[1024];
+  char text[1024];
   int next_ids[10];
   int next_mchoice; // status are next ids multiple choice
 };
