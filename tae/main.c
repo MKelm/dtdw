@@ -373,16 +373,55 @@ char *desc_get_output() {
   }
 
   // get more data of the current area place
+  int base_idx = -1, base_item_idx = 0, base_npc_idx = 0, base_trans_idx = 0;
+  int has_item = 0, has_transition = 0, has_npc = 0;
   while (desc_idx < data_counts[4]) {
     if (descriptions_data[desc_idx].id == current_place &&
         strlen(descriptions_data[desc_idx].id_verb) == 0) {
 
-      snprintf(line, 1024, "%s ", descriptions_data[desc_idx].text);
-      if (has_text == 1) {
-        strcat(output, line);
+      if (base_idx == -1) {
+        base_idx = desc_idx;
       } else {
-        snprintf(output, 1024, "%s ", descriptions_data[desc_idx].text);
-        has_text = 1;
+        has_item = 0;
+        has_transition = 0;
+        has_npc = 0;
+
+        // show place descriptions with valid item only
+        for (base_item_idx = 0; base_item_idx < MAX_DESC_TEXT_ITEMS; base_item_idx++) {
+          if (descriptions_data[base_idx].items[base_item_idx] > 0 &&
+              descriptions_data[base_idx].items[base_item_idx] == descriptions_data[desc_idx].id_items[0]) {
+            has_item = 1;
+          }
+        }
+        if (has_item == 0) {
+          // show place descriptions with valid npc only
+          for (base_npc_idx = 0; base_npc_idx < MAX_DESC_TEXT_NPCS; base_npc_idx++) {
+            if (descriptions_data[base_idx].npcs[base_npc_idx] > 0 &&
+                descriptions_data[base_idx].npcs[base_npc_idx] == descriptions_data[desc_idx].id_npcs[0]) {
+              has_npc = 1;
+            }
+          }
+        }
+        if (has_item == 0 && has_npc == 0) {
+          // show place descriptions with valid transitions only
+          for (base_trans_idx = 0; base_trans_idx < MAX_DESC_TEXT_TRANS; base_trans_idx++) {
+            if (descriptions_data[base_idx].transitions[base_trans_idx] > 0 &&
+                descriptions_data[base_idx].transitions[base_trans_idx] ==
+                    descriptions_data[desc_idx].id_transitions[0]) {
+              has_transition = 1;
+            }
+          }
+        }
+      }
+
+      if (desc_idx == base_idx || has_item == 1 || has_transition == 1 || has_npc == 1) {
+        snprintf(line, 1024, "%s ", descriptions_data[desc_idx].text);
+        if (has_text == 1) {
+          strcat(output, line);
+        } else {
+          snprintf(output, 1024, "%s ", descriptions_data[desc_idx].text);
+          has_text = 1;
+        }
       }
     } else if (descriptions_data[desc_idx].id == current_place + 1) {
       break;
