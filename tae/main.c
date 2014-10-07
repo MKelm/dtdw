@@ -67,7 +67,18 @@ int main(void) {
           strcasecmp(caction.in_command, "quit") != 0) {
 
         output_change = 1;
-        if (strcmp(caction.in_command, "use") == 0 &&
+        if (dialog_get_current_idx() > -1) {
+          // dialog mode
+          output_change = 0;
+          if (strcmp(caction.in_command, "close") == 0) {
+            dialog_close();
+            init_action(&caction);
+          } else {
+            // handle input for dialog
+            output_change = dialog_handle_input(caction.in_command);
+          }
+
+        } if (strcmp(caction.in_command, "use") == 0 &&
             caction.transition != NULL && caction.transition->id > 0) {
           // output transition action description before location change
           dsp_set_output(action_get_output(&caction));
@@ -326,8 +337,12 @@ char *action_get_output(struct action *caction) {
     }
 
   } else if (strlen(caction->in_command) > 0) {
+    // for dialog commands
+    if (dialog_get_current_idx() > 0) {
+      strcat(output, dialog_get_output());
+
     // for simple actions commands
-    if (strcmp(caction->in_command, "description") == 0) {
+    } else if (strcmp(caction->in_command, "description") == 0) {
       strcat(output, desc_get_output());
 
     } else if (strcmp(caction->in_command, "help") == 0) {

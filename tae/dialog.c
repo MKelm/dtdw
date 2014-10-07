@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 #include "dialog.h"
 
 int dialog_element_idx = -1;
@@ -10,6 +11,16 @@ int is_multiple_choice = 0;
 void dialog_set_current(struct dialog *ptr_dialog) {
   dialog_element_idx = 0;
   c_dialog = ptr_dialog;
+}
+
+// to check if dialog mode is active
+int dialog_get_current_idx(void) {
+  return dialog_element_idx;
+}
+
+void dialog_close() {
+  dialog_element_idx = -1;
+  c_dialog = NULL;
 }
 
 char *dialog_get_output(void) {
@@ -85,11 +96,12 @@ int dialog_get_next_element_idx(int dialog_element_idx, int next_id) {
   return idx;
 }
 
-void dialog_set_input(char *input) {
-  if (strlen(input) > 0) {
-    if (is_multiple_choice == 1) {
-      // int choice_id = atoi(input);
-      // handle choice decision todo ...
+// returns 0 or 1 for output_change
+int dialog_handle_input(char *input) {
+  if (is_multiple_choice == 1) {
+    if (strlen(input) > 0 && isdigit(input)) {
+      // get next element id by input selection
     }
   }
+  return 0;
 }
