@@ -68,6 +68,7 @@ void dialog_get_next_element_output(char *output) {
   char line[1024];
   if (is_multiple_choice == 1)
     dialog_init_current_choice();
+
   for (i = 0; i < DIALOG_ELEMENT_MAX_NEXT_IDS; i++) {
     if (c_dialog->elements[dialog_element_idx].next_ids[i] > 0) {
       next_id_idx = dialog_get_next_element_idx(
@@ -95,6 +96,8 @@ void dialog_get_next_element_output(char *output) {
       dialog_element_idx = next_id_idx;
       dialog_get_next_element_output(output);
     }
+  } else if (is_multiple_choice == 0) {
+    dialog_close();
   }
 }
 
