@@ -56,6 +56,7 @@ struct dialogelement {
 
 struct dialog {
   int npc_id;
+  int elements_count;
   struct dialogelement elements[DIALOG_MAX_ELEMENTS];
 };
 
