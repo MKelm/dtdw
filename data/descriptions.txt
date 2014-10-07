@@ -50,7 +50,7 @@ Du bist im Wohnzimmer. In der Mitte steht eine Couch.
 #1&1
 
 #2&1
-Auf ihr sitzt &Marunix&.
+Auf ihr sitzt &Marunix& bequem.
 
 #2#1
 Zudem gibt es eine #Treppe# die nach oben führt.
