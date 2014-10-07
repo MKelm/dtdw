@@ -5,7 +5,6 @@ void init_action(struct action *caction);
 
 int *get_area_place_idx(void);
 
-struct action get_input_action(char *input);
 char *get_internal_command(char *ccommand);
 
 struct item *get_item(char *titel);
