@@ -12,3 +12,4 @@ help=hilfe
 description=beschreibung
 inventory=inventar
 quit=beenden
+close=schließen
