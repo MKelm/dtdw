@@ -38,6 +38,9 @@ char *dialog_get_output(void) {
 
     if (has_next_ids == 1) {
       dialog_get_next_element_output(output);
+    } else if (is_multiple_choice == 0) {
+      strcat(output, "\n");
+      dialog_close();
     }
   }
   return output;
