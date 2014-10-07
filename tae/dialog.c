@@ -21,6 +21,7 @@ int dialog_get_current_idx(void) {
 }
 
 void dialog_close() {
+  is_multiple_choice = 0;
   dialog_element_idx = -1;
   c_dialog = NULL;
 }
