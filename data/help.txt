@@ -3,6 +3,7 @@ hilfe = Zeigt diesen Hilfetext an
 beschreibung = Zeigt die aktuelle Ortsbeschreibung erneut an
 inventar = Zeigt den Inhalt des Inventars an
 beenden = Beendet das Abenteuer
+schließen = Dialog schließen
 
 Textmarkierungen in Beschreibungen: $Bezeichnung$ == Gegenstand, #Bezeichnung# == Übergang, &Bezeichnung& == Person
 
