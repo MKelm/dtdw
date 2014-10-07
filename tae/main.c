@@ -190,7 +190,7 @@ struct npc *get_npc(char *title) {
 
 void load_data(void) {
   // help text
-  char help_text[2048];
+  static char help_text[2048];
   load_help(help_text);
   description_set_help(help_text);
   // meta
