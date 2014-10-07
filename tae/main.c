@@ -3,14 +3,13 @@
 #include <locale.h>
 #include "main.h"
 #include "loader.h"
+#include "description.h"
 #include "inventory.h"
 #include "dialog.h"
 #include "display.h"
 
 int current_area = 0;
 int current_place = 0;
-
-char help_text[2048];
 
 // dc: 0 == commands, 1 == areas, 2 == places, 3 == items,
 //     4 == descriptions, 5 = transitions, 6 = npcs, 7 = dialogs
@@ -45,7 +44,7 @@ int main(void) {
   do {
     // check location change, change header display output if needed
     if (location_change == 1) {
-      dsp_set_output(desc_get_output()); // output location description
+      dsp_set_output(description_by_area_place()); // output area place description
       area_place_idx = get_area_place_idx();
       dsp_set_location(
         &areas_data[area_place_idx[0]], &places_data[area_place_idx[1]]
@@ -54,7 +53,7 @@ int main(void) {
     }
     // check output change, change output display window if needed
     if (output_change == 1) {
-      dsp_set_output(action_get_output(&caction));
+      dsp_set_output(description_by_action(&caction));
       output_change = 0;
       init_action(&caction);
     }
@@ -81,7 +80,7 @@ int main(void) {
         } if (strcmp(caction.in_command, "use") == 0 &&
             caction.transition != NULL && caction.transition->id > 0) {
           // output transition action description before location change
-          dsp_set_output(action_get_output(&caction));
+          dsp_set_output(description_by_action(&caction));
           current_place = caction.transition->id;
           location_change = 1;
 
@@ -192,46 +191,6 @@ struct action get_input_action(char *input) {
   return iaction;
 }
 
-struct item *get_item(char *title) {
-  int i;
-  for (i = 0; i < data_counts[3]; i++) {
-    if (strcasecmp(items_data[i].title, title) == 0) {
-      return &items_data[i];
-    }
-  }
-  return NULL;
-}
-
-struct item *get_item_by_id(int id) {
-  int i;
-  for (i = 0; i < data_counts[3]; i++) {
-    if (items_data[i].id == id) {
-      return &items_data[i];
-    }
-  }
-  return NULL;
-}
-
-struct placetrans *get_transition(char *title) {
-  int i;
-  for (i = 0; i < data_counts[5]; i++) {
-    if (strcasecmp(transitions_data[i].title, title) == 0) {
-      return &transitions_data[i];
-    }
-  }
-  return NULL;
-}
-
-struct npc *get_npc(char *title) {
-  int i;
-  for (i = 0; i < data_counts[6]; i++) {
-    if (strcasecmp(npcs_data[i].title, title) == 0) {
-      return &npcs_data[i];
-    }
-  }
-  return NULL;
-}
-
 char *get_internal_command(char *ccommand) {
   int i;
   for (i = 0; i < data_counts[0]; i++) {
@@ -269,173 +228,51 @@ int *get_area_place_idx(void) {
   return area_place_idx;
 }
 
-char *action_get_output(struct action *caction) {
-  // get action related output of the current area place
-  int desc_idx = 0, i, has_text = 0, has_item, has_transition, has_npc;
-  char line[1024];
-  static char output[1024];
-  strncpy(output, "", sizeof(output));
-
-  if (strlen(caction->in_command) > 0 &&
-      ((caction->pitem != NULL && caction->pitem->id > 0) ||
-       (caction->transition != NULL && caction->transition->id > 0) ||
-       (caction->c_npc != NULL && caction->c_npc->id > 0))) {
-
-    // for transition / item / npc action commands
-    desc_idx = 0;
-    while (desc_idx < data_counts[4]) {
-      if (descriptions_data[desc_idx].id == current_place &&
-          strcmp(descriptions_data[desc_idx].id_verb, caction->in_command) == 0) {
-
-        // check status of id item / transition / npc
-        has_item = 0;
-        has_transition = 0;
-        has_npc = 0;
-        if (caction->pitem != NULL && caction->pitem->id > 0 &&
-            descriptions_data[desc_idx].id_items[0] == caction->pitem->id) {
-          has_item = 1;
-
-        } else if (caction->transition != NULL && caction->transition->id > 0 &&
-                   descriptions_data[desc_idx].id_transitions[0] == caction->transition->id) {
-          has_transition = 1;
-
-        } else if (caction->c_npc != NULL && caction->c_npc->id > 0 &&
-                   descriptions_data[desc_idx].id_npcs[0] == caction->c_npc->id) {
-          has_npc = 1;
-        }
-
-        if (has_item == 1 || has_transition == 1 || has_npc == 1) {
-          // check status of available text items to hide descs with non existent items
-          for (i = 0; i < MAX_DESC_TEXT_ITEMS; i++) {
-            struct item *citem = get_item_by_id(descriptions_data[desc_idx].items[i]);
-            if (citem != NULL && citem->status != 0) {
-              has_item = 0;
-              has_transition = 0;
-              has_npc = 0;
-            }
-          }
-
-          if (has_item == 1 || has_transition == 1 || has_npc == 1) {
-            snprintf(line, 1024, "%s ", descriptions_data[desc_idx].text);
-            strcat(output, line);
-            has_text = 1;
-          }
-        }
-
-      } else if (descriptions_data[desc_idx].id == current_place + 1) {
-        break;
-      }
-      desc_idx++;
-    }
-    if (has_text == 1)
-      strcat(output, "\n\n");
-
-    // talkto action dialog output
-    if (strcmp(caction->in_command, "talkto") == 0 &&
-        caction->c_npc != NULL && caction->c_npc->id > 0) {
-      strcat(output, dialog_get_output());
-    }
-
-  } else if (strlen(caction->in_command) > 0) {
-    // for dialog commands
-    if (dialog_get_current_idx() > 0) {
-      strcat(output, dialog_get_output());
-
-    // for simple actions commands
-    } else if (strcmp(caction->in_command, "description") == 0) {
-      strcat(output, desc_get_output());
-
-    } else if (strcmp(caction->in_command, "help") == 0) {
-      strcat(output, help_text);
-      strcat(output, "\n");
-
-    } else if (strcmp(caction->in_command, "inventory") == 0) {
-      strcat(output, inventory_get_output(&meta_data));
+struct placetrans *get_transition(char *title) {
+  int i;
+  for (i = 0; i < data_counts[5]; i++) {
+    if (strcasecmp(transitions_data[i].title, title) == 0) {
+      return &transitions_data[i];
     }
   }
-
-  return output;
+  return NULL;
 }
 
-char *desc_get_output() {
-  // get first output with intro by using virtual description
-  int desc_idx = 0, has_text = 0;
-  char line[1024];
-  static char output[1024];
-  strncpy(output, "", sizeof(output));
-
-  if (current_area == 0 && descriptions_data[desc_idx].id == 0) {
-    snprintf(output, 1024, "%s\n\n", descriptions_data[desc_idx].text);
-    current_area = 1;
-    current_place = 1;
-    has_text = 1;
-    desc_idx++;
-  }
-
-  // get more data of the current area place
-  int base_idx = -1, base_item_idx = 0, base_npc_idx = 0, base_trans_idx = 0;
-  int has_item = 0, has_transition = 0, has_npc = 0;
-  while (desc_idx < data_counts[4]) {
-    if (descriptions_data[desc_idx].id == current_place &&
-        strlen(descriptions_data[desc_idx].id_verb) == 0) {
-
-      if (base_idx == -1) {
-        base_idx = desc_idx;
-      } else {
-        has_item = 0;
-        has_transition = 0;
-        has_npc = 0;
-
-        // show place descriptions with valid item only
-        for (base_item_idx = 0; base_item_idx < MAX_DESC_TEXT_ITEMS; base_item_idx++) {
-          if (descriptions_data[base_idx].items[base_item_idx] > 0 &&
-              descriptions_data[base_idx].items[base_item_idx] == descriptions_data[desc_idx].id_items[0]) {
-            has_item = 1;
-          }
-        }
-        if (has_item == 0) {
-          // show place descriptions with valid npc only
-          for (base_npc_idx = 0; base_npc_idx < MAX_DESC_TEXT_NPCS; base_npc_idx++) {
-            if (descriptions_data[base_idx].npcs[base_npc_idx] > 0 &&
-                descriptions_data[base_idx].npcs[base_npc_idx] == descriptions_data[desc_idx].id_npcs[0]) {
-              has_npc = 1;
-            }
-          }
-        }
-        if (has_item == 0 && has_npc == 0) {
-          // show place descriptions with valid transitions only
-          for (base_trans_idx = 0; base_trans_idx < MAX_DESC_TEXT_TRANS; base_trans_idx++) {
-            if (descriptions_data[base_idx].transitions[base_trans_idx] > 0 &&
-                descriptions_data[base_idx].transitions[base_trans_idx] ==
-                    descriptions_data[desc_idx].id_transitions[0]) {
-              has_transition = 1;
-            }
-          }
-        }
-      }
-
-      if (desc_idx == base_idx || has_item == 1 || has_transition == 1 || has_npc == 1) {
-        snprintf(line, 1024, "%s ", descriptions_data[desc_idx].text);
-        if (has_text == 1) {
-          strcat(output, line);
-        } else {
-          snprintf(output, 1024, "%s ", descriptions_data[desc_idx].text);
-          has_text = 1;
-        }
-      }
-    } else if (descriptions_data[desc_idx].id == current_place + 1) {
-      break;
+struct item *get_item(char *title) {
+  int i;
+  for (i = 0; i < data_counts[3]; i++) {
+    if (strcasecmp(items_data[i].title, title) == 0) {
+      return &items_data[i];
     }
-    desc_idx++;
   }
-  strcat(output, "\n\n");
+  return NULL;
+}
 
-  return output;
+struct item *get_item_by_id(int id) {
+  int i;
+  for (i = 0; i < data_counts[3]; i++) {
+    if (items_data[i].id == id) {
+      return &items_data[i];
+    }
+  }
+  return NULL;
+}
+
+struct npc *get_npc(char *title) {
+  int i;
+  for (i = 0; i < data_counts[6]; i++) {
+    if (strcasecmp(npcs_data[i].title, title) == 0) {
+      return &npcs_data[i];
+    }
+  }
+  return NULL;
 }
 
 void load_data(void) {
   // help text
+  char help_text[2048];
   load_help(help_text);
+  description_set_help(help_text);
   // meta
   load_meta(&meta_data);
   // commands
@@ -448,6 +285,8 @@ void load_data(void) {
   data_counts[3] = load_items(items_data, MAX_ITEMS);
   // descriptions
   data_counts[4] = load_descriptions(descriptions_data, MAX_DESCRIPTIONS);
+  description_set_descriptions(descriptions_data, data_counts[4]);
+
   // transitions related to places
   data_counts[5] = load_transitions(
     transitions_data, MAX_PLACETRANS, places_data, data_counts[2], MAX_PLACE_TRANSITIONS
