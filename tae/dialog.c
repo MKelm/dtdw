@@ -12,9 +12,9 @@ void dialog_set_current(struct dialog *ptr_dialog) {
   c_dialog = ptr_dialog;
 }
 
-char *dialog_get_next_output(void) {
+char *dialog_get_output(void) {
   static char output[1024], line[1024];
-  int has_next_ids = 0;
+  int has_next_ids = 0, next_id_idx = 0;
   strncpy(output, "", sizeof(output));
   if (dialog_element_idx > -1) {
     // first output
@@ -32,16 +32,16 @@ char *dialog_get_next_output(void) {
       int i;
       for (i = 0; i < DIALOG_ELEMENT_MAX_NEXT_IDS; i++) {
         if (c_dialog->elements[dialog_element_idx].next_ids[i] > 0) {
-
-          dialog_element_idx = dialog_get_next_element_idx(
-            c_dialog->elements[dialog_element_idx].next_ids[i]
+          next_id_idx = dialog_get_next_element_idx(
+             dialog_element_idx, c_dialog->elements[dialog_element_idx].next_ids[i]
           );
+
           if (is_multiple_choice == 1) {
             snprintf(line, 1024, "*  \"%s\" (%d)\n",
-              c_dialog->elements[dialog_element_idx].text, i+1);
+              c_dialog->elements[next_id_idx].text, i+1);
           } else {
             snprintf(line, 1024, "\"%s\"\n",
-              c_dialog->elements[dialog_element_idx].text);
+              c_dialog->elements[next_id_idx].text);
           }
           strcat(output, line);
         }
@@ -52,14 +52,14 @@ char *dialog_get_next_output(void) {
   return output;
 }
 
-int dialog_get_next_element_idx(int id) {
+int dialog_get_next_element_idx(int current_idx, int next_id) {
   int idx;
-  for (idx = dialog_element_idx; idx < DIALOG_MAX_ELEMENTS; idx++) {
-    if (c_dialog->elements[idx].id == id) {
+  for (idx = current_idx; idx < DIALOG_MAX_ELEMENTS; idx++) {
+    if (c_dialog->elements[idx].id == next_id) {
       return idx;
     }
   }
-  return dialog_element_idx;
+  return idx;
 }
 
 void dialog_set_input(char *input) {

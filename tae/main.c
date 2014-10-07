@@ -322,7 +322,7 @@ char *action_get_output(struct action *caction) {
     // talkto action dialog output
     if (strcmp(caction->in_command, "talkto") == 0 &&
         caction->c_npc != NULL && caction->c_npc->id > 0) {
-      strcat(output, dialog_get_next_output());
+      strcat(output, dialog_get_output());
     }
 
   } else if (strlen(caction->in_command) > 0) {
