@@ -62,13 +62,10 @@ void load_phrases(struct phrases *data) {
           strncpy(data->items_comb, line, sizeof(data->items_comb));
           break;
         case 3:
-          strncpy(data->items_comb_new_item, line, sizeof(data->items_comb_new_item));
+          strncpy(data->items_comb_failure, line, sizeof(data->items_comb_failure));
           break;
         case 4:
-          strncpy(data->items_comb_open_trans, line, sizeof(data->items_comb_open_trans));
-          break;
-        case 5:
-          strncpy(data->items_comb_close_trans, line, sizeof(data->items_comb_close_trans));
+          strncpy(data->item_usage_failure, line, sizeof(data->item_usage_failure));
           break;
       }
       strncpy(line, "", sizeof(line));

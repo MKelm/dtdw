@@ -14,9 +14,8 @@ struct phrases {
   char inv_title[PHRASES_CHARS_LENGTH];
   char no_inv_items[PHRASES_CHARS_LENGTH];
   char items_comb[PHRASES_CHARS_LENGTH];
-  char items_comb_new_item[PHRASES_CHARS_LENGTH];
-  char items_comb_open_trans[PHRASES_CHARS_LENGTH];
-  char items_comb_close_trans[PHRASES_CHARS_LENGTH];
+  char items_comb_failure[PHRASES_CHARS_LENGTH];
+  char item_usage_failure[PHRASES_CHARS_LENGTH];
 };
 
 struct command {

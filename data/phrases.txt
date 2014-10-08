@@ -1,6 +1,5 @@
 Inventar
 Keine Inventargegenstände
-Gegenstand %s mit %s kombiniert
-, neuer Gegenstand %s
-, Übergang ist nun offen
-, Übergang ist nun geschlossen
+Gegenstand %s mit %s kombiniert, neuer Gegenstand %s
+Die gewählten Gegenstände lassen sich nicht kombinieren.
+Der gewählte Gegenstand lässt sich nicht benutzen.

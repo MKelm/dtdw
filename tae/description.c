@@ -106,13 +106,12 @@ char *description_by_action(struct action *caction) {
   static char output[1024];
   strncpy(output, "", sizeof(output));
 
-  // todo: output on transition status change
-  if (caction->f_item != NULL) {
-    snprintf(line, 1024, phrases_data.items_comb, caction->pitem->title, caction->sitem->title);
-    if (caction->transition == 0) {
-      char tmp[1024];
-      snprintf(tmp, 1024, phrases_data.items_comb_new_item, caction->f_item->title);
-      strcat(line, tmp);
+  if (caction->pitem != NULL && caction->sitem != NULL) {
+    if (caction->f_item == NULL) {
+      snprintf(line, 1024, phrases_data.items_comb_failure, "");
+    } else {
+      snprintf(line, 1024, phrases_data.items_comb,
+        caction->pitem->title, caction->sitem->title, caction->f_item->title);
     }
     strcat(line, "\n\n");
     strcat(output, line);

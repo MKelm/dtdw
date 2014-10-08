@@ -80,10 +80,7 @@ int action_handle_input(char *input) {
 
             // check try item combination
             if (c_action.pitem != NULL && c_action.sitem != NULL) {
-              if (main_item_check_comb(c_action.pitem, c_action.sitem) == 0) {
-                action_reset();
-                return 0;
-              } else {
+              if (main_item_check_comb(c_action.pitem, c_action.sitem) == 1) {
                 c_action.f_item = get_item_by_id(c_action.pitem->final_id);
               }
             } else if (c_action.pitem != NULL) {
