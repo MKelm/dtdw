@@ -88,6 +88,17 @@ int main(void) {
             current_place = caction->transition->id;
             location_change = 1;
 
+          } else if (strcmp(caction->in_command, "use") == 0 &&
+                     caction->transition != NULL &&
+                     caction->transition->status == 2 && caction->pitem != NULL) {
+
+            if (inventory_has_item(caction->pitem)) {
+              // remove locked status by use item command
+              dsp_set_output(description_by_action(action_get()));
+              caction->transition->status = 1; // unlock -> closed status
+            }
+            output_change = 0;
+
           } else if (strcmp(caction->in_command, "open") == 0 &&
                      caction->transition->status == 1) {
             // remove closed status by open command

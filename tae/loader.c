@@ -384,9 +384,10 @@ int load_descriptions_rec(FILE *f, struct description *data, int data_idx) {
           // id trans status used to get descriptions in relation to closed / locked status
           if ((ch = fgetc(f)) == '<') {
             fscanf(f, "%[^\n^/^$]", str);
-            if (strcmp(str, "c") == 0)
+            if (strcmp(str, "c") == 0) {
               data[data_idx].id_trans_status[id_trans_idx] = 1; // closed
-            else if (strcmp(str, "l") == 0) {
+              data[data_idx].id_trans_item_id[id_trans_idx] = 0;
+            } else if (strcmp(str, "l") == 0) {
               data[data_idx].id_trans_status[id_trans_idx] = 2; // locked
               // needs an item (id) to unlock transition
               fscanf(f, "$%d", &data[data_idx].id_trans_item_id[id_trans_idx]);

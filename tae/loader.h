@@ -58,6 +58,7 @@ int load_dialogs(struct npc npcs_data[], int nlmax, struct dialog data[], int lm
 #define MAX_DESCRIPTIONS 1000
 
 int load_descriptions(struct description data[], int lmax);
+int load_descriptions_rec(FILE *f, struct description *data, int data_idx);
 
 // transitions
 #define MAX_PLACETRANS 1000

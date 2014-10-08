@@ -8,6 +8,16 @@ struct inventory_item {
 
 int inventory_count = 0;
 
+int inventory_has_item(struct item *link) {
+  int i;
+  for (i = 0; i < inventory_count; i++) {
+    if (inventory_items[i].link->id == link->id) {
+      return 1;
+    }
+  }
+  return 0;
+}
+
 int inventory_add_item(struct item *link) {
   if (link != NULL && link->id > 0) {
     link->status = 1; // set status to "in inventory"

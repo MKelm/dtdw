@@ -78,12 +78,17 @@ int action_handle_input(char *input) {
             c_action.pitem = get_item(inputarr[1]);
             c_action.sitem = get_item(inputarr[3]);
 
-            if (c_action.pitem == NULL || c_action.sitem == NULL ||
-                main_item_check_comb(c_action.pitem, c_action.sitem) == 0) {
-              action_reset();
-              return 0;
-            } else {
-              c_action.f_item = get_item_by_id(c_action.pitem->final_id);
+            // check try item combination
+            if (c_action.pitem != NULL && c_action.sitem != NULL) {
+              if (main_item_check_comb(c_action.pitem, c_action.sitem) == 0) {
+                action_reset();
+                return 0;
+              } else {
+                c_action.f_item = get_item_by_id(c_action.pitem->final_id);
+              }
+            } else if (c_action.pitem != NULL) {
+              // check try item / transition combination
+              c_action.transition = get_transition(inputarr[3]);
             }
             return 1;
           }

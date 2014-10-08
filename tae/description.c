@@ -142,7 +142,18 @@ char *description_by_action(struct action *caction) {
 
           if (descriptions[desc_idx].id_trans_status[0] == caction->transition->status) {
             // set has transition with valid status only
-            has_transition = 1;
+            if (caction->transition->status == 2 && caction->pitem == NULL &&
+                descriptions[desc_idx].id_trans_item_id[0] == 0) {
+              // use (unlock) command without correct item
+              has_transition = 1;
+            } else if (caction->transition->status == 2 && caction->pitem != NULL &&
+                descriptions[desc_idx].id_trans_item_id[0] == caction->pitem->id) {
+              // use (unlock) command with correct item
+              has_transition = 1;
+            } else if (caction->transition->status != 2) {
+              // another valid transition status
+              has_transition = 1;
+            }
           }
 
         } else if (caction->c_npc != NULL && caction->c_npc->id > 0 &&
