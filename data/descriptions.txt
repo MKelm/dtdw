@@ -8,6 +8,15 @@ Du bist in deinem Zimmer. Es gibt eine #Tür# zum Flur der nach unten führt.
 #1#2/lookat
 Eine solide Holztür, sie steht offen.
 
+#1#2<l/lookat
+Eine solide Holztür, sie ist verschlossen. Auf ihr ist ein Heavy Xettel-Poster.
+
+#1#2<l/use
+Das ist nicht möglich, leider ist die Tür verschlossen.
+
+#1#2<l$10/use
+Du gehst zur Tür und benutzt den Zimmerschlüssel um die Tür zu öffnen.
+
 #1#2<c/lookat
 Eine solide Holztür, sie ist geschlossen. Auf ihr ist ein Heavy Xettel-Poster.
 

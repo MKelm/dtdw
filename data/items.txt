@@ -24,3 +24,6 @@ Feuerzeug
 
 $9&4=6
 Kerze(an)
+
+$10&0=0
+Zimmerschlüssel
