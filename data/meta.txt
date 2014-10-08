@@ -2,5 +2,3 @@ Der Talisman der Wächterin
 0.0.2 alpha
 Martin Kelm
 2014
-Inventar
-Keine Inventargegenstände

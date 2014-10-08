@@ -10,7 +10,7 @@ int descriptions_count = 0;
 
 char *help_description;
 
-extern struct meta meta_data;
+extern struct phrases phrases_data;
 extern int current_area;
 extern int current_place;
 
@@ -180,7 +180,7 @@ char *description_by_action(struct action *caction) {
       strcat(output, "\n");
 
     } else if (strcmp(caction->in_command, "inventory") == 0) {
-      strcat(output, inventory_get_output(&meta_data));
+      strcat(output, inventory_get_output(&phrases_data));
     }
   }
 

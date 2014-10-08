@@ -10,6 +10,12 @@ void load_help(char *text);
 
 void load_meta(struct meta *data);
 
+// phrases
+
+#define FILE_PHRASES "../data/phrases.txt"
+
+void load_phrases(struct phrases *data) ;
+
 // commands
 #define FILE_COMMANDS "../data/commands.txt"
 #define MAX_COMMANDS 20

@@ -1,0 +1,6 @@
+Inventar
+Keine Inventargegenstände
+Gegenstand %s mit %s kombiniert
+, neuer Gegenstand %s
+, Übergang ist nun offen
+, Übergang ist nun geschlossen

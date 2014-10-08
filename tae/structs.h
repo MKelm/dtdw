@@ -6,8 +6,17 @@ struct meta {
   char version[24];
   char author[36];
   int cyear;
-  char tinventory[24];
-  char noinvitems[42];
+};
+
+#define PHRASES_CHARS_LENGTH 256
+
+struct phrases {
+  char inv_title[PHRASES_CHARS_LENGTH];
+  char no_inv_items[PHRASES_CHARS_LENGTH];
+  char items_comb[PHRASES_CHARS_LENGTH];
+  char items_comb_new_item[PHRASES_CHARS_LENGTH];
+  char items_comb_open_trans[PHRASES_CHARS_LENGTH];
+  char items_comb_close_trans[PHRASES_CHARS_LENGTH];
 };
 
 struct command {

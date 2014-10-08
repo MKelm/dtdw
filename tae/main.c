@@ -16,6 +16,7 @@ int current_place = 0;
 //     4 == descriptions, 5 = transitions, 6 = npcs, 7 = dialogs
 int data_counts[8];
 struct meta meta_data;
+struct phrases phrases_data;
 struct command commands_data[MAX_COMMANDS];
 struct area areas_data[MAX_AREAS];
 struct place places_data[MAX_PLACES];
@@ -212,6 +213,8 @@ void load_data(void) {
   description_set_help(help_text);
   // meta
   load_meta(&meta_data);
+  // phrases
+  load_phrases(&phrases_data);
   // commands
   data_counts[0] = load_commands(commands_data, MAX_COMMANDS);
   // areas

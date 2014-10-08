@@ -34,16 +34,16 @@ int inventory_rm_item(struct item *link) {
   return removed;
 }
 
-char *inventory_get_output(struct meta *meta_data) {
+char *inventory_get_output(struct phrases *phrases_data) {
   char line[1024];
   static char output[1024];
   strncpy(output, "", sizeof(output));
   if (inventory_count == 0) {
     snprintf(
-      output, 1024, "%s: %s\n\n", meta_data->tinventory, meta_data->noinvitems
+      output, 1024, "%s: %s\n\n", phrases_data->inv_title, phrases_data->no_inv_items
     );
   } else {
-    snprintf(output, 1024, "%s:", meta_data->tinventory);
+    snprintf(output, 1024, "%s:", phrases_data->inv_title);
     int i;
     for (i = 0; i < inventory_count; i++) {
       snprintf(

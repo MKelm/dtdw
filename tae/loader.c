@@ -34,10 +34,43 @@ void load_meta(struct meta *data) {
         strncpy(data->author, line, sizeof(data->author));
       else if (linenum == 3)
         data->cyear = atoi(line);
-      else if (linenum == 4)
-        strncpy(data->tinventory, line, sizeof(data->tinventory));
-      else
-        strncpy(data->noinvitems, line, sizeof(data->noinvitems));
+      strncpy(line, "", sizeof(line));
+      linenum++;
+    }
+  }
+  fclose(f);
+}
+
+void load_phrases(struct phrases *data) {
+  FILE *f = fopen(FILE_PHRASES, "r");
+  int ch, linenum = 0;
+  char line[1024] = "", chstr[2];
+
+  while ((ch = fgetc(f)) != EOF) {
+    if (ch != '\n') {
+      snprintf(chstr, 2, "%c", ch);
+      strcat(line, chstr);
+    } else {
+      switch (linenum) {
+        case 0:
+          strncpy(data->inv_title, line, sizeof(data->inv_title));
+          break;
+        case 1:
+          strncpy(data->no_inv_items, line, sizeof(data->no_inv_items));
+          break;
+        case 2:
+          strncpy(data->items_comb, line, sizeof(data->items_comb));
+          break;
+        case 3:
+          strncpy(data->items_comb_new_item, line, sizeof(data->items_comb_new_item));
+          break;
+        case 4:
+          strncpy(data->items_comb_open_trans, line, sizeof(data->items_comb_open_trans));
+          break;
+        case 5:
+          strncpy(data->items_comb_close_trans, line, sizeof(data->items_comb_close_trans));
+          break;
+      }
       strncpy(line, "", sizeof(line));
       linenum++;
     }
