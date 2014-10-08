@@ -393,6 +393,9 @@ int load_descriptions_rec(FILE *f, struct description *data, int data_idx) {
     }
     // get text
     fgets(data[data_idx].text, sizeof(data[data_idx].text), f);
+    int len = strlen(data[data_idx].text);
+    if (data[data_idx].text[len - 1] == '\n')
+        data[data_idx].text[len - 1] = '\0';
     // switch to get transitions / npcs or items
     if ((ch = fgetc(f)) != '\n') {
       int trans_idx = 0, npc_idx = 0, item_idx = 0;
