@@ -62,9 +62,9 @@ int main(void) {
     if (strlen(input) > 0) {
       action_handle_input(input);
       struct action *caction = action_get();
+
       if (strlen(caction->in_command) > 0 &&
           strcasecmp(caction->in_command, "quit") != 0) {
-
         output_change = 1;
         if (dialog_get_current_idx() > -1) {
           // dialog mode
@@ -77,12 +77,19 @@ int main(void) {
             output_change = dialog_handle_input(caction->in_command);
           }
 
-        } if (strcmp(caction->in_command, "use") == 0 &&
-            caction->transition != NULL && caction->transition->id > 0) {
+        } else if (strcmp(caction->in_command, "use") == 0 &&
+                   caction->transition != NULL && caction->transition->id > 0) {
           // output transition action description before location change
           dsp_set_output(description_by_action(action_get()));
           current_place = caction->transition->id;
           location_change = 1;
+
+        } else if (strcmp(caction->in_command, "use") == 0 &&
+                   caction->pitem != NULL && caction->sitem != NULL &&
+                   caction->pitem->id > 0 && caction->sitem->id > 0) {
+
+          // todo combine action
+          printf("combine items");
 
         } else if (strcmp(caction->in_command, "pickup") == 0 &&
                    caction->pitem != NULL && caction->pitem->id > 0) {
@@ -156,6 +163,13 @@ struct placetrans *get_transition(char *title) {
     }
   }
   return NULL;
+}
+
+int main_item_check_comb(struct item *p_item, struct item *s_item) {
+  if (p_item->id == s_item->comb_id || s_item->id == p_item->comb_id) {
+    return 1;
+  }
+  return 0;
 }
 
 struct item *get_item(char *title) {
