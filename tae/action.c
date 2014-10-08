@@ -8,6 +8,7 @@ struct action c_action;
 void action_reset() {
   strcpy(c_action.in_command, "");
   c_action.transition = NULL;
+  c_action.item_comb = 0;
   c_action.pitem = NULL;
   c_action.sitem = NULL;
   c_action.c_npc = NULL;
@@ -79,8 +80,11 @@ int action_handle_input(char *input) {
 
             if (c_action.pitem == NULL || c_action.sitem == NULL ||
                 main_item_check_comb(c_action.pitem, c_action.sitem) == 0) {
+              c_action.item_comb = 0;
               action_reset();
               return 0;
+            } else {
+              c_action.item_comb = 1;
             }
             return 1;
           }

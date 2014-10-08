@@ -56,6 +56,7 @@ int main(void) {
       output_change = 0;
       action_reset();
     }
+
     // input prompt
     input = dsp_get_input();
     // check input to set action flags
@@ -88,8 +89,10 @@ int main(void) {
                    caction->pitem != NULL && caction->sitem != NULL &&
                    caction->pitem->id > 0 && caction->sitem->id > 0) {
 
-          // todo combine action
-          printf("combine items");
+          // combine two items and put new item to inventory
+          inventory_rm_item(caction->sitem);
+          inventory_rm_item(caction->pitem);
+          inventory_add_item(get_item_by_id(caction->sitem->final_id));
 
         } else if (strcmp(caction->in_command, "pickup") == 0 &&
                    caction->pitem != NULL && caction->pitem->id > 0) {
