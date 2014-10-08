@@ -140,78 +140,45 @@ int load_areas(struct area *data, int lmax) {
   return entryidx;
 }
 
-int load_places(struct place *data, int lmax) {
-  FILE *f = fopen(FILE_PLACES, "r");
-  int ch, entryidx = 0;
-  char line[1024] = "", chstr[2];
-  int loadareaid = 0, loadid = 0, loadtitle = 0;
-  int loadtransitions = 0, loadtransid = 0, loadtranstitle = 0;
-  int transitionidx = 0;
+int load_places_rec(FILE *f, struct place *data, int data_idx) {
+  int area_id, place_id, transition_id;
+  char title[256] = "", transition_title[256] = "", trans_status[2] = "";
 
-  while ((ch = fgetc(f)) != EOF) {
-    if (loadareaid == 0 && loadid == 0 && loadtitle == 0 && loadtransitions == 0) {
-      loadareaid = 1;
+  if (fscanf(f, "%d#%d\n", &area_id, &place_id)) {
+    data[data_idx].area_id = area_id;
+    data[data_idx].id = place_id;
+  }
+  if (area_id > 0 && place_id > 0) {
+    if (fscanf(f, "%[^\n]\n", &title[0])) {
+      strncpy(data[data_idx].title, title, sizeof(data[data_idx].title));
     }
-    if ((loadareaid == 1 || loadid == 1 || loadtitle == 1 || loadtranstitle == 1) &&
-        ch != '#' && ch != '\n') {
-      snprintf(chstr, 2, "%c", ch);
-      strcat(line, chstr);
-    } else if (loadareaid == 1 && ch == '#') {
-      data[entryidx].area_id = atoi(line);
-      strncpy(line, "", sizeof(line));
-      loadareaid = 0;
-      loadid = 1;
-    } else if (loadid == 1 && ch == '\n') {
-      data[entryidx].id = atoi(line);
-      strncpy(line, "", sizeof(line));
-      loadid = 0;
-      loadtitle = 1;
-    } else if (loadtitle == 1 &&  ch == '\n') {
-      strncpy(data[entryidx].title, line, sizeof(data[entryidx].title));
-      strncpy(line, "", sizeof(line));
-      loadtitle = 0;
-      loadtransitions = 1;
-
-    } else if (loadtransitions == 1) {
-      if (loadtransid == 0 && loadtranstitle == 0 && ch != '#') {
-        loadtransitions = 0;
-        entryidx++;
-        if (entryidx == lmax)
-          return entryidx;
-      } else if (loadtransid == 0 && loadtranstitle == 0 && ch == '#') {
-        loadtransid = 1;
-      } else if ((loadtransid == 1 && isdigit(ch)) ||
-                 (loadtranstitle == 1 && ch != '#' && ch != '\n')) {
-        snprintf(chstr, 2, "%c", ch);
-        strcat(line, chstr);
-      } else if (loadtransid == 1 && !isdigit(ch)) {
-        data[entryidx].transitions[transitionidx].id = atoi(line);
-        data[entryidx].transitions[transitionidx].locked = 0;
-        strncpy(line, "", sizeof(line));
-        loadtransid = 0;
-        loadtranstitle = 1;
-        snprintf(chstr, 2, "%c", ch);
-        strcat(line, chstr);
-      } else if (loadtranstitle == 1 && (ch == '#' || ch == '\n')) {
-        strncpy(data[entryidx].transitions[transitionidx].title, line,
-          sizeof(data[entryidx].transitions[transitionidx].title));
-        strncpy(line, "", sizeof(line));
-        loadtranstitle = 0;
-        if (ch == '#') {
-          loadtransid = 1;
-          transitionidx++;
-        } else {
-          loadtransitions = 0;
-          transitionidx = 0;
-          entryidx++;
-          if (entryidx == lmax)
-            return entryidx;
-        }
+    // todo: add multiple transitions support if needed
+    if (fscanf(f, "#%d%[^<^\n]", &transition_id, &transition_title[0])) {
+      data[data_idx].transitions[0].id = transition_id;
+      strncpy(data[data_idx].transitions[0].title, transition_title,
+        sizeof(data[data_idx].transitions[0].title));
+    }
+    if (fgetc(f) != '\n') {
+      fscanf(f, "%[^#^\n]", &trans_status[0]);
+      if (strlen(trans_status) > 0) {
+        data[data_idx].transitions[0].locked = (strcmp(trans_status, "l") == 0)
+          ? 1 : 0;
+      }
+      if (fgetc(f) == '\n') {
+        data_idx++;
+        data_idx = load_places_rec(f, data, data_idx);
       }
     }
   }
+  return data_idx;
+}
+
+int load_places(struct place *data, int lmax) {
+  FILE *f = fopen(FILE_PLACES, "r");
+  int data_idx = 0;
+  data_idx = load_places_rec(f, data, data_idx);
   fclose(f);
-  return entryidx;
+  return ++data_idx;
 }
 
 int load_transitions(struct placetrans transitions_data[], int transitions_lmax,

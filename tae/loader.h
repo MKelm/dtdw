@@ -33,6 +33,7 @@ int load_areas(struct area data[], int lmax);
 #define MAX_PLACES 200
 
 int load_places(struct place data[], int lmax);
+int load_places_rec(FILE *f, struct place *data, int data_idx);
 
 // items
 #define FILE_ITEMS "../data/items.txt"
