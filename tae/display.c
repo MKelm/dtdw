@@ -117,11 +117,11 @@ char *dsp_word_wrap(char* buffer, char* string, int line_width) {
 }
 
 char *dsp_get_input(void) {
-  static char str[25];
+  static char str[128];
   wclear(input);
   mvwaddstr(input, 0, 1, ">> ");
   curs_set(1);
-  mvwgetnstr(input, 0, 4, str, 24);
+  mvwgetnstr(input, 0, 4, str, 127);
   curs_set(0);
   return str;
 }
