@@ -93,7 +93,9 @@ int main(void) {
           // combine two items and put new item to inventory
           inventory_rm_item(caction->sitem);
           inventory_rm_item(caction->pitem);
-          inventory_add_item(get_item_by_id(caction->sitem->final_id));
+          inventory_add_item(caction->f_item);
+
+          // todo: add logic to handle transitions status change by item usage
 
         } else if (strcmp(caction->in_command, "pickup") == 0 &&
                    caction->pitem != NULL && caction->pitem->id > 0) {

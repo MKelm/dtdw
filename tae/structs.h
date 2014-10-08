@@ -95,11 +95,11 @@ struct description {
 };
 
 struct action {
-  int item_comb; // status of item combinition
   char in_command[256]; // internal command
   struct placetrans *transition;
   struct item *pitem; // primary item
   struct item *sitem; // sub item
+  struct item *f_item; // final item after item combinition
   struct npc *c_npc; // current npc
 };
 

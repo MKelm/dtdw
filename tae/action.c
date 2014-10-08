@@ -8,9 +8,9 @@ struct action c_action;
 void action_reset() {
   strcpy(c_action.in_command, "");
   c_action.transition = NULL;
-  c_action.item_comb = 0;
   c_action.pitem = NULL;
   c_action.sitem = NULL;
+  c_action.f_item = NULL;
   c_action.c_npc = NULL;
 }
 
@@ -80,11 +80,10 @@ int action_handle_input(char *input) {
 
             if (c_action.pitem == NULL || c_action.sitem == NULL ||
                 main_item_check_comb(c_action.pitem, c_action.sitem) == 0) {
-              c_action.item_comb = 0;
               action_reset();
               return 0;
             } else {
-              c_action.item_comb = 1;
+              c_action.f_item = get_item_by_id(c_action.pitem->final_id);
             }
             return 1;
           }

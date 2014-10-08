@@ -106,10 +106,22 @@ char *description_by_action(struct action *caction) {
   static char output[1024];
   strncpy(output, "", sizeof(output));
 
-  if (strlen(caction->in_command) > 0 &&
-      ((caction->pitem != NULL && caction->pitem->id > 0) ||
-       (caction->transition != NULL && caction->transition->id > 0) ||
-       (caction->c_npc != NULL && caction->c_npc->id > 0))) {
+  // todo: output on transition status change
+  if (caction->f_item != NULL) {
+    snprintf(line, 1024, phrases_data.items_comb, caction->pitem->title, caction->sitem->title);
+    if (caction->transition == 0) {
+      char tmp[1024];
+      snprintf(tmp, 1024, phrases_data.items_comb_new_item, caction->f_item->title);
+      strcat(line, tmp);
+    }
+    strcat(line, "\n\n");
+    strcat(output, line);
+    has_text = 1;
+
+  } else if (strlen(caction->in_command) > 0 &&
+             ((caction->pitem != NULL && caction->pitem->id > 0) ||
+              (caction->transition != NULL && caction->transition->id > 0) ||
+              (caction->c_npc != NULL && caction->c_npc->id > 0))) {
 
     // for transition / item / npc action commands
     desc_idx = 0;
