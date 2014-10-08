@@ -32,7 +32,7 @@ struct area {
 struct placetrans {
   int id;
   char title[56];
-  int locked;
+  int status; // 0 = open, 1 = closed
 };
 
 #define MAX_PLACE_TRANSITIONS 5
@@ -85,6 +85,7 @@ struct npc {
 struct description {
   int id;
   int id_transitions[MAX_DESC_ID_EXTRAS];
+  int id_trans_status[MAX_DESC_ID_EXTRAS];
   int id_items[MAX_DESC_ID_EXTRAS];
   int id_npcs[MAX_DESC_ID_EXTRAS];
   char id_verb[24];

@@ -139,7 +139,11 @@ char *description_by_action(struct action *caction) {
 
         } else if (caction->transition != NULL && caction->transition->id > 0 &&
                    descriptions[desc_idx].id_transitions[0] == caction->transition->id) {
-          has_transition = 1;
+
+          if (descriptions[desc_idx].id_trans_status[0] == caction->transition->status) {
+            // set has transition with valid status only
+            has_transition = 1;
+          }
 
         } else if (caction->c_npc != NULL && caction->c_npc->id > 0 &&
                    descriptions[desc_idx].id_npcs[0] == caction->c_npc->id) {

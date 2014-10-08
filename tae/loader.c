@@ -161,8 +161,8 @@ int load_places_rec(FILE *f, struct place *data, int data_idx) {
     if (fgetc(f) != '\n') {
       fscanf(f, "%[^#^\n]", &trans_status[0]);
       if (strlen(trans_status) > 0) {
-        data[data_idx].transitions[0].locked = (strcmp(trans_status, "l") == 0)
-          ? 1 : 0;
+        data[data_idx].transitions[0].status = (strcmp(trans_status, "c") == 0)
+          ? 1 : 0; // 1 == closed
       }
       if (fgetc(f) == '\n') {
         data_idx++;
@@ -377,6 +377,15 @@ int load_descriptions_rec(FILE *f, struct description *data, int data_idx) {
         fscanf(f, "%[#&$]%d", str, &tmp);
         if (strcmp(str, "#") == 0 && id_trans_idx < MAX_DESC_ID_EXTRAS) {
           data[data_idx].id_transitions[id_trans_idx] = tmp;
+          data[data_idx].id_trans_status[id_trans_idx] = 0;
+          // simple implementation of trans id status for trans id
+          if ((ch = fgetc(f)) == '<') {
+            fscanf(f, "%[^\n^/]", str);
+            if (strcmp(str, "c") == 0)
+              data[data_idx].id_trans_status[id_trans_idx] = 1; // closed
+          } else {
+            fseek(f, ftell(f) - 1, SEEK_SET);
+          }
           id_trans_idx++;
         } else if (strcmp(str, "&") == 0 && id_npc_idx < MAX_DESC_ID_EXTRAS) {
           data[data_idx].id_npcs[id_npc_idx] = tmp;

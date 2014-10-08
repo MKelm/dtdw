@@ -6,7 +6,19 @@ Du bist in deinem Zimmer. Es gibt eine #Tür# zum Flur der nach unten führt.
 #2$1$2$3
 
 #1#2/lookat
-Eine solide Holztür, auf der einen Seite ist ein Heavy Xettel-Poster.
+Eine solide Holztür, sie steht offen.
+
+#1#2<c/lookat
+Eine solide Holztür, sie ist geschlossen. Auf ihr ist ein Heavy Xettel-Poster.
+
+#1#2<c/use
+Das ist nicht möglich, leider ist die Tür geschlossen.
+
+#1#2<c/open
+Du gehst zu Tür und öffnest sie.
+
+#1#2/close
+Du gehst zu Tür und schließt sie.
 
 #1#2/use
 Du gehst durch die Tür nach unten ins Wohnzimmer.
