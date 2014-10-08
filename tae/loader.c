@@ -418,10 +418,9 @@ int load_descriptions_rec(FILE *f, struct description *data, int data_idx) {
     while ((ch = fgetc(f)) == '\n');
     if (ch == '#') {
       fseek(f, ftell(f) - 1, SEEK_SET);
+      data_idx++;
       data_idx = load_descriptions_rec(f, data, data_idx);
     }
-
-    data_idx++;
   }
 
   return data_idx;
@@ -432,5 +431,5 @@ int load_descriptions(struct description *data, int lmax) {
   int data_idx = 0;
   data_idx = load_descriptions_rec(f, data, data_idx);
   fclose(f);
-  return data_idx;
+  return ++data_idx;
 }
