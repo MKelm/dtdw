@@ -357,163 +357,80 @@ int load_dialogs(struct npc npcs_data[], int nlmax, struct dialog data[], int lm
   }
   return elementcount;
 }
+
 /*
  Description definitions:
- #placeId$itemId...(optional)/verb(optional)
- Text with #transition# or $item$ ...
- #transitionID...$itemID...
+ #placeId&npcId$itemId...(optional)/verb(optional)
+ Text with #transition# or &npc& or $item$ ...
+ #transitionIDs...npcIDs...$itemIDs...
 */
-int load_descriptions(struct description data[], int lmax) {
-  FILE *f = fopen(FILE_DESCRIPTIONS, "r");
-  int ch, entryidx = 0;
-  // load status values: main id, id trans id, id items id, id npcs id, id verb, transition id, items id
-  int loadid = 0, lidtransid = 0, liditemsid = 0, lidnpcsid = 0, lidverb = 0, ltransid = 0, litemsid = 0, lnpcsid = 0;
-  // transition / item ids indexes
-  int lidtransidx = 0, liditemidx = 0, lidnpcidx = 0, ltransidx = 0, litemidx = 0, lnpcidx = 0;
-  // temporary characters
-  char line[1024] = "", chstr[2];
-  // load modes: 0 = id (+ desc items) (+ verb), 1 = text, 2 = transitions and items
-  int loadmode = 0;
+int load_descriptions_rec(FILE *f, struct description *data, int data_idx) {
+  char str[256];
+  int tmp, ch;
 
-  while ((ch = fgetc(f)) != EOF) {
-    switch (loadmode) {
-      case 0:
-        // load desc id
-        if (ch == '#' && loadid == 0 && lidtransid == 0) {
-          loadid = 1;
-        } else if (loadid == 1 && ch != '\n' && ch != '#' && ch != '$' && ch != '/' && ch != '&') {
-          snprintf(chstr, 2, "%c", ch);
-          strcat(line, chstr);
-        } else if (loadid == 1 && (ch == '\n' || ch == '#' || ch == '$' || ch == '/' || ch == '&')) {
-          loadid = 0;
-          data[entryidx].id = atoi(line);
-          strncpy(line, "", sizeof(line));
-          liditemidx = 0;
-          lidnpcidx = 0;
-          lidtransidx = 0;
-          ltransidx = 0;
-          litemidx = 0;
-          lnpcidx = 0;
-          if (ch == '\n')
-            loadmode = 1;
+  if (fscanf(f, "#%d", &data[data_idx].id)) {
+    // switch to get id transitions / id npcs or id items
+    if ((ch = fgetc(f)) != '\n') {
+      int id_trans_idx = 0, id_npc_idx = 0, id_item_idx = 0;
+      do {
+        fseek(f, ftell(f) - 1, SEEK_SET);
+        fscanf(f, "%[#&$]%d", str, &tmp);
+        if (strcmp(str, "#") == 0 && id_trans_idx < MAX_DESC_ID_EXTRAS) {
+          data[data_idx].id_transitions[id_trans_idx] = tmp;
+          id_trans_idx++;
+        } else if (strcmp(str, "&") == 0 && id_npc_idx < MAX_DESC_ID_EXTRAS) {
+          data[data_idx].id_npcs[id_npc_idx] = tmp;
+          id_npc_idx++;
+        } else if (strcmp(str, "$") == 0 && id_item_idx < MAX_DESC_ID_EXTRAS) {
+          data[data_idx].id_items[id_item_idx] = tmp;
+          id_item_idx++;
         }
-        // load id transition ids
-        if (ch == '#' && loadid == 0 && lidtransid == 0) {
-          lidtransid = 1;
-        } else if (lidtransid == 1 && ch != '\n' && ch != '#' && ch != '$' && ch != '/' && ch != '&') {
-          snprintf(chstr, 2, "%c", ch);
-          strcat(line, chstr);
-        } else if (lidtransid == 1 && (ch == '\n' || ch == '#' || ch == '$' || ch == '/' || ch == '&')) {
-          data[entryidx].id_transitions[lidtransidx] = atoi(line);
-          strncpy(line, "", sizeof(line));
-          lidtransidx++;
-          lidtransid = (ch == '#') ? 1 : 0;
-          if (ch == '\n')
-            loadmode = 1;
-        }
-        // load id item ids
-        if (ch == '$' && liditemsid == 0) {
-          liditemsid = 1;
-        } else if (liditemsid == 1 && ch != '\n' && ch != '$' && ch != '/' && ch != '&') {
-          snprintf(chstr, 2, "%c", ch);
-          strcat(line, chstr);
-        } else if (liditemsid == 1 && (ch == '\n' || ch == '$' || ch == '/' || ch == '&')) {
-          data[entryidx].id_items[liditemidx] = atoi(line);
-          strncpy(line, "", sizeof(line));
-          liditemidx++;
-          liditemsid = (ch == '$') ? 1 : 0;
-          if (ch == '\n')
-            loadmode = 1;
-        }
-        // load id npcs ids
-        if (ch == '&' && lidnpcsid == 0) {
-          lidnpcsid = 1;
-        } else if (lidnpcsid == 1 && ch != '\n' && ch != '$' && ch != '/' && ch != '&') {
-          snprintf(chstr, 2, "%c", ch);
-          strcat(line, chstr);
-        } else if (lidnpcsid == 1 && (ch == '\n' || ch == '$' || ch == '/' || ch == '&')) {
-          data[entryidx].id_npcs[lidnpcidx] = atoi(line);
-          strncpy(line, "", sizeof(line));
-          lidnpcidx++;
-          lidnpcsid = (ch == '&') ? 1 : 0;
-          if (ch == '\n')
-            loadmode = 1;
-        }
-        // load id verb ids
-        if (ch == '/' && lidverb == 0) {
-          lidverb = 1;
-        } else if (lidverb == 1 && ch != '\n') {
-          snprintf(chstr, 2, "%c", ch);
-          strcat(line, chstr);
-        } else if (lidverb == 1 && ch == '\n') {
-          strncpy(data[entryidx].id_verb, line, sizeof(data[entryidx].id_verb));
-          strncpy(line, "", sizeof(line));
-          lidverb = 0;
-          loadmode = 1;
-        }
-        break;
-      case 1:
-        // load room description
-        if (ch != '\n') {
-          snprintf(chstr, 2, "%c", ch);
-          strcat(line, chstr);
-        } else if (ch == '\n' && strlen(line) > 0) {
-          strncpy(data[entryidx].text, line, sizeof(data[entryidx].text));
-          strncpy(line, "", sizeof(line));
-          loadmode = 2;
-        }
-        break;
-      case 2:
-        // load transition ids
-        if (ch == '#' && ltransid == 0) {
-          ltransid = 1;
-        } else if (ltransid == 1 && ch != '\n' && ch != '#' && ch != '$' && ch != '&') {
-          snprintf(chstr, 2, "%c", ch);
-          strcat(line, chstr);
-        } else if (ltransid == 1 && (ch == '\n' || ch == '#' || ch == '$' || ch == '&')) {
-          data[entryidx].transitions[ltransidx] = atoi(line);
-          strncpy(line, "", sizeof(line));
-          ltransidx++;
-          ltransid = (ch == '#') ? 1 : 0;
-        }
-        // load item ids
-        if (ch == '$' && litemsid == 0) {
-          litemsid = 1;
-        } else if (litemsid == 1 && ch != '\n' && ch != '$' && ch != '&') {
-          snprintf(chstr, 2, "%c", ch);
-          strcat(line, chstr);
-        } else if (litemsid == 1 && (ch == '\n' || ch == '$' || ch != '&')) {
-          data[entryidx].items[litemidx] = atoi(line);
-          strncpy(line, "", sizeof(line));
-          litemidx++;
-          litemsid = (ch == '$') ? 1 : 0;
-        }
-        // load npcs ids
-        if (ch == '&' && lnpcsid == 0) {
-          lnpcsid = 1;
-        } else if (lnpcsid == 1 && ch != '\n' && ch != '$' && ch != '&') {
-          snprintf(chstr, 2, "%c", ch);
-          strcat(line, chstr);
-        } else if (lnpcsid == 1 && (ch == '\n' || ch == '$' || ch != '&')) {
-          data[entryidx].npcs[lnpcidx] = atoi(line);
-          strncpy(line, "", sizeof(line));
-          lnpcidx++;
-          lnpcsid = (ch == '&') ? 1 : 0;
-        }
-        // jump to next room description after transitions / items
-        if (ch == '\n') {
-          entryidx++;
-          if (entryidx == lmax) {
-            return entryidx;
-          }
-          loadmode = 0;
-        }
-        break;
+      } while ((ch = fgetc(f)) != '\n' && ch != '/');
     }
+    // command detection
+    if (ch != '\n' && ch == '/') {
+      fscanf(f, "%[^\n]\n", data[data_idx].id_verb);
+    }
+    // get text
+    fgets(data[data_idx].text, sizeof(data[data_idx].text), f);
+    // switch to get transitions / npcs or items
+    if ((ch = fgetc(f)) != '\n') {
+      int trans_idx = 0, npc_idx = 0, item_idx = 0;
+      do {
+        strncpy(str, "", sizeof(str));
+        fseek(f, ftell(f) - 1, SEEK_SET);
+        fscanf(f, "%[#&$]%d", str, &tmp);
+        if (strcmp(str, "#") == 0 && trans_idx < MAX_DESC_TEXT_TRANS) {
+          data[data_idx].transitions[trans_idx] = tmp;
+          trans_idx++;
+        } else if (strcmp(str, "&") == 0 && npc_idx < MAX_DESC_TEXT_NPCS) {
+          data[data_idx].npcs[npc_idx] = tmp;
+          npc_idx++;
+        } else if (strcmp(str, "$") == 0 && item_idx < MAX_DESC_TEXT_ITEMS) {
+          data[data_idx].items[item_idx] = tmp;
+          item_idx++;
+        }
+      } while ((ch = fgetc(f)) != '\n');
+    } else {
+      fseek(f, ftell(f) - 1, SEEK_SET);
+    }
+    // search for more entries to get data from
+    while ((ch = fgetc(f)) == '\n');
+    if (ch == '#') {
+      fseek(f, ftell(f) - 1, SEEK_SET);
+      data_idx = load_descriptions_rec(f, data, data_idx);
+    }
+
+    data_idx++;
   }
-  if (data[entryidx].id > 0) {
-    entryidx++;
-  }
+
+  return data_idx;
+}
+
+int load_descriptions(struct description *data, int lmax) {
+  FILE *f = fopen(FILE_DESCRIPTIONS, "r");
+  int data_idx = 0;
+  data_idx = load_descriptions_rec(f, data, data_idx);
   fclose(f);
-  return entryidx; // returns entries count
+  return data_idx;
 }

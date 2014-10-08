@@ -228,7 +228,6 @@ void load_data(void) {
   // descriptions
   data_counts[4] = load_descriptions(descriptions_data, MAX_DESCRIPTIONS);
   description_set_descriptions(descriptions_data, data_counts[4]);
-
   // transitions related to places
   data_counts[5] = load_transitions(
     transitions_data, MAX_PLACETRANS, places_data, data_counts[2], MAX_PLACE_TRANSITIONS
