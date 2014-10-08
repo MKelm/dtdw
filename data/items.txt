@@ -7,11 +7,20 @@ Kommode
 $3&0=0
 Bett
 
-$4&5=6
+$4&9=6
 Zettel
 
-$5&4=6
+$5&8=9
 Kerze
 
 $6&0=0
 Asche
+
+$7&0=0
+Couch
+
+$8&5=9
+Feuerzeug
+
+$9&4=6
+Kerze(an)
