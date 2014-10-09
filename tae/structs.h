@@ -54,7 +54,7 @@ struct item {
   int id;
   int comb_id; // combination item id
   int final_id; // final item id after combination
-  char title[56];
+  char title[MAX_ITEM_TITLE_LENGTH];
   int status; // 0 == in place, 1 == in inventory, -1 == exists no longer
 };
 
@@ -75,9 +75,11 @@ struct dialog {
   struct dialogelement elements[DIALOG_MAX_ELEMENTS];
 };
 
+#define MAX_NPC_NAME_LENGTH 56
+
 struct npc {
   int id;
-  char title[56];
+  char title[MAX_NPC_NAME_LENGTH];
   int area_id;
   int place_id;
   struct dialog *c_dialog;
