@@ -51,12 +51,6 @@ int main(void) {
       );
       location_change = 0;
     }
-    // check output change, change output display window if needed
-    if (output_change == 1) {
-      dsp_set_output(description_by_action(action_get()));
-      output_change = 0;
-      action_reset();
-    }
 
     // input prompt
     input = dsp_get_input();
@@ -67,6 +61,7 @@ int main(void) {
 
       if (strlen(caction->in_command) > 0 &&
           strcasecmp(caction->in_command, "quit") != 0) {
+
         output_change = 1;
         if (dialog_get_current_idx() > -1) {
           // dialog mode
@@ -138,6 +133,13 @@ int main(void) {
                    caction->c_npc != NULL && caction->c_npc->id > 0) {
 
           dialog_set_current(caction->c_npc->c_dialog);
+        }
+
+        // check output change, change output display window if needed
+        if (output_change == 1) {
+          dsp_set_output(description_by_action(action_get()));
+          output_change = 0;
+          action_reset();
         }
 
       } else if (strcasecmp(caction->in_command, "quit") == 0) {
