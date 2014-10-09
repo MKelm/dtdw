@@ -23,14 +23,20 @@ void load_meta(struct meta *data) {
   do {
     strncpy(line, "", sizeof(line));
     if (fscanf(f, "%[^\n]\n", &line[0]) && strlen(line) > 0) {
-      if (linenum == 0)
-        strncpy(data->title, line, sizeof(data->title));
-      else if (linenum == 1)
-        strncpy(data->version, line, sizeof(data->version));
-      else if (linenum == 2)
-        strncpy(data->author, line, sizeof(data->author));
-      else if (linenum == 3)
-        data->cyear = atoi(line);
+      switch (linenum) {
+        case 0:
+          strncpy(data->title, line, sizeof(data->title));
+          break;
+        case 1:
+          strncpy(data->version, line, sizeof(data->version));
+          break;
+        case 2:
+          strncpy(data->author, line, sizeof(data->author));
+          break;
+        case 3:
+          data->cyear = atoi(line);
+          break;
+      }
       linenum++;
     } else {
       run = 0;
