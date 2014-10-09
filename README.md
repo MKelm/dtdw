@@ -7,6 +7,15 @@ engine related source code and contents are in english.
 
 ## Changelog
 
+### v0.0.3 alpha
+- tae: added logic to combine items
+- tae: added logic to handle locked/closes status for transitions
+- tae: added logic to unlock transitions by using an item
+- tae: added logic to open/close transitions
+- tae: added some phrases, e.g. to use in inventory
+- tae: some minor improvements, e.g. simplified loader logic
+- dtdw: some minor changes to use/test the new features
+
 ### v0.0.2 alpha
 - tae: added basic logic: for npcs, for npc dialogs
 - tae: moved some main logic to seperate action / description module
