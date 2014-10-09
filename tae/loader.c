@@ -183,46 +183,32 @@ int load_transitions(struct placetrans transitions_data[], int transitions_lmax,
 }
 
 int load_items(struct item data[], int lmax) {
+  int data_idx = 0, run = 1, data_type = 0;
+  char item_title[MAX_ITEM_TITLE_LENGTH], item_id[24], comb_id[24], final_id[24];
   FILE *f = fopen(FILE_ITEMS, "r");
-  int ch, entryidx = 0;
-  char line[1024] = "", chstr[2];
-  int loadid = 0, loadcombid = 0, loadfinalid = 0, loadtitle = 0;
-
-  while ((ch = fgetc(f)) != EOF) {
-    if (ch == '$') {
-      loadid = 1;
-    } else if ((loadid == 1 || loadcombid == 1 || loadfinalid == 1 || loadtitle == 1) &&
-               ch != '&' && ch != '=' && ch != '\n') {
-      snprintf(chstr, 2, "%c", ch);
-      strcat(line, chstr);
-    } else if (ch == '&' || ch == '=' || ch == '\n') {
-      if (loadtitle == 1) {
-        strncpy(data[entryidx].title, line, sizeof(data[entryidx].title));
-        loadtitle = 0;
-        entryidx++;
-        if (entryidx == lmax)
-          return lmax;
-      } else {
-        if (loadid == 1) {
-          data[entryidx].id = atoi(line);
-          data[entryidx].status = 0;
-          loadid = 0;
-          loadcombid = 1;
-        } else if (loadcombid == 1) {
-          data[entryidx].comb_id = atoi(line);
-          loadcombid = 0;
-          loadfinalid = 1;
-        } else if (loadfinalid == 1) {
-          data[entryidx].final_id = atoi(line);
-          loadfinalid = 0;
-          loadtitle = 1;
-        }
-        strncpy(line, "", sizeof(line));
-      }
+  do {
+    strncpy(item_id, "", sizeof(item_id));
+    strncpy(item_id, "", sizeof(comb_id));
+    strncpy(item_id, "", sizeof(final_id));
+    strncpy(item_id, "", sizeof(item_title));
+    if (data_type == 0 &&
+        fscanf(f, "$%[0-9]&%[0-9]=%[0-9]\n", item_id, comb_id, final_id) &&
+        strlen(item_id) > 0) {
+      data[data_idx].id = atoi(item_id);
+      data[data_idx].comb_id = atoi(comb_id);
+      data[data_idx].final_id = atoi(final_id);
+      data_type = 1;
+    } else if (data_type == 1 && fscanf(f, "%[^\n]\n", item_title) &&
+               strlen(item_title) > 0) {
+      strncpy(data[data_idx].title, item_title, sizeof(data[data_idx].title));
+      data_type = 0;
+      data_idx++;
+    } else {
+      run = 0;
     }
-  }
+  } while (run == 1);
   fclose(f);
-  return entryidx;
+  return data_idx;
 }
 
 /* configuration style:

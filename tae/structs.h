@@ -48,6 +48,8 @@ struct place {
   struct placetrans transitions[MAX_PLACE_TRANSITIONS];
 };
 
+#define MAX_ITEM_TITLE_LENGTH 56
+
 struct item {
   int id;
   int comb_id; // combination item id
