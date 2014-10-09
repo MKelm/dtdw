@@ -19,7 +19,6 @@ void load_help(char *help) {
 void load_meta(struct meta *data) {
   int linenum = 0, run = 1;
   char line[1024];
-
   FILE *f = fopen(FILE_META, "r");
   do {
     strncpy(line, "", sizeof(line));
@@ -41,15 +40,12 @@ void load_meta(struct meta *data) {
 }
 
 void load_phrases(struct phrases *data) {
+  int linenum = 0, run = 1;
+  char line[1024];
   FILE *f = fopen(FILE_PHRASES, "r");
-  int ch, linenum = 0;
-  char line[1024] = "", chstr[2];
-
-  while ((ch = fgetc(f)) != EOF) {
-    if (ch != '\n') {
-      snprintf(chstr, 2, "%c", ch);
-      strcat(line, chstr);
-    } else {
+  do {
+    strncpy(line, "", sizeof(line));
+    if (fscanf(f, "%[^\n]\n", &line[0]) && strlen(line) > 0) {
       switch (linenum) {
         case 0:
           strncpy(data->inv_title, line, sizeof(data->inv_title));
@@ -67,10 +63,11 @@ void load_phrases(struct phrases *data) {
           strncpy(data->item_usage_failure, line, sizeof(data->item_usage_failure));
           break;
       }
-      strncpy(line, "", sizeof(line));
       linenum++;
+    } else {
+      run = 0;
     }
-  }
+  } while (run == 1);
   fclose(f);
 }
 
