@@ -25,9 +25,11 @@ struct command {
   char ex[MAX_COMMAND_LENGTH]; // external
 };
 
+#define MAX_AREA_TITLE_LENGTH 56
+
 struct area {
   int id;
-  char title[56];
+  char title[MAX_AREA_TITLE_LENGTH];
 };
 
 struct placetrans {

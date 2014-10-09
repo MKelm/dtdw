@@ -98,34 +98,26 @@ int load_commands(struct command *data, int lmax) {
 }
 
 int load_areas(struct area *data, int lmax) {
+  int data_idx = 0, run = 1, data_type = 0;
+  char line[MAX_AREA_TITLE_LENGTH];
   FILE *f = fopen(FILE_AREAS, "r");
-  int ch, entryidx = 0;
-  char line[1024] = "", chstr[2];
-  int loadid = 0, loadtitle = 0;
-
-  while ((ch = fgetc(f)) != EOF) {
-    if (loadid == 0 && loadtitle == 0) {
-      loadid = 1;
+  do {
+    strncpy(line, "", sizeof(line));
+    if (fscanf(f, "%[^\n]\n", &line[0]) && strlen(line) > 0) {
+      if (data_type == 0) {
+        data[data_idx].id = atoi(line);
+        data_type = 1;
+      } else if (data_type == 1) {
+        strncpy(data[data_idx].title, line, sizeof(data[data_idx].title));
+        data_type = 0;
+        data_idx++;
+      }
+    } else {
+      run = 0;
     }
-    if ((loadid == 1 || loadtitle == 1) && ch != '\n') {
-      snprintf(chstr, 2, "%c", ch);
-      strcat(line, chstr);
-    } else if (loadid == 1 && ch == '\n') {
-      data[entryidx].id = atoi(line);
-      strncpy(line, "", sizeof(line));
-      loadid = 0;
-      loadtitle = 1;
-    } else if (loadtitle == 1 && ch == '\n') {
-      strncpy(data[entryidx].title, line, sizeof(data[entryidx].title));
-      strncpy(line, "", sizeof(line));
-      loadtitle = 0;
-      entryidx++;
-      if (entryidx == lmax)
-        return lmax;
-    }
-  }
+  } while (run == 1);
   fclose(f);
-  return entryidx;
+  return data_idx;
 }
 
 int load_places_rec(FILE *f, struct place *data, int data_idx) {
