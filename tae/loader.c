@@ -21,7 +21,6 @@ void load_meta(struct meta *data) {
   char line[1024];
   FILE *f = fopen(FILE_META, "r");
   do {
-    strncpy(line, "", sizeof(line));
     if (fscanf(f, "%[^\n]\n", &line[0]) && strlen(line) > 0) {
       switch (linenum) {
         case 0:
@@ -37,6 +36,7 @@ void load_meta(struct meta *data) {
           data->cyear = atoi(line);
           break;
       }
+      strncpy(line, "", sizeof(line));
       linenum++;
     } else {
       run = 0;
@@ -50,7 +50,6 @@ void load_phrases(struct phrases *data) {
   char line[1024];
   FILE *f = fopen(FILE_PHRASES, "r");
   do {
-    strncpy(line, "", sizeof(line));
     if (fscanf(f, "%[^\n]\n", &line[0]) && strlen(line) > 0) {
       switch (linenum) {
         case 0:
@@ -69,6 +68,7 @@ void load_phrases(struct phrases *data) {
           strncpy(data->item_usage_failure, line, sizeof(data->item_usage_failure));
           break;
       }
+      strncpy(line, "", sizeof(line));
       linenum++;
     } else {
       run = 0;
@@ -82,13 +82,13 @@ int load_commands(struct command *data, int lmax) {
   char intern_command[MAX_COMMAND_LENGTH], extern_command[MAX_COMMAND_LENGTH];
   FILE *f = fopen(FILE_COMMANDS, "r");
   do {
-    strncpy(intern_command, "", sizeof(intern_command));
-    strncpy(extern_command, "", sizeof(extern_command));
     if (fscanf(f, "%[^=]=%[^\n]\n", &intern_command[0], &extern_command[0]) &&
         strlen(intern_command) > 0 && strlen(extern_command) > 0) {
       strncpy(data[data_idx].in, intern_command, sizeof(data[data_idx].in));
       strncpy(data[data_idx].ex, extern_command, sizeof(data[data_idx].ex));
       data_idx++;
+      strncpy(intern_command, "", sizeof(intern_command));
+      strncpy(extern_command, "", sizeof(extern_command));
     } else {
       run = 0;
     }
@@ -102,7 +102,6 @@ int load_areas(struct area *data, int lmax) {
   char line[MAX_AREA_TITLE_LENGTH];
   FILE *f = fopen(FILE_AREAS, "r");
   do {
-    strncpy(line, "", sizeof(line));
     if (fscanf(f, "%[^\n]\n", &line[0]) && strlen(line) > 0) {
       if (data_type == 0) {
         data[data_idx].id = atoi(line);
@@ -112,6 +111,7 @@ int load_areas(struct area *data, int lmax) {
         data_type = 0;
         data_idx++;
       }
+      strncpy(line, "", sizeof(line));
     } else {
       run = 0;
     }
@@ -187,22 +187,22 @@ int load_items(struct item data[], int lmax) {
   char item_title[MAX_ITEM_TITLE_LENGTH], item_id[24], comb_id[24], final_id[24];
   FILE *f = fopen(FILE_ITEMS, "r");
   do {
-    strncpy(item_id, "", sizeof(item_id));
-    strncpy(item_id, "", sizeof(comb_id));
-    strncpy(item_id, "", sizeof(final_id));
-    strncpy(item_id, "", sizeof(item_title));
     if (data_type == 0 &&
         fscanf(f, "$%[0-9]&%[0-9]=%[0-9]\n", item_id, comb_id, final_id) &&
         strlen(item_id) > 0) {
       data[data_idx].id = atoi(item_id);
       data[data_idx].comb_id = atoi(comb_id);
       data[data_idx].final_id = atoi(final_id);
+      strncpy(item_id, "", sizeof(item_id));
+      strncpy(item_id, "", sizeof(comb_id));
+      strncpy(item_id, "", sizeof(final_id));
       data_type = 1;
     } else if (data_type == 1 && fscanf(f, "%[^\n]\n", item_title) &&
                strlen(item_title) > 0) {
       strncpy(data[data_idx].title, item_title, sizeof(data[data_idx].title));
       data_type = 0;
       data_idx++;
+      strncpy(item_id, "", sizeof(item_title));
     } else {
       run = 0;
     }
