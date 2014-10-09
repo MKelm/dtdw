@@ -21,7 +21,7 @@ struct action *action_get() {
 int action_handle_input(char *input) {
   action_reset();
 
-  char inputarr[4][24], commandarr[4][24];
+  char inputarr[4][MAX_COMMAND_LENGTH], commandarr[4][MAX_COMMAND_LENGTH];
   char *ptr;
   ptr = strtok(input, " ");
   int i = 0;
@@ -34,17 +34,17 @@ int action_handle_input(char *input) {
   }
   if (i == 1 || i == 2 || i == 4) {
     char *icommand; // internal command
-    char ccommand[24];
+    char ccommand[MAX_COMMAND_LENGTH];
     if (i == 1) {
       // simple command
       icommand = get_internal_command(inputarr[0]);
     } else if (i == 2) {
       // transition/item action command
-      snprintf(ccommand, 24, "%s ??", inputarr[0]);
+      snprintf(ccommand, MAX_COMMAND_LENGTH, "%s ??", inputarr[0]);
       icommand = get_internal_command(ccommand);
     } else if (i == 4) {
       // item combinition action command
-      snprintf(ccommand, 24, "%s ?? %s ??", inputarr[0], inputarr[2]);
+      snprintf(ccommand, MAX_COMMAND_LENGTH, "%s ?? %s ??", inputarr[0], inputarr[2]);
       icommand = get_internal_command(ccommand);
     }
     if (strlen(icommand) > 0) {

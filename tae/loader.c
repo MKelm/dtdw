@@ -78,34 +78,23 @@ void load_phrases(struct phrases *data) {
 }
 
 int load_commands(struct command *data, int lmax) {
+  int data_idx = 0, run = 1;
+  char intern_command[MAX_COMMAND_LENGTH], extern_command[MAX_COMMAND_LENGTH];
   FILE *f = fopen(FILE_COMMANDS, "r");
-  int ch, entryidx = 0;
-  char line[1024] = "", chstr[2];
-  int loadin = 0, loadex = 0;
-
-  while ((ch = fgetc(f)) != EOF) {
-    if (ch != '\n' && loadin == 0 && loadex == 0) {
-      loadin = 1;
+  do {
+    strncpy(intern_command, "", sizeof(intern_command));
+    strncpy(extern_command, "", sizeof(extern_command));
+    if (fscanf(f, "%[^=]=%[^\n]\n", &intern_command[0], &extern_command[0]) &&
+        strlen(intern_command) > 0 && strlen(extern_command) > 0) {
+      strncpy(data[data_idx].in, intern_command, sizeof(data[data_idx].in));
+      strncpy(data[data_idx].ex, extern_command, sizeof(data[data_idx].ex));
+      data_idx++;
+    } else {
+      run = 0;
     }
-    if ((loadin == 1 || loadex == 1) && ch != '\n' && ch != '=') {
-      snprintf(chstr, 2, "%c", ch);
-      strcat(line, chstr);
-    } else if (loadin == 1 && ch == '=') {
-      strncpy(data[entryidx].in, line, sizeof(data[entryidx].in));
-      strncpy(line, "", sizeof(line));
-      loadin = 0;
-      loadex = 1;
-    } else if (loadex == 1 && ch == '\n') {
-      strncpy(data[entryidx].ex, line, sizeof(data[entryidx].ex));
-      strncpy(line, "", sizeof(line));
-      loadex = 0;
-      entryidx++;
-      if (entryidx == lmax)
-        return lmax;
-    }
-  }
+  } while (run == 1);
   fclose(f);
-  return entryidx;
+  return data_idx;
 }
 
 int load_areas(struct area *data, int lmax) {

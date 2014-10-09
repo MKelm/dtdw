@@ -18,9 +18,11 @@ struct phrases {
   char item_usage_failure[PHRASES_CHARS_LENGTH];
 };
 
+#define MAX_COMMAND_LENGTH 36
+
 struct command {
-  char in[24]; // internal
-  char ex[24]; // external
+  char in[MAX_COMMAND_LENGTH]; // internal
+  char ex[MAX_COMMAND_LENGTH]; // external
 };
 
 struct area {
