@@ -5,13 +5,13 @@
 #include "loader.h"
 
 void load_help(char *help) {
+  int ch, ch_count = 0;
+  char ch_str[2];
   FILE *f = fopen(FILE_HELP, "r");
-  int ch;
-  char chstr[2];
-
-  while ((ch = fgetc(f)) != EOF) {
-    snprintf(chstr, 2, "%c", ch);
-    strcat(help, chstr);
+  while ((ch = fgetc(f)) != EOF && ch_count < MAX_HELP_TEXT_CHARS) {
+    snprintf(ch_str, 2, "%c", ch);
+    strcat(help, ch_str);
+    ch_count++;
   }
   fclose(f);
 }

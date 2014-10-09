@@ -2,11 +2,13 @@
 
 // help
 #define FILE_HELP "../data/help.txt"
+#define MAX_HELP_TEXT_CHARS 2048
 
 void load_help(char *text);
 
 // meta
 #define FILE_META "../data/meta.txt"
+#define MAX_META_LINE_CHARS 1024
 
 void load_meta(struct meta *data);
 

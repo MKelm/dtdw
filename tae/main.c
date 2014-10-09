@@ -238,7 +238,7 @@ struct npc *get_npc(char *title) {
 
 void load_data(void) {
   // help text
-  static char help_text[2048];
+  static char help_text[MAX_HELP_TEXT_CHARS];
   load_help(help_text);
   description_set_help(help_text);
   // meta
