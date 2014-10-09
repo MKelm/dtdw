@@ -59,10 +59,11 @@ struct item {
 };
 
 #define DIALOG_ELEMENT_MAX_NEXT_IDS 10
+#define DIALOG_MAX_TEXT_LENGTH 1024
 
 struct dialogelement {
   int id;
-  char text[1024];
+  char text[DIALOG_MAX_TEXT_LENGTH];
   int next_ids[DIALOG_ELEMENT_MAX_NEXT_IDS];
   int next_mchoice; // status are next ids multiple choice
 };

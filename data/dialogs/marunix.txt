@@ -20,6 +20,7 @@ Ne Joarana, ich hab auf dich gewartet.
 
 !6
 Ja, davon habe ich schon gekostet, vollzüglich.
+>0
 
 !7
 Auf mich, wieso was habe ich verbrochen?
@@ -27,6 +28,8 @@ Auf mich, wieso was habe ich verbrochen?
 
 !8
 Achso, ja dann ist ja gut.
+>0
 
 !9
 Nichts, aber ich möchte dir noch einmal gratulieren.
+>0

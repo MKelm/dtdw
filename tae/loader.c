@@ -246,72 +246,61 @@ int load_npcs(struct npc data[], int lmax) {
 }
 
 int load_dialogs(struct npc npcs_data[], int nlmax, struct dialog data[], int lmax) {
-  int npcidx, titleidx, elementcount, elementidx, nextididx, ch, loadmode = 0;
+  int npc_idx, title_idx, elements_count, element_idx;
+  int data_mode = 0, run, ch;
+  char line[1024], file_name[1024], dialog_text[DIALOG_MAX_TEXT_LENGTH], dialog_int_str[24];
   FILE *f;
-  char line[1024] = "", title[56] = "", chstr[2];
 
-  elementcount = 0;
-  for (npcidx = 0; npcidx < nlmax; npcidx++) {
-    strncpy(title, "", 56);
-    if (npcidx == lmax)
-      return npcidx;
+  elements_count = 0;
+  for (npc_idx = 0; npc_idx < nlmax; npc_idx++) {
+    if (npc_idx == lmax)
+      return npc_idx;
 
-    data[npcidx].npc_id = npcs_data[npcidx].id;
-    for (titleidx = 0; npcs_data[npcidx].title[titleidx]; titleidx++){
-      title[titleidx] = tolower(npcs_data[npcidx].title[titleidx]);
-    }
-    snprintf(line, 1024, "%s%s%s", FILE_DIALOGS_FOLDER, title, FILE_DIALOGS_POSTFIX);
-
-    elementidx = 0;
-    nextididx = -1;
-    f = fopen(line, "r");
+    data[npc_idx].npc_id = npcs_data[npc_idx].id;
     strncpy(line, "", 1024);
-
-    // loadmode 0 = nothing, 1 = id, 2 = text, 3 = next ids
-    while ((ch = fgetc(f)) != EOF) {
-      if (loadmode == 0 && ch == '!') {
-        loadmode = 1;
-      } else if (loadmode == 1 && ch == '\n') {
-        data[npcidx].elements[elementidx].id = atoi(line);
-        strncpy(line, "", sizeof(line));
-        loadmode = 2;
-      } else if (loadmode == 2 && ch == '\n') {
-        strncpy(data[npcidx].elements[elementidx].text, line,
-          sizeof(data[npcidx].elements[elementidx].text));
-        strncpy(line, "", sizeof(line));
-        loadmode = 3;
-      } else if (loadmode == 3 && (ch == '>' || ch == '?' || ch == '\n')) {
-        if (nextididx == -1 && ch != '\n') {
-          nextididx++;
-        } else if (nextididx == -1 && ch == '\n') {
-          loadmode = 0;
-          elementidx++;
-        } else {
-          data[npcidx].elements[elementidx].next_ids[nextididx] = atoi(line);
-          if (ch != '\n')
-            data[npcidx].elements[elementidx].next_mchoice = (ch == '?') ? 1 : 0;
-          strncpy(line, "", sizeof(line));
-          nextididx++;
-          if (ch == '\n') {
-            loadmode = 0;
-            nextididx = -1;
-            elementidx++;
-          }
-        }
-      } else if (loadmode == 1 || loadmode == 2 || loadmode == 3) {
-        snprintf(chstr, 2, "%c", ch);
-        strcat(line, chstr);
-      }
+    for (title_idx = 0; npcs_data[npc_idx].title[title_idx]; title_idx++){
+      line[title_idx] = tolower(npcs_data[npc_idx].title[title_idx]);
     }
-    if (data[npcidx].elements[elementidx].id > 0)
-      elementidx++;
-    data[npcidx].elements_count = elementidx;
-    elementcount += elementidx;
+    snprintf(file_name, 1024, "%s%s%s", FILE_DIALOGS_FOLDER, line, FILE_DIALOGS_POSTFIX);
+
+    f = fopen(file_name, "r");
+    run = 1;
+    element_idx = 0;
+    do {
+      if (data_mode == 0 && fscanf(f, "!%[0-9]\n", dialog_int_str) &&
+          strlen(dialog_int_str) > 0) {
+        // get dialog element id
+        data[npc_idx].elements[element_idx].id = atoi(dialog_int_str);
+        strncpy(dialog_int_str, "", sizeof(dialog_int_str));
+        data_mode = 1;
+      } else if (data_mode == 1 && fscanf(f, "%[^\n]\n", dialog_text) &&
+                 strlen(dialog_text) > 0) {
+        // get dialog element text
+        strncpy(data[npc_idx].elements[element_idx].text, dialog_text,
+          sizeof(data[npc_idx].elements[element_idx].text));
+        strncpy(dialog_text, "", sizeof(dialog_text));
+        data_mode = 2;
+      } else if (data_mode == 2) {
+        // get next ids
+        int i = 0;
+        while ((ch = fgetc(f)) != '\n' && fscanf(f, "%[0-9]", dialog_int_str) && dialog_int_str > 0) {
+          data[npc_idx].elements[element_idx].next_mchoice = (ch == '?') ? 1 : 0;
+          data[npc_idx].elements[element_idx].next_ids[i] = atoi(dialog_int_str);
+          i++;
+        }
+        data_mode = 0;
+        element_idx++;
+        fseek(f, ftell(f) + 1, SEEK_SET);
+      } else {
+        run = 0;
+      }
+    } while (run == 1);
     fclose(f);
+    elements_count += element_idx;
     // link dialog to npc
-    npcs_data[npcidx].c_dialog = &data[npcidx];
+    npcs_data[npc_idx].c_dialog = data;
   }
-  return elementcount;
+  return elements_count;
 }
 
 /*
