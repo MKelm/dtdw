@@ -49,6 +49,13 @@ struct place {
 };
 
 #define MAX_ITEM_TITLE_LENGTH 56
+#define MAX_ITEM_COMMAND_LENGTH MAX_COMMAND_LENGTH
+#define MAX_ITEM_DESCRIPTION_LENGTH 1024
+
+struct itemdescription {
+  char i_command[MAX_ITEM_COMMAND_LENGTH];
+  char i_description[MAX_ITEM_DESCRIPTION_LENGTH];
+};
 
 struct item {
   int id;
@@ -56,6 +63,7 @@ struct item {
   int final_id; // final item id after combination
   char title[MAX_ITEM_TITLE_LENGTH];
   int status; // 0 == in place, 1 == in inventory, -1 == exists no longer
+  struct itemdescription descriptions[5];
 };
 
 #define DIALOG_ELEMENT_MAX_NEXT_IDS 10

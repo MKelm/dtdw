@@ -122,6 +122,16 @@ char *description_by_action(struct action *caction) {
               (caction->transition != NULL && caction->transition->id > 0) ||
               (caction->c_npc != NULL && caction->c_npc->id > 0))) {
 
+    // for inventory item actions
+    if (caction->pitem != NULL && caction->pitem->id > 0 &&
+        inventory_has_item(caction->pitem) == 1 &&
+        strcmp(caction->pitem->descriptions[0].i_command, caction->in_command) == 0) {
+
+      strcat(output, caction->pitem->descriptions[0].i_description);
+      strcat(output, "\n\n");
+      return output;
+    }
+
     // for transition / item / npc action commands
     desc_idx = 0;
     while (desc_idx < descriptions_count) {

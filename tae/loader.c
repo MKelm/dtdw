@@ -219,6 +219,8 @@ int load_transitions(struct placetrans transitions_data[], int transitions_lmax,
 int load_items(struct item data[], int lmax) {
   int data_idx = 0, run = 1, data_type = 0;
   char item_title[MAX_ITEM_TITLE_LENGTH], item_id[24], comb_id[24], final_id[24];
+  char item_inventory_command[MAX_ITEM_COMMAND_LENGTH],
+       item_inventory_description[MAX_ITEM_DESCRIPTION_LENGTH];
   FILE *f = loader_get_data_file(FILE_ITEMS, 1);
   do {
     if (data_type == 0 &&
@@ -228,15 +230,23 @@ int load_items(struct item data[], int lmax) {
       data[data_idx].comb_id = atoi(comb_id);
       data[data_idx].final_id = atoi(final_id);
       strncpy(item_id, "", sizeof(item_id));
-      strncpy(item_id, "", sizeof(comb_id));
-      strncpy(item_id, "", sizeof(final_id));
+      strncpy(comb_id, "", sizeof(comb_id));
+      strncpy(final_id, "", sizeof(final_id));
       data_type = 1;
     } else if (data_type == 1 && fscanf(f, "%[^\n]\n", item_title) &&
                strlen(item_title) > 0) {
       strncpy(data[data_idx].title, item_title, sizeof(data[data_idx].title));
+
+      if (fscanf(f, "inv/%[^\n]\n", item_inventory_command)) {
+        if (fscanf(f, "%[^\n]\n", item_inventory_description)) {
+          strcpy(data[data_idx].descriptions[0].i_command, item_inventory_command);
+          strcpy(data[data_idx].descriptions[0].i_description, item_inventory_description);
+        }
+      } // item command / description for item inventory descriptions
+
       data_type = 0;
       data_idx++;
-      strncpy(item_id, "", sizeof(item_title));
+      strncpy(item_title, "", sizeof(item_title));
     } else {
       run = 0;
     }

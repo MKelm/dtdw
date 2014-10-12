@@ -9,12 +9,18 @@ Bett
 
 $4&9=6
 Zettel
+inv/lookat
+Ein gelber Zettel von deiner Holzbank, auf diesem stehen die Zugangscodes für die Portaladministration.
 
 $5&8=9
 Kerze
+inv/lookat
+Die Kerze von der Kommode ist bei dir in sicheren Händen, solange sie nicht brennt, oder?
 
 $6&0=0
-Asche
+Zettel_mit_Wachs
+inv/lookat
+Der Zettel hat jetzt einen Rand aus Wachs, wozu das auch immer gut ist.
 
 $7&0=0
 Couch
@@ -23,7 +29,9 @@ $8&5=9
 Feuerzeug
 
 $9&4=6
-Kerze(an)
+Kerze_brennend
+inv/lookat
+Nachdem du die Kerze angezündet hast, brennt sie jetzt und es tropft immer mal wieder etwas Wachs herunter.
 
 $10&0=0
 Zimmerschlüssel
