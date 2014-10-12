@@ -1,37 +1,37 @@
-$1&0=0
+$1$0>$0
 Holzbank
 
-$2&0=0
+$2$0>$0
 Kommode
 
-$3&0=0
+$3$0>$0
 Bett
 
-$4&9=6
+$4$9>$6
 Zettel
 inv/lookat
 Ein gelber Zettel von deiner Holzbank, auf diesem stehen die Zugangscodes für die Portaladministration.
 
-$5&8=9
+$5$8>$9
 Kerze
 inv/lookat
 Die Kerze von der Kommode ist bei dir in sicheren Händen, solange sie nicht brennt, oder?
 
-$6&0=0
+$6$0>$0
 Zettel_mit_Wachs
 inv/lookat
 Der Zettel hat jetzt einen Rand aus Wachs, wozu das auch immer gut ist.
 
-$7&0=0
+$7$0>$0
 Couch
 
-$8&5=9
+$8$5>$9
 Feuerzeug
 
-$9&4=6
+$9$4>$6
 Kerze_brennend
 inv/lookat
 Nachdem du die Kerze angezündet hast, brennt sie jetzt und es tropft immer mal wieder etwas Wachs herunter.
 
-$10&0=0
+$10$11>$12
 Zimmerschlüssel

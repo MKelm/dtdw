@@ -224,7 +224,7 @@ int load_items(struct item data[], int lmax) {
   FILE *f = loader_get_data_file(FILE_ITEMS, 1);
   do {
     if (data_type == 0 &&
-        fscanf(f, "$%[0-9]&%[0-9]=%[0-9]\n", item_id, comb_id, final_id) &&
+        fscanf(f, "$%[0-9]$%[0-9]>$%[0-9]\n", item_id, comb_id, final_id) &&
         strlen(item_id) > 0) {
       data[data_idx].id = atoi(item_id);
       data[data_idx].comb_id = atoi(comb_id);
