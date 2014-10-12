@@ -33,5 +33,5 @@ Kerze_brennend
 inv/lookat
 Nachdem du die Kerze angezündet hast, brennt sie jetzt und es tropft immer mal wieder etwas Wachs herunter.
 
-$10#10>$0
+$10#2>$0
 Zimmerschlüssel

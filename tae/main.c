@@ -135,7 +135,15 @@ int main(void) {
                    caction->c_npc != NULL && caction->c_npc->id > 0) {
 
           dialog_set_current(caction->c_npc->c_dialog);
+
+        } else if (strcmp(caction->in_command, "give") == 0 &&
+                   caction->p_item != NULL && caction->p_item->id > 0 &&
+                   caction->c_npc != NULL && caction->c_npc->id > 0) {
+
+          dsp_set_output("give item to npc"); // todo item action description
+          inventory_rm_item(caction->p_item);
         }
+
 
         // check output change, change output display window if needed
         if (output_change == 1) {
@@ -199,13 +207,6 @@ struct placetrans *get_transition(char *title) {
     }
   }
   return NULL;
-}
-
-int main_item_check_comb(struct item *p_item, struct item *s_item) {
-  if (p_item->id == s_item->comb_id || s_item->id == p_item->comb_id) {
-    return 1;
-  }
-  return 0;
 }
 
 struct item *get_item(char *title) {

@@ -18,6 +18,14 @@ struct action *action_get() {
   return &c_action;
 }
 
+int action_item_check_comb(struct item *p_item, struct item *s_item) {
+  if ((p_item->id == s_item->comb_id && s_item->comb_type == ITEM_COMB_TYPE_ITEM) ||
+      (s_item->id == p_item->comb_id && p_item->comb_type == ITEM_COMB_TYPE_ITEM)) {
+    return 1;
+  }
+  return 0;
+}
+
 int action_handle_input(char *input) {
   action_reset();
 
@@ -73,19 +81,39 @@ int action_handle_input(char *input) {
             }
             return 1;
           } else if (i == 4) {
-            // more actions for item combinition action command
             strncpy(c_action.in_command, commandarr[0], sizeof(c_action.in_command));
-            c_action.p_item = get_item(inputarr[1]);
-            c_action.s_item = get_item(inputarr[3]);
 
-            // check try item combination
-            if (c_action.p_item != NULL && c_action.s_item != NULL) {
-              if (main_item_check_comb(c_action.p_item, c_action.s_item) == 1) {
+            if (strcmp(c_action.in_command, "use") == 0) {
+              // more actions for item combinition action command
+              c_action.p_item = get_item(inputarr[1]);
+              c_action.s_item = get_item(inputarr[3]);
+
+              // check try item combination
+              if (c_action.p_item != NULL && c_action.s_item != NULL &&
+                  action_item_check_comb(c_action.p_item, c_action.s_item) == 1) {
                 c_action.f_item = get_item_by_id(c_action.p_item->final_id);
+
+              } else if (c_action.p_item != NULL &&
+                         c_action.p_item->comb_type == ITEM_COMB_TYPE_TRANS) {
+                // check try item / transition combination
+                c_action.transition = get_transition(inputarr[3]);
+                if (c_action.transition != NULL &&
+                    c_action.transition->id != c_action.p_item->comb_id) {
+                  c_action.p_item = NULL;
+                  c_action.transition = NULL;
+                }
               }
-            } else if (c_action.p_item != NULL) {
-              // check try item / transition combination
-              c_action.transition = get_transition(inputarr[3]);
+
+            } else if (strcmp(c_action.in_command, "give") == 0) {
+              // check try item / npc combination action
+              c_action.p_item = get_item(inputarr[1]);
+              if (c_action.p_item != NULL &&
+                  c_action.p_item->comb_type == ITEM_COMB_TYPE_NPC) {
+                c_action.c_npc = get_npc(inputarr[3]);
+                if (c_action.c_npc == NULL) {
+                  c_action.p_item = NULL;
+                }
+              }
             }
             return 1;
           }
