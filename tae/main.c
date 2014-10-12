@@ -87,9 +87,9 @@ int main(void) {
 
           } else if (strcmp(caction->in_command, "use") == 0 &&
                      caction->transition != NULL &&
-                     caction->transition->status == 2 && caction->pitem != NULL) {
+                     caction->transition->status == 2 && caction->p_item != NULL) {
 
-            if (inventory_has_item(caction->pitem)) {
+            if (inventory_has_item(caction->p_item)) {
               // remove locked status by use item command
               dsp_set_output(description_by_action(action_get()));
               caction->transition->status = 1; // unlock -> closed status
@@ -112,19 +112,19 @@ int main(void) {
           }
 
         } else if (strcmp(caction->in_command, "use") == 0 &&
-                   caction->pitem != NULL && caction->sitem != NULL &&
-                   caction->pitem->id > 0 && caction->sitem->id > 0) {
+                   caction->p_item != NULL && caction->s_item != NULL &&
+                   caction->p_item->id > 0 && caction->s_item->id > 0) {
 
           // combine two items and put new item to inventory
-          inventory_rm_item(caction->sitem);
-          inventory_rm_item(caction->pitem);
+          inventory_rm_item(caction->s_item);
+          inventory_rm_item(caction->p_item);
           inventory_add_item(caction->f_item);
 
         } else if (strcmp(caction->in_command, "pickup") == 0 &&
-                   caction->pitem != NULL && caction->pitem->id > 0) {
+                   caction->p_item != NULL && caction->p_item->id > 0) {
           // get inventory item if it exists at the current place
-          if (caction->pitem->status == 0) {
-            inventory_add_item(caction->pitem);
+          if (caction->p_item->status == 0) {
+            inventory_add_item(caction->p_item);
           } else {
             // no valid item selection / output
             output_change = 0;

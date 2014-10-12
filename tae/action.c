@@ -8,8 +8,8 @@ struct action c_action;
 void action_reset() {
   strcpy(c_action.in_command, "");
   c_action.transition = NULL;
-  c_action.pitem = NULL;
-  c_action.sitem = NULL;
+  c_action.p_item = NULL;
+  c_action.s_item = NULL;
   c_action.f_item = NULL;
   c_action.c_npc = NULL;
 }
@@ -63,27 +63,27 @@ int action_handle_input(char *input) {
           if (i == 2) {
             // more actions for item/transition action command
             strncpy(c_action.in_command, commandarr[0], sizeof(c_action.in_command));
-            c_action.pitem = get_item(inputarr[1]);
-            if (c_action.pitem == NULL) {
+            c_action.p_item = get_item(inputarr[1]);
+            if (c_action.p_item == NULL) {
               c_action.transition = get_transition(inputarr[1]);
             }
 
-            if (c_action.pitem == NULL && c_action.transition == NULL) {
+            if (c_action.p_item == NULL && c_action.transition == NULL) {
               c_action.c_npc = get_npc(inputarr[1]);
             }
             return 1;
           } else if (i == 4) {
             // more actions for item combinition action command
             strncpy(c_action.in_command, commandarr[0], sizeof(c_action.in_command));
-            c_action.pitem = get_item(inputarr[1]);
-            c_action.sitem = get_item(inputarr[3]);
+            c_action.p_item = get_item(inputarr[1]);
+            c_action.s_item = get_item(inputarr[3]);
 
             // check try item combination
-            if (c_action.pitem != NULL && c_action.sitem != NULL) {
-              if (main_item_check_comb(c_action.pitem, c_action.sitem) == 1) {
-                c_action.f_item = get_item_by_id(c_action.pitem->final_id);
+            if (c_action.p_item != NULL && c_action.s_item != NULL) {
+              if (main_item_check_comb(c_action.p_item, c_action.s_item) == 1) {
+                c_action.f_item = get_item_by_id(c_action.p_item->final_id);
               }
-            } else if (c_action.pitem != NULL) {
+            } else if (c_action.p_item != NULL) {
               // check try item / transition combination
               c_action.transition = get_transition(inputarr[3]);
             }

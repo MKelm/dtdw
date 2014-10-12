@@ -106,28 +106,28 @@ char *description_by_action(struct action *caction) {
   static char output[1024];
   strncpy(output, "", sizeof(output));
 
-  if (caction->pitem != NULL && caction->sitem != NULL) {
+  if (caction->p_item != NULL && caction->s_item != NULL) {
     if (caction->f_item == NULL) {
       snprintf(line, 1024, phrases_data.items_comb_failure, "");
     } else {
       snprintf(line, 1024, phrases_data.items_comb,
-        caction->pitem->title, caction->sitem->title, caction->f_item->title);
+        caction->p_item->title, caction->s_item->title, caction->f_item->title);
     }
     strcat(line, "\n\n");
     strcat(output, line);
     has_text = 1;
 
   } else if (strlen(caction->in_command) > 0 &&
-             ((caction->pitem != NULL && caction->pitem->id > 0) ||
+             ((caction->p_item != NULL && caction->p_item->id > 0) ||
               (caction->transition != NULL && caction->transition->id > 0) ||
               (caction->c_npc != NULL && caction->c_npc->id > 0))) {
 
     // for inventory item actions
-    if (caction->pitem != NULL && caction->pitem->id > 0 &&
-        inventory_has_item(caction->pitem) == 1 &&
-        strcmp(caction->pitem->descriptions[0].i_command, caction->in_command) == 0) {
+    if (caction->p_item != NULL && caction->p_item->id > 0 &&
+        inventory_has_item(caction->p_item) == 1 &&
+        strcmp(caction->p_item->descriptions[0].i_command, caction->in_command) == 0) {
 
-      strcat(output, caction->pitem->descriptions[0].i_description);
+      strcat(output, caction->p_item->descriptions[0].i_description);
       strcat(output, "\n\n");
       return output;
     }
@@ -142,8 +142,8 @@ char *description_by_action(struct action *caction) {
         has_item = 0;
         has_transition = 0;
         has_npc = 0;
-        if (caction->pitem != NULL && caction->pitem->id > 0 &&
-            descriptions[desc_idx].id_items[0] == caction->pitem->id) {
+        if (caction->p_item != NULL && caction->p_item->id > 0 &&
+            descriptions[desc_idx].id_items[0] == caction->p_item->id) {
           has_item = 1;
 
         } else if (caction->transition != NULL && caction->transition->id > 0 &&
@@ -151,12 +151,12 @@ char *description_by_action(struct action *caction) {
 
           if (descriptions[desc_idx].id_trans_status[0] == caction->transition->status) {
             // set has transition with valid status only
-            if (caction->transition->status == 2 && caction->pitem == NULL &&
+            if (caction->transition->status == 2 && caction->p_item == NULL &&
                 descriptions[desc_idx].id_trans_item_id[0] == 0) {
               // use (unlock) command without correct item
               has_transition = 1;
-            } else if (caction->transition->status == 2 && caction->pitem != NULL &&
-                descriptions[desc_idx].id_trans_item_id[0] == caction->pitem->id) {
+            } else if (caction->transition->status == 2 && caction->p_item != NULL &&
+                descriptions[desc_idx].id_trans_item_id[0] == caction->p_item->id) {
               // use (unlock) command with correct item
               has_transition = 1;
             } else if (caction->transition->status != 2) {
