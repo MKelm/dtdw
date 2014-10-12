@@ -218,21 +218,32 @@ int load_transitions(struct placetrans transitions_data[], int transitions_lmax,
 
 int load_items(struct item data[], int lmax) {
   int data_idx = 0, run = 1, data_type = 0;
-  char item_title[MAX_ITEM_TITLE_LENGTH], item_id[24], comb_id[24], final_id[24];
+  char item_title[MAX_ITEM_TITLE_LENGTH], item_id[24], comb_type[2], comb_id[24], final_id[24];
   char item_inventory_command[MAX_ITEM_COMMAND_LENGTH],
        item_inventory_description[MAX_ITEM_DESCRIPTION_LENGTH];
   FILE *f = loader_get_data_file(FILE_ITEMS, 1);
   do {
     if (data_type == 0 &&
-        fscanf(f, "$%[0-9]$%[0-9]>$%[0-9]\n", item_id, comb_id, final_id) &&
+        fscanf(f, "$%[0-9]%[$&#]%[0-9]>$%[0-9]\n", item_id, comb_type, comb_id, final_id) &&
         strlen(item_id) > 0) {
       data[data_idx].id = atoi(item_id);
+
+      if (strcmp(comb_type, "$") == 0)
+          data[data_idx].comb_type = ITEM_COMB_TYPE_ITEM;
+      else if (strcmp(comb_type, "&") == 0)
+        data[data_idx].comb_type = ITEM_COMB_TYPE_NPC;
+      else if (strcmp(comb_type, "#") == 0)
+        data[data_idx].comb_type = ITEM_COMB_TYPE_TRANS;
+
       data[data_idx].comb_id = atoi(comb_id);
+
       data[data_idx].final_id = atoi(final_id);
       strncpy(item_id, "", sizeof(item_id));
+      strncpy(comb_type, "", sizeof(comb_type));
       strncpy(comb_id, "", sizeof(comb_id));
       strncpy(final_id, "", sizeof(final_id));
       data_type = 1;
+
     } else if (data_type == 1 && fscanf(f, "%[^\n]\n", item_title) &&
                strlen(item_title) > 0) {
       strncpy(data[data_idx].title, item_title, sizeof(data[data_idx].title));

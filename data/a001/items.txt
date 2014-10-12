@@ -17,7 +17,7 @@ Kerze
 inv/lookat
 Die Kerze von der Kommode ist bei dir in sicheren Händen, solange sie nicht brennt, oder?
 
-$6$0>$0
+$6&1>$0
 Zettel_mit_Wachs
 inv/lookat
 Der Zettel hat jetzt einen Rand aus Wachs, wozu das auch immer gut ist.
@@ -33,5 +33,5 @@ Kerze_brennend
 inv/lookat
 Nachdem du die Kerze angezündet hast, brennt sie jetzt und es tropft immer mal wieder etwas Wachs herunter.
 
-$10$11>$12
+$10#10>$0
 Zimmerschlüssel

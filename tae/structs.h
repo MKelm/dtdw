@@ -57,9 +57,14 @@ struct itemdescription {
   char i_description[MAX_ITEM_DESCRIPTION_LENGTH];
 };
 
+#define ITEM_COMB_TYPE_ITEM 0
+#define ITEM_COMB_TYPE_NPC 1
+#define ITEM_COMB_TYPE_TRANS 2
+
 struct item {
   int id;
-  int comb_id; // combination item id
+  int comb_type; // combination type item, npc or transition
+  int comb_id; // combination item/npc/transition id
   int final_id; // final item id after combination
   char title[MAX_ITEM_TITLE_LENGTH];
   int status; // 0 == in place, 1 == in inventory, -1 == exists no longer
