@@ -1,13 +1,47 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 #include <ctype.h>
 #include "loader.h"
+
+int current_area_id = 0;
+char data_directory[256];
+
+void loader_set_data_dir(void) {
+  ssize_t len = readlink("/proc/self/exe", data_directory, sizeof(data_directory));
+  if (len != -1)
+    data_directory[len-7] = '\0';
+  strcat(data_directory, LOADER_DATA_FOLDER);
+}
+
+void loader_set_area_id(int area_id) {
+  current_area_id = area_id;
+}
+
+FILE *loader_get_data_file(char *file_name, short in_area) {
+  char tmp1[256], tmp2[256];
+  strncpy(tmp1, data_directory, 256);
+  if (in_area == 1) {
+    strcat(tmp1, "a");
+    if (current_area_id < 10) {
+      strcat(tmp1, "00");
+    } else if (current_area_id < 100) {
+      strcat(tmp1, "0");
+    }
+    char buffer[256];
+    snprintf(buffer, sizeof(buffer), "%d/", current_area_id);
+    strcat(tmp1, buffer);
+  }
+  strncpy(tmp2, file_name, 256);
+  strcat(tmp1, tmp2);
+  return fopen(tmp1, "r");
+}
 
 void load_help(char *help) {
   int ch, ch_count = 0;
   char ch_str[2];
-  FILE *f = fopen(FILE_HELP, "r");
+  FILE *f = loader_get_data_file(FILE_HELP, 0);
   while ((ch = fgetc(f)) != EOF && ch_count < MAX_HELP_TEXT_CHARS) {
     snprintf(ch_str, 2, "%c", ch);
     strcat(help, ch_str);
@@ -19,7 +53,7 @@ void load_help(char *help) {
 void load_meta(struct meta *data) {
   int linenum = 0, run = 1;
   char line[1024];
-  FILE *f = fopen(FILE_META, "r");
+  FILE *f = loader_get_data_file(FILE_META, 0);
   do {
     if (fscanf(f, "%[^\n]\n", &line[0]) && strlen(line) > 0) {
       switch (linenum) {
@@ -48,7 +82,7 @@ void load_meta(struct meta *data) {
 void load_phrases(struct phrases *data) {
   int linenum = 0, run = 1;
   char line[1024];
-  FILE *f = fopen(FILE_PHRASES, "r");
+  FILE *f = loader_get_data_file(FILE_PHRASES, 0);
   do {
     if (fscanf(f, "%[^\n]\n", &line[0]) && strlen(line) > 0) {
       switch (linenum) {
@@ -80,7 +114,7 @@ void load_phrases(struct phrases *data) {
 int load_commands(struct command *data, int lmax) {
   int data_idx = 0, run = 1;
   char intern_command[MAX_COMMAND_LENGTH], extern_command[MAX_COMMAND_LENGTH];
-  FILE *f = fopen(FILE_COMMANDS, "r");
+  FILE *f = loader_get_data_file(FILE_COMMANDS, 0);
   do {
     if (fscanf(f, "%[^=]=%[^\n]\n", &intern_command[0], &extern_command[0]) &&
         strlen(intern_command) > 0 && strlen(extern_command) > 0) {
@@ -100,7 +134,7 @@ int load_commands(struct command *data, int lmax) {
 int load_areas(struct area *data, int lmax) {
   int data_idx = 0, run = 1, data_type = 0;
   char line[MAX_AREA_TITLE_LENGTH];
-  FILE *f = fopen(FILE_AREAS, "r");
+  FILE *f = loader_get_data_file(FILE_AREAS, 0);
   do {
     if (fscanf(f, "%[^\n]\n", &line[0]) && strlen(line) > 0) {
       if (data_type == 0) {
@@ -157,7 +191,7 @@ int load_places_rec(FILE *f, struct place *data, int data_idx) {
 }
 
 int load_places(struct place *data, int lmax) {
-  FILE *f = fopen(FILE_PLACES, "r");
+  FILE *f = loader_get_data_file(FILE_PLACES, 1);
   int data_idx = 0;
   data_idx = load_places_rec(f, data, data_idx);
   fclose(f);
@@ -185,7 +219,7 @@ int load_transitions(struct placetrans transitions_data[], int transitions_lmax,
 int load_items(struct item data[], int lmax) {
   int data_idx = 0, run = 1, data_type = 0;
   char item_title[MAX_ITEM_TITLE_LENGTH], item_id[24], comb_id[24], final_id[24];
-  FILE *f = fopen(FILE_ITEMS, "r");
+  FILE *f = loader_get_data_file(FILE_ITEMS, 1);
   do {
     if (data_type == 0 &&
         fscanf(f, "$%[0-9]&%[0-9]=%[0-9]\n", item_id, comb_id, final_id) &&
@@ -219,7 +253,7 @@ int load_items(struct item data[], int lmax) {
 int load_npcs(struct npc data[], int lmax) {
   int data_idx = 0, run = 1, data_type = 0;
   char npc_title[MAX_NPC_NAME_LENGTH], npc_id[24], area_id[24], place_id[24];
-  FILE *f = fopen(FILE_NPCS, "r");
+  FILE *f = loader_get_data_file(FILE_NPCS, 1);
   do {
     if (data_type == 0 && fscanf(f, "&%[0-9]\n", npc_id) && strlen(npc_id) > 0) {
       data[data_idx].id = atoi(npc_id);
@@ -263,7 +297,7 @@ int load_dialogs(struct npc npcs_data[], int nlmax, struct dialog data[], int lm
     }
     snprintf(file_name, 1024, "%s%s%s", FILE_DIALOGS_FOLDER, line, FILE_DIALOGS_POSTFIX);
 
-    f = fopen(file_name, "r");
+    f = loader_get_data_file(file_name, 1);
     run = 1;
     element_idx = 0;
     do {
@@ -390,7 +424,7 @@ int load_descriptions_rec(FILE *f, struct description *data, int data_idx) {
 }
 
 int load_descriptions(struct description *data, int lmax) {
-  FILE *f = fopen(FILE_DESCRIPTIONS, "r");
+  FILE *f = loader_get_data_file(FILE_DESCRIPTIONS, 1);
   int data_idx = 0;
   data_idx = load_descriptions_rec(f, data, data_idx);
   fclose(f);

@@ -29,6 +29,8 @@ struct dialog dialogs_data[MAX_DIALOGS];
 int main(void) {
   setlocale (LC_ALL, "");
 
+  loader_set_data_dir();
+  loader_set_area_id(1);
   load_data();
   action_reset();
 

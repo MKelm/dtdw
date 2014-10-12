@@ -1,6 +1,7 @@
 *
 !data
-!data/dialogs
+!data/*
+!data/*/dialogs
 !tae
 !.gitignore
 !Makefile
