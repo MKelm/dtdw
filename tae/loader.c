@@ -66,7 +66,7 @@ void load_json(FILE *f, char *output, int output_length, jsmntok_t *tokens, int 
 void load_help(char *help) {
   FILE *f = loader_get_data_file(FILE_HELP, 0);
 
-  char output[2048];
+  char output[MAX_HELP_TEXT_CHARS];
   jsmntok_t tokens[128];
   load_json(f, output, 2048, tokens, 128);
 
@@ -90,31 +90,47 @@ void load_help(char *help) {
 }
 
 void load_meta(struct meta *data) {
-  int linenum = 0, run = 1;
-  char line[1024];
   FILE *f = loader_get_data_file(FILE_META, 0);
-  do {
-    if (fscanf(f, "%[^\n]\n", &line[0]) && strlen(line) > 0) {
-      switch (linenum) {
-        case 0:
-          strncpy(data->title, line, sizeof(data->title));
-          break;
-        case 1:
-          strncpy(data->version, line, sizeof(data->version));
-          break;
-        case 2:
-          strncpy(data->author, line, sizeof(data->author));
-          break;
-        case 3:
-          data->cyear = atoi(line);
-          break;
-      }
+
+  char output[2048];
+  jsmntok_t tokens[128];
+  load_json(f, output, 2048, tokens, 128);
+
+  int i = 1;
+  char line[MAX_META_LINE_CHARS];
+  while (tokens[i].end != 0 && tokens[i].end < tokens[0].end) {
+
+    if (tokens[i].type == JSMN_STRING) {
       strncpy(line, "", sizeof(line));
-      linenum++;
-    } else {
-      run = 0;
+      strncpy(line, output + tokens[i].start, tokens[i].end - tokens[i].start);
+      i++;
+      if (strcmp(line, "title") == 0) {
+        strncpy(line, "", sizeof(line));
+        strncpy(line, output + tokens[i].start, tokens[i].end - tokens[i].start);
+        strncpy(data->title, line, sizeof(data->title));
+        printf("title %s\n", data->title);
+      } else if (strcmp(line, "version") == 0) {
+        strncpy(line, "", sizeof(line));
+        strncpy(line, output + tokens[i].start, tokens[i].end - tokens[i].start);
+        strncpy(data->version, line, sizeof(data->version));
+        printf("version %s\n", data->version);
+      } else if (strcmp(line, "author") == 0) {
+        strncpy(line, "", sizeof(line));
+        strncpy(line, output + tokens[i].start, tokens[i].end - tokens[i].start);
+        strncpy(data->author, line, sizeof(data->author));
+        printf("author %s\n", data->author);
+      } else if (strcmp(line, "year") == 0) {
+        strncpy(line, "", sizeof(line));
+        strncpy(line, output + tokens[i].start, tokens[i].end - tokens[i].start);
+        data->cyear = atoi(line);
+      }
     }
-  } while (run == 1);
+    printf("ttype %d, tsize %d\n", tokens[i].type, tokens[i].size);
+    if (tokens[i].end >= tokens[0].end)
+      break;
+    i++;
+  }
+
   fclose(f);
 }
 

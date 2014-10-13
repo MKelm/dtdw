@@ -12,7 +12,7 @@ void loader_set_area_id(int area_id);
 void load_help(char *text);
 
 // meta
-#define FILE_META "meta.txt"
+#define FILE_META "meta.json"
 #define MAX_META_LINE_CHARS 1024
 
 void load_meta(struct meta *data);
