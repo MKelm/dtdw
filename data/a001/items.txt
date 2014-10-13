@@ -40,3 +40,7 @@ Zimmerschlüssel
 
 $11$0>$0
 Kuscheltier
+inv/push
+Du drückst das Kuscheltier und es macht "Mäh", es ist jetzt zerdrückt.
+inv/pull
+Du ziehst am Kuscheltier und es macht "Möh", es ist jetzt verzogen.
