@@ -1,9 +1,15 @@
 #include "structs.h"
+#include "jsmn/jsmn.h"
 
 #define LOADER_DATA_FOLDER "data/"
+#define MAX_JSON_LINE_CHARS 1024
 
 void loader_set_data_dir(void);
 void loader_set_area_id(int area_id);
+
+FILE *loader_get_data_file(char *file_name, short in_area);
+void load_json(FILE *f, char *output, int output_length, jsmntok_t *tokens, int tokens_length);
+void load_json_token(char* input, char *token, jsmntok_t *tokens, int token_idx);
 
 // help
 #define FILE_HELP "help.json"
@@ -39,10 +45,10 @@ int load_areas(struct area data[], int lmax);
 
 // places
 #define FILE_PLACES "places.txt"
+#define MAX_PLACES_LINE_CHARS 1024
 #define MAX_PLACES 200
 
 int load_places(struct place data[], int lmax);
-int load_places_rec(FILE *f, struct place *data, int data_idx);
 
 // items
 #define FILE_ITEMS "items.txt"

@@ -3,7 +3,6 @@
 #include <string.h>
 #include <unistd.h>
 #include <ctype.h>
-#include "jsmn/jsmn.h"
 #include "loader.h"
 
 int current_area_id = 0;
@@ -63,6 +62,12 @@ void load_json(FILE *f, char *output, int output_length, jsmntok_t *tokens, int 
   }
 }
 
+void load_json_token(char* input, char *token, jsmntok_t *tokens, int token_idx) {
+  strncpy(token, "", MAX_JSON_LINE_CHARS);
+  strncpy(token, input + tokens[token_idx].start,
+    tokens[token_idx].end - tokens[token_idx].start);
+}
+
 void load_help(char *help) {
   FILE *f = loader_get_data_file(FILE_HELP, 0);
 
@@ -71,12 +76,11 @@ void load_help(char *help) {
   load_json(f, output, 2048, tokens, 128);
 
   int i = 1, has_help_array = 0;
-  char line[512];
+  char line[MAX_JSON_LINE_CHARS];
   strcpy(help, "");
   while (tokens[i].end != 0 && tokens[i].end < tokens[0].end) {
     if (has_help_array == 1 && tokens[i].type == JSMN_STRING) {
-      strncpy(line, "", sizeof(line));
-      strncpy(line, output + tokens[i].start, tokens[i].end - tokens[i].start);
+      load_json_token(output, line, tokens, i);
       strcat(line, "\n");
       strcat(help, line);
     } else if (tokens[i].type == JSMN_ARRAY && tokens[i].size > 0) {
@@ -97,7 +101,7 @@ void load_meta(struct meta *data) {
   load_json(f, output, 2048, tokens, 128);
 
   int i = 1;
-  char line[MAX_META_LINE_CHARS];
+  char line[MAX_JSON_LINE_CHARS];
   while (tokens[i].end != 0 && tokens[i].end < tokens[0].end) {
 
     if (tokens[i].type == JSMN_STRING) {
@@ -105,20 +109,16 @@ void load_meta(struct meta *data) {
       strncpy(line, output + tokens[i].start, tokens[i].end - tokens[i].start);
       i++;
       if (strcmp(line, "title") == 0) {
-        strncpy(line, "", sizeof(line));
-        strncpy(line, output + tokens[i].start, tokens[i].end - tokens[i].start);
+        load_json_token(output, line, tokens, i);
         strncpy(data->title, line, sizeof(data->title));
       } else if (strcmp(line, "version") == 0) {
-        strncpy(line, "", sizeof(line));
-        strncpy(line, output + tokens[i].start, tokens[i].end - tokens[i].start);
+        load_json_token(output, line, tokens, i);
         strncpy(data->version, line, sizeof(data->version));
       } else if (strcmp(line, "author") == 0) {
-        strncpy(line, "", sizeof(line));
-        strncpy(line, output + tokens[i].start, tokens[i].end - tokens[i].start);
+        load_json_token(output, line, tokens, i);
         strncpy(data->author, line, sizeof(data->author));
       } else if (strcmp(line, "year") == 0) {
-        strncpy(line, "", sizeof(line));
-        strncpy(line, output + tokens[i].start, tokens[i].end - tokens[i].start);
+        load_json_token(output, line, tokens, i);
         data->cyear = atoi(line);
       }
     }
@@ -138,7 +138,7 @@ void load_phrases(struct phrases *data) {
   load_json(f, output, 2048, tokens, 128);
 
   int i = 1;
-  char line[MAX_PHRASES_LINE_CHARS];
+  char line[MAX_JSON_LINE_CHARS];
   while (tokens[i].end != 0 && tokens[i].end < tokens[0].end) {
 
     if (tokens[i].type == JSMN_STRING) {
@@ -147,24 +147,19 @@ void load_phrases(struct phrases *data) {
       i++;
       if (tokens[i].type == JSMN_STRING) {
         if (strcmp(line, "inv_title") == 0) {
-          strncpy(line, "", sizeof(line));
-          strncpy(line, output + tokens[i].start, tokens[i].end - tokens[i].start);
+          load_json_token(output, line, tokens, i);
           strncpy(data->inv_title, line, sizeof(data->inv_title));
         } else if (strcmp(line, "no_inv_items") == 0) {
-          strncpy(line, "", sizeof(line));
-          strncpy(line, output + tokens[i].start, tokens[i].end - tokens[i].start);
+          load_json_token(output, line, tokens, i);
           strncpy(data->no_inv_items, line, sizeof(data->no_inv_items));
         } else if (strcmp(line, "items_comb") == 0) {
-          strncpy(line, "", sizeof(line));
-          strncpy(line, output + tokens[i].start, tokens[i].end - tokens[i].start);
+          load_json_token(output, line, tokens, i);
           strncpy(data->items_comb, line, sizeof(data->items_comb));
         } else if (strcmp(line, "items_comb_failure") == 0) {
-          strncpy(line, "", sizeof(line));
-          strncpy(line, output + tokens[i].start, tokens[i].end - tokens[i].start);
+          load_json_token(output, line, tokens, i);
           strncpy(data->items_comb_failure, line, sizeof(data->items_comb_failure));
         } else if (strcmp(line, "item_usage_failure") == 0) {
-          strncpy(line, "", sizeof(line));
-          strncpy(line, output + tokens[i].start, tokens[i].end - tokens[i].start);
+          load_json_token(output, line, tokens, i);
           strncpy(data->item_usage_failure, line, sizeof(data->item_usage_failure));
         }
       }
@@ -185,17 +180,14 @@ int load_commands(struct command *data, int lmax) {
   load_json(f, output, 2048, tokens, 128);
 
   int i = 1, idx = 0;
-  char line[MAX_COMMANDS_LINE_CHARS];
+  char line[MAX_JSON_LINE_CHARS];
   while (tokens[i].end != 0 && tokens[i].end < tokens[0].end) {
 
     if (tokens[i].type == JSMN_STRING) {
-      strncpy(line, "", sizeof(line));
-      strncpy(line, output + tokens[i].start, tokens[i].end - tokens[i].start);
-      i++;
+      load_json_token(output, line, tokens, i++);
       if (strlen(line) > 0 && tokens[i].type == JSMN_STRING) {
         strncpy(data[idx].in, line, sizeof(data[idx].in));
-        strncpy(line, "", sizeof(line));
-        strncpy(line, output + tokens[i].start, tokens[i].end - tokens[i].start);
+        load_json_token(output, line, tokens, i);
         strncpy(data[idx].ex, line, sizeof(data[idx].ex));
         idx++;
       }
@@ -217,17 +209,14 @@ int load_areas(struct area *data, int lmax) {
   load_json(f, output, 2048, tokens, 128);
 
   int i = 1, idx = 0;
-  char line[MAX_AREA_TITLE_LENGTH];
+  char line[MAX_JSON_LINE_CHARS];
   while (tokens[i].end != 0 && tokens[i].end < tokens[0].end) {
 
     if (tokens[i].type == JSMN_STRING) {
-      strncpy(line, "", sizeof(line));
-      strncpy(line, output + tokens[i].start, tokens[i].end - tokens[i].start);
-      i++;
+      load_json_token(output, line, tokens, i++);
       if (strlen(line) > 0 && tokens[i].type == JSMN_STRING) {
         data[idx].id = atoi(line);
-        strncpy(line, "", sizeof(line));
-        strncpy(line, output + tokens[i].start, tokens[i].end - tokens[i].start);
+        load_json_token(output, line, tokens, i);
         strncpy(data[idx].title, line, sizeof(data[idx].title));
         idx++;
       }
