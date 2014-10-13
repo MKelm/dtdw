@@ -217,7 +217,7 @@ int load_transitions(struct placetrans transitions_data[], int transitions_lmax,
 }
 
 int load_items(struct item data[], int lmax) {
-  int data_idx = 0, run = 1, data_type = 0;
+  int data_idx = 0, run = 1, i_run = 1, data_type = 0, i  ;
   char item_title[MAX_ITEM_TITLE_LENGTH], item_id[24], comb_type[2], comb_id[24], final_id[24];
   char item_inventory_command[MAX_ITEM_COMMAND_LENGTH],
        item_inventory_description[MAX_ITEM_DESCRIPTION_LENGTH];
@@ -248,12 +248,18 @@ int load_items(struct item data[], int lmax) {
                strlen(item_title) > 0) {
       strncpy(data[data_idx].title, item_title, sizeof(data[data_idx].title));
 
-      if (fscanf(f, "inv/%[^\n]\n", item_inventory_command)) {
-        if (fscanf(f, "%[^\n]\n", item_inventory_description)) {
-          strcpy(data[data_idx].descriptions[0].i_command, item_inventory_command);
-          strcpy(data[data_idx].descriptions[0].i_description, item_inventory_description);
-        }
-      } // item command / description for item inventory descriptions
+      i = 0;
+      do {
+        if ((i_run = fscanf(f, "inv/%[^\n]\n", item_inventory_command)) > 0) {
+          if ((i_run = fscanf(f, "%[^\n]\n", item_inventory_description)) > 0) {
+            strcpy(data[data_idx].descriptions[i].i_command, item_inventory_command);
+            strcpy(data[data_idx].descriptions[i].i_description, item_inventory_description);
+            i++;
+            if (i == MAX_ITEM_DESCRIPTIONS)
+              break;
+          }
+        } // item command / description for item inventory descriptions
+      } while (i_run > 0);
 
       data_type = 0;
       data_idx++;

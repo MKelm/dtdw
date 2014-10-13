@@ -133,17 +133,18 @@ int main(void) {
 
         } else if (strcmp(caction->in_command, "talkto") == 0 &&
                    caction->c_npc != NULL && caction->c_npc->id > 0) {
-
+          // start dialog with npc
           dialog_set_current(caction->c_npc->c_dialog);
 
         } else if (strcmp(caction->in_command, "give") == 0 &&
                    caction->p_item != NULL && caction->p_item->id > 0 &&
                    caction->c_npc != NULL && caction->c_npc->id > 0) {
 
-          dsp_set_output("give item to npc"); // todo item action description
+          dsp_set_output(description_by_action(action_get()));
+          output_change = 0;
+          // give item from inventory to npc
           inventory_rm_item(caction->p_item);
         }
-
 
         // check output change, change output display window if needed
         if (output_change == 1) {

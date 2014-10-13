@@ -106,7 +106,14 @@ char *description_by_action(struct action *caction) {
   static char output[1024];
   strncpy(output, "", sizeof(output));
 
+  if (strlen(caction->in_command) == 0) {
+    // no active command
+    return output;
+  }
+
   if (caction->p_item != NULL && caction->s_item != NULL) {
+
+    // item combination actions
     if (caction->f_item == NULL) {
       snprintf(line, 1024, phrases_data.items_comb_failure, "");
     } else {
@@ -117,19 +124,21 @@ char *description_by_action(struct action *caction) {
     strcat(output, line);
     has_text = 1;
 
-  } else if (strlen(caction->in_command) > 0 &&
-             ((caction->p_item != NULL && caction->p_item->id > 0) ||
-              (caction->transition != NULL && caction->transition->id > 0) ||
-              (caction->c_npc != NULL && caction->c_npc->id > 0))) {
+  } else if ((caction->p_item != NULL && caction->p_item->id > 0) ||
+             (caction->transition != NULL && caction->transition->id > 0) ||
+             (caction->c_npc != NULL && caction->c_npc->id > 0)) {
 
-    // for inventory item actions
+    // for item actions (lookat / give)
     if (caction->p_item != NULL && caction->p_item->id > 0 &&
-        inventory_has_item(caction->p_item) == 1 &&
-        strcmp(caction->p_item->descriptions[0].i_command, caction->in_command) == 0) {
+        inventory_has_item(caction->p_item) == 1) {
 
-      strcat(output, caction->p_item->descriptions[0].i_description);
-      strcat(output, "\n\n");
-      return output;
+      for (i = 0; i < MAX_ITEM_DESCRIPTIONS; i++) {
+        if (strcmp(caction->p_item->descriptions[i].i_command, caction->in_command) == 0) {
+          strcat(output, caction->p_item->descriptions[i].i_description);
+          strcat(output, "\n\n");
+          return output;
+        }
+      }
     }
 
     // for transition / item / npc action commands
@@ -202,7 +211,7 @@ char *description_by_action(struct action *caction) {
       strcat(output, dialog_get_output());
     }
 
-  } else if (strlen(caction->in_command) > 0) {
+  } else {
     // for dialog commands
     if (dialog_get_current_idx() > 0) {
       strcat(output, dialog_get_output());

@@ -61,6 +61,8 @@ struct itemdescription {
 #define ITEM_COMB_TYPE_NPC 1
 #define ITEM_COMB_TYPE_TRANS 2
 
+#define MAX_ITEM_DESCRIPTIONS 5
+
 struct item {
   int id;
   int comb_type; // combination type item, npc or transition
@@ -68,7 +70,7 @@ struct item {
   int final_id; // final item id after combination
   char title[MAX_ITEM_TITLE_LENGTH];
   int status; // 0 == in place, 1 == in inventory, -1 == exists no longer
-  struct itemdescription descriptions[5];
+  struct itemdescription descriptions[MAX_ITEM_DESCRIPTIONS];
 };
 
 #define DIALOG_ELEMENT_MAX_NEXT_IDS 10

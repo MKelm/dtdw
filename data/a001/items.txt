@@ -21,6 +21,8 @@ $6&1>$0
 Zettel_mit_Wachs
 inv/lookat
 Der Zettel hat jetzt einen Rand aus Wachs, wozu das auch immer gut ist.
+inv/give
+Du gibtst den Zettel an Marunix, er nimmt ihn entgegen und sagt: "Ah ein schönes Geschenk von deiner Arbeit."
 
 $7$0>$0
 Couch
