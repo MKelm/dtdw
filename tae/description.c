@@ -184,7 +184,7 @@ char *description_by_action(struct action *caction) {
           // of items which have another location than "in place"
           for (i = 0; i < MAX_DESC_TEXT_ITEMS; i++) {
             struct item *citem = get_item_by_id(descriptions[desc_idx].items[i]);
-            if (citem != NULL && citem->location != 0) {
+            if (citem != NULL && citem->location != ITEM_LOCATION_PLACE) {
               has_item = 0;
               has_transition = 0;
               has_npc = 0;
