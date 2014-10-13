@@ -69,7 +69,7 @@ struct item {
   int comb_id; // combination item/npc/transition id
   int final_id; // final item id after combination
   char title[MAX_ITEM_TITLE_LENGTH];
-  int status; // 0 == in place, 1 == in inventory, -1 == exists no longer
+  int location; // 0 == in place, 1 == in inventory, -1 == exists no longer
   struct itemdescription descriptions[MAX_ITEM_DESCRIPTIONS];
 };
 
