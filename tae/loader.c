@@ -3,6 +3,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <ctype.h>
+#include "jsmn/jsmn.h"
 #include "loader.h"
 
 int current_area_id = 0;
@@ -38,15 +39,48 @@ FILE *loader_get_data_file(char *file_name, short in_area) {
   return fopen(tmp1, "r");
 }
 
-void load_help(char *help) {
+void load_json(FILE *f, char *output, int output_length, jsmntok_t *tokens, int tokens_length) {
   int ch, ch_count = 0;
   char ch_str[2];
-  FILE *f = loader_get_data_file(FILE_HELP, 0);
-  while ((ch = fgetc(f)) != EOF && ch_count < MAX_HELP_TEXT_CHARS) {
-    snprintf(ch_str, 2, "%c", ch);
-    strcat(help, ch_str);
+  strcpy(output, "");
+  while ((ch = fgetc(f)) != EOF && ch_count < output_length) {
+    if (ch == '\n') {
+      strcat(output, " ");
+    } else {
+      snprintf(ch_str, 2, "%c", ch);
+      strcat(output, ch_str);
+    }
     ch_count++;
   }
+  int r;
+  jsmn_parser p;
+  jsmn_init(&p);
+  r = jsmn_parse(&p, output, strlen(output), tokens, tokens_length);
+  if (r < 0) {
+    tokens = NULL;
+  }
+}
+
+void load_help(char *help) {
+  FILE *f = loader_get_data_file(FILE_HELP, 0);
+
+  char output[2048];
+  jsmntok_t tokens[128];
+  load_json(f, output, 2048, tokens, 128);
+
+  int i = 1;
+  char line[512];
+  strcpy(help, "");
+  while (tokens[i].end != 0 && tokens[i].end < tokens[0].end) {
+    if (tokens[i].type == JSMN_STRING) {
+      strncpy(line, "", sizeof(line));
+      strncpy(line, output + tokens[i].start, tokens[i].end - tokens[i].start);
+      strcat(line, "\n");
+      strcat(help, line);
+    }
+    i++;
+  }
+
   fclose(f);
 }
 

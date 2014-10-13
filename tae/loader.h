@@ -6,7 +6,7 @@ void loader_set_data_dir(void);
 void loader_set_area_id(int area_id);
 
 // help
-#define FILE_HELP "help.txt"
+#define FILE_HELP "help.json"
 #define MAX_HELP_TEXT_CHARS 2048
 
 void load_help(char *text);
