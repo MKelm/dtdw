@@ -144,6 +144,8 @@ int main(void) {
           output_change = 0;
           // give item from inventory to npc
           inventory_rm_item(caction->p_item);
+          // optional get item from npc to inventory
+          inventory_add_item(caction->f_item);
         }
 
         // check output change, change output display window if needed

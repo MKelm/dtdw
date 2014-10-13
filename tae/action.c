@@ -112,6 +112,9 @@ int action_handle_input(char *input) {
                 c_action.c_npc = get_npc(inputarr[3]);
                 if (c_action.c_npc == NULL) {
                   c_action.p_item = NULL;
+                } else {
+                  // optional new item from npc
+                  c_action.f_item = get_item_by_id(c_action.p_item->final_id);
                 }
               }
             }

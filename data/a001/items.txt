@@ -17,12 +17,12 @@ Kerze
 inv/lookat
 Die Kerze von der Kommode ist bei dir in sicheren Händen, solange sie nicht brennt, oder?
 
-$6&1>$0
+$6&1>$11
 Zettel_mit_Wachs
 inv/lookat
 Der Zettel hat jetzt einen Rand aus Wachs, wozu das auch immer gut ist.
 inv/give
-Du gibtst den Zettel an Marunix, er nimmt ihn entgegen und sagt: "Ah ein schönes Geschenk von deiner Arbeit."
+Du gibtst den Zettel an Marunix, er nimmt ihn entgegen und sagt: "Ah ein schönes Geschenk von deiner Arbeit, dafür gebe ich dir ein Kuscheltier."
 
 $7$0>$0
 Couch
@@ -37,3 +37,6 @@ Nachdem du die Kerze angezündet hast, brennt sie jetzt und es tropft immer mal 
 
 $10#2>$0
 Zimmerschlüssel
+
+$11$0>$0
+Kuscheltier
