@@ -160,15 +160,16 @@ char *description_by_action(struct action *caction) {
 
           if (descriptions[desc_idx].id_trans_status[0] == caction->transition->status) {
             // set has transition with valid status only
-            if (caction->transition->status == 2 && caction->p_item == NULL &&
-                descriptions[desc_idx].id_trans_item_id[0] == 0) {
+            if (caction->transition->status == TRANSITION_STATUS_LOCKED &&
+                caction->p_item == NULL && descriptions[desc_idx].id_trans_item_id[0] == 0) {
               // use (unlock) command without correct item
               has_transition = 1;
-            } else if (caction->transition->status == 2 && caction->p_item != NULL &&
-                descriptions[desc_idx].id_trans_item_id[0] == caction->p_item->id) {
+            } else if (caction->transition->status == TRANSITION_STATUS_LOCKED &&
+                       caction->p_item != NULL &&
+                       descriptions[desc_idx].id_trans_item_id[0] == caction->p_item->id) {
               // use (unlock) command with correct item
               has_transition = 1;
-            } else if (caction->transition->status != 2) {
+            } else if (caction->transition->status != TRANSITION_STATUS_LOCKED) {
               // another valid transition status
               has_transition = 1;
             }

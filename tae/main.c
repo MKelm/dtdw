@@ -78,7 +78,8 @@ int main(void) {
 
         } else if (caction->transition != NULL && caction->transition->id > 0) {
 
-          if (strcmp(caction->in_command, "use") == 0 && caction->transition->status == 0) {
+          if (strcmp(caction->in_command, "use") == 0 &&
+              caction->transition->status == TRANSITION_STATUS_OPEN) {
             // location change with open transitions only
             // output transition action description before location change
             dsp_set_output(description_by_action(action_get()));
@@ -87,27 +88,29 @@ int main(void) {
 
           } else if (strcmp(caction->in_command, "use") == 0 &&
                      caction->transition != NULL &&
-                     caction->transition->status == 2 && caction->p_item != NULL) {
+                     caction->transition->status == TRANSITION_STATUS_LOCKED &&
+                     caction->p_item != NULL) {
 
             if (inventory_has_item(caction->p_item)) {
               // remove locked status by use item command
               dsp_set_output(description_by_action(action_get()));
-              caction->transition->status = 1; // unlock -> closed status
+              caction->transition->status = TRANSITION_STATUS_CLOSED; // unlock -> closed status
+              inventory_rm_item(caction->p_item);
             }
             output_change = 0;
 
           } else if (strcmp(caction->in_command, "open") == 0 &&
-                     caction->transition->status == 1) {
+                     caction->transition->status == TRANSITION_STATUS_CLOSED) {
             // remove closed status by open command
             dsp_set_output(description_by_action(action_get()));
-            caction->transition->status = 0;
+            caction->transition->status = TRANSITION_STATUS_OPEN;
             output_change = 0;
 
           } else if (strcmp(caction->in_command, "close") == 0 &&
-                     caction->transition->status == 0) {
+                     caction->transition->status == TRANSITION_STATUS_OPEN) {
             // remove open status by close command
             dsp_set_output(description_by_action(action_get()));
-            caction->transition->status = 1;
+            caction->transition->status = TRANSITION_STATUS_CLOSED;
             output_change = 0;
           }
 
