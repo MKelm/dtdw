@@ -3,7 +3,9 @@
 !data/*
 !data/*/dialogs
 !tae
+!tae/jsmn
 !.gitignore
+!README.md
 !Makefile
 !*.c
 !*.h
