@@ -146,6 +146,22 @@ int main(void) {
           inventory_rm_item(caction->p_item);
           // optional get item from npc to inventory
           inventory_add_item(caction->f_item);
+
+        } else if (strcmp(caction->in_command, "push") == 0 &&
+                   caction->p_item != NULL && caction->p_item->id > 0) {
+
+          if (caction->p_item->status == ITEM_STATUS_NORMAL)
+            caction->p_item->status = ITEM_STATUS_PUSHED;
+          else if (caction->p_item->status == ITEM_STATUS_PULLED)
+            caction->p_item->status = ITEM_STATUS_NORMAL;
+
+        } else if (strcmp(caction->in_command, "pull") == 0 &&
+                   caction->p_item != NULL && caction->p_item->id > 0) {
+
+          if (caction->p_item->status == ITEM_STATUS_NORMAL)
+            caction->p_item->status = ITEM_STATUS_PULLED;
+          else if (caction->p_item->status == ITEM_STATUS_PUSHED)
+            caction->p_item->status = ITEM_STATUS_NORMAL;
         }
 
         // check output change, change output display window if needed

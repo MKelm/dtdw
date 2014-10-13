@@ -63,6 +63,10 @@ struct itemdescription {
 
 #define MAX_ITEM_DESCRIPTIONS 5
 
+#define ITEM_STATUS_NORMAL 0
+#define ITEM_STATUS_PUSHED 1
+#define ITEM_STATUS_PULLED 2
+
 struct item {
   int id;
   int comb_type; // combination type item, npc or transition
@@ -70,6 +74,7 @@ struct item {
   int final_id; // final item id after combination
   char title[MAX_ITEM_TITLE_LENGTH];
   int location; // 0 == in place, 1 == in inventory, -1 == exists no longer
+  int status; // 0 == normal, 1 = pushed, 2 = pulled
   struct itemdescription descriptions[MAX_ITEM_DESCRIPTIONS];
 };
 
