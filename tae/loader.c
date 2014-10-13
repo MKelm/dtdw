@@ -145,26 +145,28 @@ void load_phrases(struct phrases *data) {
       strncpy(line, "", sizeof(line));
       strncpy(line, output + tokens[i].start, tokens[i].end - tokens[i].start);
       i++;
-      if (strcmp(line, "inv_title") == 0) {
-        strncpy(line, "", sizeof(line));
-        strncpy(line, output + tokens[i].start, tokens[i].end - tokens[i].start);
-        strncpy(data->inv_title, line, sizeof(data->inv_title));
-      } else if (strcmp(line, "no_inv_items") == 0) {
-        strncpy(line, "", sizeof(line));
-        strncpy(line, output + tokens[i].start, tokens[i].end - tokens[i].start);
-        strncpy(data->no_inv_items, line, sizeof(data->no_inv_items));
-      } else if (strcmp(line, "items_comb") == 0) {
-        strncpy(line, "", sizeof(line));
-        strncpy(line, output + tokens[i].start, tokens[i].end - tokens[i].start);
-        strncpy(data->items_comb, line, sizeof(data->items_comb));
-      } else if (strcmp(line, "items_comb_failure") == 0) {
-        strncpy(line, "", sizeof(line));
-        strncpy(line, output + tokens[i].start, tokens[i].end - tokens[i].start);
-        strncpy(data->items_comb_failure, line, sizeof(data->items_comb_failure));
-      } else if (strcmp(line, "item_usage_failure") == 0) {
-        strncpy(line, "", sizeof(line));
-        strncpy(line, output + tokens[i].start, tokens[i].end - tokens[i].start);
-        strncpy(data->item_usage_failure, line, sizeof(data->item_usage_failure));
+      if (tokens[i].type == JSMN_STRING) {
+        if (strcmp(line, "inv_title") == 0) {
+          strncpy(line, "", sizeof(line));
+          strncpy(line, output + tokens[i].start, tokens[i].end - tokens[i].start);
+          strncpy(data->inv_title, line, sizeof(data->inv_title));
+        } else if (strcmp(line, "no_inv_items") == 0) {
+          strncpy(line, "", sizeof(line));
+          strncpy(line, output + tokens[i].start, tokens[i].end - tokens[i].start);
+          strncpy(data->no_inv_items, line, sizeof(data->no_inv_items));
+        } else if (strcmp(line, "items_comb") == 0) {
+          strncpy(line, "", sizeof(line));
+          strncpy(line, output + tokens[i].start, tokens[i].end - tokens[i].start);
+          strncpy(data->items_comb, line, sizeof(data->items_comb));
+        } else if (strcmp(line, "items_comb_failure") == 0) {
+          strncpy(line, "", sizeof(line));
+          strncpy(line, output + tokens[i].start, tokens[i].end - tokens[i].start);
+          strncpy(data->items_comb_failure, line, sizeof(data->items_comb_failure));
+        } else if (strcmp(line, "item_usage_failure") == 0) {
+          strncpy(line, "", sizeof(line));
+          strncpy(line, output + tokens[i].start, tokens[i].end - tokens[i].start);
+          strncpy(data->item_usage_failure, line, sizeof(data->item_usage_failure));
+        }
       }
     }
     if (tokens[i].end >= tokens[0].end)
@@ -176,23 +178,35 @@ void load_phrases(struct phrases *data) {
 }
 
 int load_commands(struct command *data, int lmax) {
-  int data_idx = 0, run = 1;
-  char intern_command[MAX_COMMAND_LENGTH], extern_command[MAX_COMMAND_LENGTH];
   FILE *f = loader_get_data_file(FILE_COMMANDS, 0);
-  do {
-    if (fscanf(f, "%[^=]=%[^\n]\n", &intern_command[0], &extern_command[0]) &&
-        strlen(intern_command) > 0 && strlen(extern_command) > 0) {
-      strncpy(data[data_idx].in, intern_command, sizeof(data[data_idx].in));
-      strncpy(data[data_idx].ex, extern_command, sizeof(data[data_idx].ex));
-      data_idx++;
-      strncpy(intern_command, "", sizeof(intern_command));
-      strncpy(extern_command, "", sizeof(extern_command));
-    } else {
-      run = 0;
+
+  char output[2048];
+  jsmntok_t tokens[128];
+  load_json(f, output, 2048, tokens, 128);
+
+  int i = 1, idx = 0;
+  char line[MAX_COMMANDS_LINE_CHARS];
+  while (tokens[i].end != 0 && tokens[i].end < tokens[0].end) {
+
+    if (tokens[i].type == JSMN_STRING) {
+      strncpy(line, "", sizeof(line));
+      strncpy(line, output + tokens[i].start, tokens[i].end - tokens[i].start);
+      i++;
+      if (strlen(line) > 0 && tokens[i].type == JSMN_STRING) {
+        strncpy(data[idx].in, line, sizeof(data[idx].in));
+        strncpy(line, "", sizeof(line));
+        strncpy(line, output + tokens[i].start, tokens[i].end - tokens[i].start);
+        strncpy(data[idx].ex, line, sizeof(data[idx].ex));
+        idx++;
+      }
     }
-  } while (run == 1);
+    if (tokens[i].end >= tokens[0].end)
+      break;
+    i++;
+  }
+
   fclose(f);
-  return data_idx;
+  return idx;
 }
 
 int load_areas(struct area *data, int lmax) {

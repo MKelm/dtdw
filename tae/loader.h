@@ -25,7 +25,8 @@ void load_meta(struct meta *data);
 void load_phrases(struct phrases *data) ;
 
 // commands
-#define FILE_COMMANDS "commands.txt"
+#define FILE_COMMANDS "commands.json"
+#define MAX_COMMANDS_LINE_CHARS 1024
 #define MAX_COMMANDS 20
 
 int load_commands(struct command data[], int lmax);
