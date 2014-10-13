@@ -40,15 +40,17 @@ FILE *loader_get_data_file(char *file_name, short in_area) {
 }
 
 void load_json(FILE *f, char *output, int output_length, jsmntok_t *tokens, int tokens_length) {
-  int ch, ch_count = 0;
+  int ch, ch_count = 0, new_line = 1;
   char ch_str[2];
   strcpy(output, "");
   while ((ch = fgetc(f)) != EOF && ch_count < output_length) {
     if (ch == '\n') {
       strcat(output, " ");
-    } else {
+      new_line = 1;
+    } else if (new_line == 0 || ch != ' ') {
       snprintf(ch_str, 2, "%c", ch);
       strcat(output, ch_str);
+      new_line = 0;
     }
     ch_count++;
   }
