@@ -6,6 +6,7 @@
 !tae/jsmn
 !.gitignore
 !README.md
+!LICENSE
 !Makefile
 !*.c
 !*.h
