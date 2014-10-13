@@ -19,7 +19,8 @@ void load_meta(struct meta *data);
 
 // phrases
 
-#define FILE_PHRASES "phrases.txt"
+#define FILE_PHRASES "phrases.json"
+#define MAX_PHRASES_LINE_CHARS 1024
 
 void load_phrases(struct phrases *data) ;
 

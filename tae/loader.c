@@ -108,24 +108,20 @@ void load_meta(struct meta *data) {
         strncpy(line, "", sizeof(line));
         strncpy(line, output + tokens[i].start, tokens[i].end - tokens[i].start);
         strncpy(data->title, line, sizeof(data->title));
-        printf("title %s\n", data->title);
       } else if (strcmp(line, "version") == 0) {
         strncpy(line, "", sizeof(line));
         strncpy(line, output + tokens[i].start, tokens[i].end - tokens[i].start);
         strncpy(data->version, line, sizeof(data->version));
-        printf("version %s\n", data->version);
       } else if (strcmp(line, "author") == 0) {
         strncpy(line, "", sizeof(line));
         strncpy(line, output + tokens[i].start, tokens[i].end - tokens[i].start);
         strncpy(data->author, line, sizeof(data->author));
-        printf("author %s\n", data->author);
       } else if (strcmp(line, "year") == 0) {
         strncpy(line, "", sizeof(line));
         strncpy(line, output + tokens[i].start, tokens[i].end - tokens[i].start);
         data->cyear = atoi(line);
       }
     }
-    printf("ttype %d, tsize %d\n", tokens[i].type, tokens[i].size);
     if (tokens[i].end >= tokens[0].end)
       break;
     i++;
@@ -135,34 +131,47 @@ void load_meta(struct meta *data) {
 }
 
 void load_phrases(struct phrases *data) {
-  int linenum = 0, run = 1;
-  char line[1024];
   FILE *f = loader_get_data_file(FILE_PHRASES, 0);
-  do {
-    if (fscanf(f, "%[^\n]\n", &line[0]) && strlen(line) > 0) {
-      switch (linenum) {
-        case 0:
-          strncpy(data->inv_title, line, sizeof(data->inv_title));
-          break;
-        case 1:
-          strncpy(data->no_inv_items, line, sizeof(data->no_inv_items));
-          break;
-        case 2:
-          strncpy(data->items_comb, line, sizeof(data->items_comb));
-          break;
-        case 3:
-          strncpy(data->items_comb_failure, line, sizeof(data->items_comb_failure));
-          break;
-        case 4:
-          strncpy(data->item_usage_failure, line, sizeof(data->item_usage_failure));
-          break;
-      }
+
+  char output[2048];
+  jsmntok_t tokens[128];
+  load_json(f, output, 2048, tokens, 128);
+
+  int i = 1;
+  char line[MAX_PHRASES_LINE_CHARS];
+  while (tokens[i].end != 0 && tokens[i].end < tokens[0].end) {
+
+    if (tokens[i].type == JSMN_STRING) {
       strncpy(line, "", sizeof(line));
-      linenum++;
-    } else {
-      run = 0;
+      strncpy(line, output + tokens[i].start, tokens[i].end - tokens[i].start);
+      i++;
+      if (strcmp(line, "inv_title") == 0) {
+        strncpy(line, "", sizeof(line));
+        strncpy(line, output + tokens[i].start, tokens[i].end - tokens[i].start);
+        strncpy(data->inv_title, line, sizeof(data->inv_title));
+      } else if (strcmp(line, "no_inv_items") == 0) {
+        strncpy(line, "", sizeof(line));
+        strncpy(line, output + tokens[i].start, tokens[i].end - tokens[i].start);
+        strncpy(data->no_inv_items, line, sizeof(data->no_inv_items));
+      } else if (strcmp(line, "items_comb") == 0) {
+        strncpy(line, "", sizeof(line));
+        strncpy(line, output + tokens[i].start, tokens[i].end - tokens[i].start);
+        strncpy(data->items_comb, line, sizeof(data->items_comb));
+      } else if (strcmp(line, "items_comb_failure") == 0) {
+        strncpy(line, "", sizeof(line));
+        strncpy(line, output + tokens[i].start, tokens[i].end - tokens[i].start);
+        strncpy(data->items_comb_failure, line, sizeof(data->items_comb_failure));
+      } else if (strcmp(line, "item_usage_failure") == 0) {
+        strncpy(line, "", sizeof(line));
+        strncpy(line, output + tokens[i].start, tokens[i].end - tokens[i].start);
+        strncpy(data->item_usage_failure, line, sizeof(data->item_usage_failure));
+      }
     }
-  } while (run == 1);
+    if (tokens[i].end >= tokens[0].end)
+      break;
+    i++;
+  }
+
   fclose(f);
 }
 

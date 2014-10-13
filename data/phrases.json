@@ -1,0 +1,7 @@
+{
+  "inv_title" : "Inventar",
+  "no_inv_items" : "Keine Inventargegenstände",
+  "items_comb" : "Gegenstand %s mit %s kombiniert, neuer Gegenstand %s",
+  "items_comb_failure" : "Die gewählten Gegenstände lassen sich nicht kombinieren.",
+  "items_usage_failure" : "Der gewählte Gegenstand lässt sich nicht benutzen."
+}
