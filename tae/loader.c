@@ -68,15 +68,18 @@ void load_help(char *help) {
   jsmntok_t tokens[128];
   load_json(f, output, 2048, tokens, 128);
 
-  int i = 1;
+  int i = 1, has_help_array = 0;
   char line[512];
   strcpy(help, "");
   while (tokens[i].end != 0 && tokens[i].end < tokens[0].end) {
-    if (tokens[i].type == JSMN_STRING) {
+    if (has_help_array == 1 && tokens[i].type == JSMN_STRING) {
       strncpy(line, "", sizeof(line));
       strncpy(line, output + tokens[i].start, tokens[i].end - tokens[i].start);
       strcat(line, "\n");
       strcat(help, line);
+    } else if (tokens[i].type == JSMN_ARRAY && tokens[i].size > 0) {
+      i++;
+      has_help_array = 1;
     }
     i++;
   }
