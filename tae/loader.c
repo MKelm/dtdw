@@ -210,26 +210,35 @@ int load_commands(struct command *data, int lmax) {
 }
 
 int load_areas(struct area *data, int lmax) {
-  int data_idx = 0, run = 1, data_type = 0;
-  char line[MAX_AREA_TITLE_LENGTH];
   FILE *f = loader_get_data_file(FILE_AREAS, 0);
-  do {
-    if (fscanf(f, "%[^\n]\n", &line[0]) && strlen(line) > 0) {
-      if (data_type == 0) {
-        data[data_idx].id = atoi(line);
-        data_type = 1;
-      } else if (data_type == 1) {
-        strncpy(data[data_idx].title, line, sizeof(data[data_idx].title));
-        data_type = 0;
-        data_idx++;
-      }
+
+  char output[2048];
+  jsmntok_t tokens[128];
+  load_json(f, output, 2048, tokens, 128);
+
+  int i = 1, idx = 0;
+  char line[MAX_AREA_TITLE_LENGTH];
+  while (tokens[i].end != 0 && tokens[i].end < tokens[0].end) {
+
+    if (tokens[i].type == JSMN_STRING) {
       strncpy(line, "", sizeof(line));
-    } else {
-      run = 0;
+      strncpy(line, output + tokens[i].start, tokens[i].end - tokens[i].start);
+      i++;
+      if (strlen(line) > 0 && tokens[i].type == JSMN_STRING) {
+        data[idx].id = atoi(line);
+        strncpy(line, "", sizeof(line));
+        strncpy(line, output + tokens[i].start, tokens[i].end - tokens[i].start);
+        strncpy(data[idx].title, line, sizeof(data[idx].title));
+        idx++;
+      }
     }
-  } while (run == 1);
+    if (tokens[i].end >= tokens[0].end)
+      break;
+    i++;
+  }
+
   fclose(f);
-  return data_idx;
+  return idx;
 }
 
 int load_places_rec(FILE *f, struct place *data, int data_idx) {

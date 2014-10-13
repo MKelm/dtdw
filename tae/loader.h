@@ -32,7 +32,7 @@ void load_phrases(struct phrases *data) ;
 int load_commands(struct command data[], int lmax);
 
 // areas
-#define FILE_AREAS "areas.txt"
+#define FILE_AREAS "areas.json"
 #define MAX_AREAS 50
 
 int load_areas(struct area data[], int lmax);
