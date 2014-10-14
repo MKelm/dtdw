@@ -51,7 +51,7 @@ int load_areas(struct area data[], int lmax);
 int load_places(struct place data[], int lmax);
 
 // items
-#define FILE_ITEMS "items.txt"
+#define FILE_ITEMS "items.json"
 #define MAX_ITEMS 500
 
 int load_items(struct item data[], int lmax);

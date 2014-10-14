@@ -1,0 +1,100 @@
+{
+  "items" : [
+    {
+      "id" : 1,
+      "title" : "Holzbank"
+    },
+    {
+      "id" : 2,
+      "title" : "Kommode"
+    },
+    {
+      "id" : 3,
+      "title" : "Bett"
+    },
+    {
+      "id" : 4,
+      "comb_id" : 9,
+      "comb_type" : "item",
+      "final_id" : 6,
+      "title" : "Zettel",
+      "descriptions" : [
+        {
+          "command" : "lookat",
+          "text" : "Ein gelber Zettel von deiner Holzbank, auf diesem stehen die Zugangscodes für die Portaladministration."
+        }
+      ]
+    },
+    {
+      "id" : 5,
+      "comb_id" : 8,
+      "comb_type" : "item",
+      "final_id" : 9,
+      "title" : "Kerze",
+      "descriptions" : [
+        {
+          "command" : "lookat",
+          "text" : "Die Kerze von der Kommode ist bei dir in sicheren Händen, solange sie nicht brennt, oder?"
+        }
+      ]
+    },
+    {
+      "id" : 6,
+      "comb_id" : 1,
+      "comb_type" : "npc",
+      "final_id" : 11,
+      "title" : "Zettel_mit_Wachs",
+      "descriptions" : [
+        {
+          "command" : "lookat",
+          "text" : "Der Zettel hat jetzt einen Rand aus Wachs, wozu das auch immer gut ist."
+        },
+        {
+          "command" : "give",
+          "text" : "Du gibtst den Zettel an Marunix, er nimmt ihn entgegen und sagt: Ah ein schönes Geschenk von deiner Arbeit, dafür gebe ich dir ein Kuscheltier."
+        }
+      ]
+    },
+    {
+      "id" : 7,
+      "title" : "Couch"
+    },
+    {
+      "id" : 8,
+      "title" : "Feuerzeug"
+    },
+    {
+      "id" : 9,
+      "comb_id" : 4,
+      "comb_type" : "item",
+      "final_id" : 6,
+      "title" : "Kerze_brennend",
+      "descriptions" : [
+        {
+          "command" : "lookat",
+          "text" : "Nachdem du die Kerze angezündet hast, brennt sie jetzt und es tropft immer mal wieder etwas Wachs herunter."
+        }
+      ]
+    },
+    {
+      "id" : 10,
+      "comb_id" : 2,
+      "comb_type" : "trans",
+      "title" : "Zimmerschlüssel"
+    },
+    {
+      "id" : 11,
+      "title" : "Kuscheltier",
+      "descriptions" : [
+        {
+          "command" : "push",
+          "text" : "Du drückst das Kuscheltier und es macht Mäh, es ist jetzt zerdrückt."
+        },
+        {
+          "command" : "pull",
+          "text" : "Du ziehst am Kuscheltier und es macht Möh, es ist jetzt verzogen."
+        }
+      ]
+    }
+  ]
+}

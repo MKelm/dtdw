@@ -336,59 +336,96 @@ int load_transitions(struct placetrans transitions_data[], int transitions_lmax,
 }
 
 int load_items(struct item data[], int lmax) {
-  int data_idx = 0, run = 1, i_run = 1, data_type = 0, i  ;
-  char item_title[MAX_ITEM_TITLE_LENGTH], item_id[24], comb_type[2], comb_id[24], final_id[24];
-  char item_inventory_command[MAX_ITEM_COMMAND_LENGTH],
-       item_inventory_description[MAX_ITEM_DESCRIPTION_LENGTH];
   FILE *f = loader_get_data_file(FILE_ITEMS, 1);
-  do {
-    if (data_type == 0 &&
-        fscanf(f, "$%[0-9]%[$&#]%[0-9]>$%[0-9]\n", item_id, comb_type, comb_id, final_id) &&
-        strlen(item_id) > 0) {
-      data[data_idx].id = atoi(item_id);
 
-      if (strcmp(comb_type, "$") == 0)
-          data[data_idx].comb_type = ITEM_COMB_TYPE_ITEM;
-      else if (strcmp(comb_type, "&") == 0)
-        data[data_idx].comb_type = ITEM_COMB_TYPE_NPC;
-      else if (strcmp(comb_type, "#") == 0)
-        data[data_idx].comb_type = ITEM_COMB_TYPE_TRANS;
+  char output[4096];
+  jsmntok_t tokens[256];
+  load_json(f, output, 4096, tokens, 256);
 
-      data[data_idx].comb_id = atoi(comb_id);
+  int i = 1, j = 0, j_max = 0, k = 0, k_max = 0, l = 0, l_max = 0, m = 0, m_max = 0;
+  int idx = 0, desc_idx = 0;
+  char line[MAX_JSON_LINE_CHARS];
 
-      data[data_idx].final_id = atoi(final_id);
-      strncpy(item_id, "", sizeof(item_id));
-      strncpy(comb_type, "", sizeof(comb_type));
-      strncpy(comb_id, "", sizeof(comb_id));
-      strncpy(final_id, "", sizeof(final_id));
-      data_type = 1;
-
-    } else if (data_type == 1 && fscanf(f, "%[^\n]\n", item_title) &&
-               strlen(item_title) > 0) {
-      strncpy(data[data_idx].title, item_title, sizeof(data[data_idx].title));
-
-      i = 0;
-      do {
-        if ((i_run = fscanf(f, "inv/%[^\n]\n", item_inventory_command)) > 0) {
-          if ((i_run = fscanf(f, "%[^\n]\n", item_inventory_description)) > 0) {
-            strcpy(data[data_idx].descriptions[i].i_command, item_inventory_command);
-            strcpy(data[data_idx].descriptions[i].i_description, item_inventory_description);
+  if (tokens[i].type == JSMN_STRING) {
+    i++;
+    if (tokens[i].type == JSMN_ARRAY) {
+      // iterate through items array
+      j_max = tokens[i].size;
+      for (j = 0; j < j_max; j++) {
+        i++;
+        if (tokens[i].type == JSMN_OBJECT) {
+          // iterate through item object parts
+          k_max = tokens[i].size;
+          for (k = 0; k < k_max; k++) {
             i++;
-            if (i == MAX_ITEM_DESCRIPTIONS)
-              break;
+            if (k % 2 == 0 && tokens[i].type == JSMN_STRING) {
+              load_json_token(output, line, tokens, i);
+              // get item object part by key
+              load_json_token(output, line, tokens, i);
+              if (strcmp(line, "id") == 0) {
+                load_json_token(output, line, tokens, i+1);
+                data[idx].id = atoi(line);
+              } else if (strcmp(line, "comb_id") == 0) {
+                load_json_token(output, line, tokens, i+1);
+                data[idx].comb_id = atoi(line);
+              } else if (strcmp(line, "comb_type") == 0) {
+                load_json_token(output, line, tokens, i+1);
+                if (strcmp(line, "item") == 0) {
+                  data[idx].comb_type = ITEM_COMB_TYPE_ITEM;
+                } else if (strcmp(line, "npc") == 0) {
+                  data[idx].comb_type = ITEM_COMB_TYPE_NPC;
+                } else if (strcmp(line, "trans") == 0) {
+                  data[idx].comb_type = ITEM_COMB_TYPE_TRANS;
+                }
+              } else if (strcmp(line, "final_id") == 0) {
+                load_json_token(output, line, tokens, i+1);
+                data[idx].final_id = atoi(line);
+              } else if (strcmp(line, "title") == 0) {
+                load_json_token(output, line, tokens, i+1);
+                strncpy(data[idx].title, line, sizeof(data[idx].title));
+              } else if (strcmp(line, "descriptions") == 0) {
+                i++;
+                // todo go through descriptions array / objects
+                if (tokens[i].type == JSMN_ARRAY && tokens[i].size > 0) {
+                  desc_idx = 0;
+                  l_max = tokens[i].size;
+                  for (l = 0; l < l_max; l++) {
+                    i++;
+                    if (tokens[i].type == JSMN_OBJECT) {
+                      load_json_token(output, line, tokens, i);
+                      m_max = tokens[i].size;
+                      // iterate through description object elements
+                      for (m = 0; m < m_max; m++) {
+                        i++;
+                        if (m % 2 == 0 && tokens[i].type == JSMN_STRING) {
+                          load_json_token(output, line, tokens, i);
+                          if (strcmp(line, "command") == 0) {
+                            load_json_token(output, line, tokens, i+1);
+                            strncpy(data[idx].descriptions[desc_idx].i_command,
+                              line, sizeof(data[idx].descriptions[desc_idx].i_command));
+                          } else if (strcmp(line, "text") == 0) {
+                            load_json_token(output, line, tokens, i+1);
+                            strncpy(data[idx].descriptions[desc_idx].i_description,
+                              line, sizeof(data[idx].descriptions[desc_idx].i_description));
+                          }
+                        }
+                      }
+                    }
+                    desc_idx++;
+                  }
+                  i--; // reduce token idx after descriptions to get next object token correctly
+                }
+              }
+            }
           }
-        } // item command / description for item inventory descriptions
-      } while (i_run > 0);
-
-      data_type = 0;
-      data_idx++;
-      strncpy(item_title, "", sizeof(item_title));
-    } else {
-      run = 0;
+        }
+        idx++;
+      }
     }
-  } while (run == 1);
+  }
+
   fclose(f);
-  return data_idx;
+  return idx;
 }
 
 /* configuration style:
