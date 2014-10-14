@@ -206,24 +206,24 @@ int load_areas(struct area *data, int lmax) {
   jsmntok_t tokens[128];
   load_json(f, output, 2048, tokens, 128);
 
-  int i = 1, idx = 0;
+  int i = 0, j, j_max, idx = 0;
   char line[MAX_JSON_LINE_CHARS];
-  while (tokens[i].end != 0 && tokens[i].end < tokens[0].end) {
 
-    if (tokens[i].type == JSMN_STRING) {
-      load_json_token(output, line, tokens, i++);
-      if (strlen(line) > 0 && tokens[i].type == JSMN_STRING) {
-        data[idx].id = atoi(line);
+  if (tokens[i].type == JSMN_OBJECT) {
+    // iterate through areas object parts
+    j_max = tokens[i].size;
+    for (j = 0; j < j_max; j++) {
+      i++;
+      if (j % 2 == 0 && tokens[i].type == JSMN_PRIMITIVE) {
+        // get area object part content
         load_json_token(output, line, tokens, i);
+        data[idx].id = atoi(line);
+        load_json_token(output, line, tokens, i+1);
         strncpy(data[idx].title, line, sizeof(data[idx].title));
         idx++;
       }
     }
-    if (tokens[i].end >= tokens[0].end)
-      break;
-    i++;
   }
-
   fclose(f);
   return idx;
 }
