@@ -177,24 +177,24 @@ int load_commands(struct command *data, int lmax) {
   jsmntok_t tokens[128];
   load_json(f, output, 2048, tokens, 128);
 
-  int i = 1, idx = 0;
+  int i = 0, j, j_max, idx = 0;
   char line[MAX_JSON_LINE_CHARS];
-  while (tokens[i].end != 0 && tokens[i].end < tokens[0].end) {
 
-    if (tokens[i].type == JSMN_STRING) {
-      load_json_token(output, line, tokens, i++);
-      if (strlen(line) > 0 && tokens[i].type == JSMN_STRING) {
-        strncpy(data[idx].in, line, sizeof(data[idx].in));
+  if (tokens[i].type == JSMN_OBJECT) {
+    // iterate through commands object parts
+    j_max = tokens[i].size;
+    for (j = 0; j < j_max; j++) {
+      i++;
+      if (j % 2 == 0 && tokens[i].type == JSMN_STRING) {
+        // get command object part content
         load_json_token(output, line, tokens, i);
+        strncpy(data[idx].in, line, sizeof(data[idx].in));
+        load_json_token(output, line, tokens, i+1);
         strncpy(data[idx].ex, line, sizeof(data[idx].ex));
         idx++;
       }
     }
-    if (tokens[i].end >= tokens[0].end)
-      break;
-    i++;
   }
-
   fclose(f);
   return idx;
 }
