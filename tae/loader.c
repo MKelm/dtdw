@@ -230,42 +230,6 @@ int load_areas(struct area *data, int lmax) {
   return idx;
 }
 
-int load_places_rec(FILE *f, struct place *data, int data_idx) {
-  int area_id, place_id, transition_id;
-  char title[256] = "", transition_title[256] = "", trans_status[2] = "";
-
-  if (fscanf(f, "%d#%d\n", &area_id, &place_id)) {
-    data[data_idx].area_id = area_id;
-    data[data_idx].id = place_id;
-  }
-  if (area_id > 0 && place_id > 0) {
-    if (fscanf(f, "%[^\n]\n", &title[0])) {
-      strncpy(data[data_idx].title, title, sizeof(data[data_idx].title));
-    }
-    // todo: add multiple transitions support if needed
-    if (fscanf(f, "#%d%[^<^\n]", &transition_id, &transition_title[0])) {
-      data[data_idx].transitions[0].id = transition_id;
-      strncpy(data[data_idx].transitions[0].title, transition_title,
-        sizeof(data[data_idx].transitions[0].title));
-    }
-    if (fgetc(f) != '\n') {
-      fscanf(f, "%[^#^\n^$]", &trans_status[0]);
-      data[data_idx].transitions[0].status = TRANSITION_STATUS_OPEN;
-      if (strcmp(trans_status, "c") == 0) {
-        data[data_idx].transitions[0].status = TRANSITION_STATUS_CLOSED;
-      } else if (strcmp(trans_status, "l") == 0) {
-        data[data_idx].transitions[0].status = TRANSITION_STATUS_LOCKED;
-        fscanf(f, "$%d", &data[data_idx].transitions[0].ul_item_id);
-      }
-      if (fgetc(f) == '\n') {
-        data_idx++;
-        data_idx = load_places_rec(f, data, data_idx);
-      }
-    }
-  }
-  return data_idx;
-}
-
 int load_places(struct place *data, int lmax) {
   FILE *f = loader_get_data_file(FILE_PLACES, 1);
 
