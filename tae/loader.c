@@ -496,27 +496,34 @@ int load_dialogs(struct npc npcs_data[], int nlmax, struct dialog data[], int lm
     load_json(f, output, 2048, tokens, 128);
 
     int i = 0, j, j_max, k, k_max, l, l_max, element_idx = 0;
-    if (tokens[i].type == JSMN_ARRAY && tokens[i].size > 0) {
-      // iterate through dialogs array
+    if (tokens[i].type == JSMN_OBJECT) {
       j_max = tokens[i].size;
       for (j = 0; j < j_max; j++) {
         i++;
-        if (tokens[i].type == JSMN_OBJECT && tokens[i].size > 0) {
-          // iterate through dialogs element object
+        if (j % 2 == 0 && tokens[i].type == JSMN_PRIMITIVE) {
+          load_json_token(output, line, tokens, i);
+          data[npc_idx].elements[element_idx].id = atoi(line);
+          printf("dialog id %s\n", line);
+
+          i++;
+          // iterate through item part object elements
           k_max = tokens[i].size;
           for (k = 0; k < k_max; k++) {
             i++;
-            if (k % 2 == 0 && tokens[i].type == JSMN_STRING) {
-              // get dialog element object part by key
+            if (j % 2 == 0 && tokens[i].type == JSMN_STRING) {
+              // get npc object part by key
               load_json_token(output, line, tokens, i);
-              if (strcmp("id", line) == 0) {
-                load_json_token(output, line, tokens, i+1);
-                data[npc_idx].elements[element_idx].id = atoi(line);
-              } else if (strcmp("text", line) == 0) {
+              if (strcmp(line, "text") == 0) {
                 load_json_token(output, line, tokens, i+1);
                 strncpy(data[npc_idx].elements[element_idx].text,
                   line, sizeof(data[npc_idx].elements[element_idx].text));
-              } else if (strcmp("next_ids", line) == 0) {
+
+              } else if (strcmp(line, "is_multi_choice") == 0) {
+                load_json_token(output, line, tokens, i+1);
+                data[npc_idx].elements[element_idx].next_mchoice = atoi(line);
+
+              } else if (strcmp(line, "next_ids") == 0) {
+
                 if (tokens[i+1].type == JSMN_ARRAY && tokens[i+1].size > 0) {
                   i++;
                   // iterate through next ids array
@@ -526,22 +533,18 @@ int load_dialogs(struct npc npcs_data[], int nlmax, struct dialog data[], int lm
                     if (tokens[i].type == JSMN_PRIMITIVE) {
                       load_json_token(output, line, tokens, i);
                       data[npc_idx].elements[element_idx].next_ids[l] = atoi(line);
+                       printf("dialog next id %s\n", line);
                     }
                   }
                   i--;
                 }
-              } else if (strcmp("is_multi_choice", line) == 0) {
-                i++;
-                if (tokens[i].type == JSMN_PRIMITIVE) {
-                  load_json_token(output, line, tokens, i);
-                  data[npc_idx].elements[element_idx].next_mchoice = atoi(line);
-                }
-                i--;
+
               }
             }
           }
+          i--;
+          element_idx++;
         }
-        element_idx++;
       }
     }
 
