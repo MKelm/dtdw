@@ -75,21 +75,21 @@ void load_help(char *help) {
   jsmntok_t tokens[128];
   load_json(f, output, 2048, tokens, 128);
 
-  int i = 1, has_help_array = 0;
+  int i = 0, j, j_max;
   char line[MAX_JSON_LINE_CHARS];
-  strcpy(help, "");
-  while (tokens[i].end != 0 && tokens[i].end < tokens[0].end) {
-    if (has_help_array == 1 && tokens[i].type == JSMN_STRING) {
-      load_json_token(output, line, tokens, i);
-      strcat(line, "\n");
-      strcat(help, line);
-    } else if (tokens[i].type == JSMN_ARRAY && tokens[i].size > 0) {
-      i++;
-      has_help_array = 1;
-    }
-    i++;
-  }
 
+  if (tokens[i].type == JSMN_ARRAY) {
+    // iterate through help text lines array
+    j_max = tokens[i].size;
+    for (j = 0; j < j_max; j++) {
+      i++;
+      if (tokens[i].type == JSMN_STRING) {
+        load_json_token(output, line, tokens, i);
+        strcat(line, "\n");
+        strcat(help, line);
+      }
+    }
+  }
   fclose(f);
 }
 
