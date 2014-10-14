@@ -137,38 +137,36 @@ void load_phrases(struct phrases *data) {
   jsmntok_t tokens[128];
   load_json(f, output, 2048, tokens, 128);
 
-  int i = 1;
+  int i = 0, j, j_max;
   char line[MAX_JSON_LINE_CHARS];
-  while (tokens[i].end != 0 && tokens[i].end < tokens[0].end) {
 
-    if (tokens[i].type == JSMN_STRING) {
-      strncpy(line, "", sizeof(line));
-      strncpy(line, output + tokens[i].start, tokens[i].end - tokens[i].start);
+  if (tokens[i].type == JSMN_OBJECT) {
+    // iterate through phrases object parts
+    j_max = tokens[i].size;
+    for (j = 0; j < j_max; j++) {
       i++;
-      if (tokens[i].type == JSMN_STRING) {
+      if (j % 2 == 0 && tokens[i].type == JSMN_STRING) {
+        load_json_token(output, line, tokens, i);
+        // get phrase object part content by key
         if (strcmp(line, "inv_title") == 0) {
-          load_json_token(output, line, tokens, i);
+          load_json_token(output, line, tokens, i+1);
           strncpy(data->inv_title, line, sizeof(data->inv_title));
         } else if (strcmp(line, "no_inv_items") == 0) {
-          load_json_token(output, line, tokens, i);
+          load_json_token(output, line, tokens, i+1);
           strncpy(data->no_inv_items, line, sizeof(data->no_inv_items));
         } else if (strcmp(line, "items_comb") == 0) {
-          load_json_token(output, line, tokens, i);
+          load_json_token(output, line, tokens, i+1);
           strncpy(data->items_comb, line, sizeof(data->items_comb));
         } else if (strcmp(line, "items_comb_failure") == 0) {
-          load_json_token(output, line, tokens, i);
+          load_json_token(output, line, tokens, i+1);
           strncpy(data->items_comb_failure, line, sizeof(data->items_comb_failure));
         } else if (strcmp(line, "item_usage_failure") == 0) {
-          load_json_token(output, line, tokens, i);
+          load_json_token(output, line, tokens, i+1);
           strncpy(data->item_usage_failure, line, sizeof(data->item_usage_failure));
         }
       }
     }
-    if (tokens[i].end >= tokens[0].end)
-      break;
-    i++;
   }
-
   fclose(f);
 }
 
