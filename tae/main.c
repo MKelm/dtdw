@@ -256,6 +256,10 @@ struct npc *get_npc(char *title) {
 }
 
 void load_data(void) {
+  // intro text
+  static char intro_text[MAX_INTRO_TEXT_CHARS];
+  load_intro(intro_text);
+  description_set_intro(intro_text);
   // help text
   static char help_text[MAX_HELP_TEXT_CHARS];
   load_help(help_text);

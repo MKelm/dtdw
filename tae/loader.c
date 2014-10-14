@@ -68,9 +68,7 @@ void load_json_token(char* input, char *token, jsmntok_t *tokens, int token_idx)
     tokens[token_idx].end - tokens[token_idx].start);
 }
 
-void load_help(char *help) {
-  FILE *f = loader_get_data_file(FILE_HELP, 0);
-
+void load_full_text(FILE *f, char *text) {
   char output[MAX_HELP_TEXT_CHARS];
   jsmntok_t tokens[128];
   load_json(f, output, 2048, tokens, 128);
@@ -79,17 +77,22 @@ void load_help(char *help) {
   char line[MAX_JSON_LINE_CHARS];
 
   if (tokens[i].type == JSMN_ARRAY) {
-    // iterate through help text lines array
+    // iterate through full text lines array
     j_max = tokens[i].size;
     for (j = 0; j < j_max; j++) {
       i++;
       if (tokens[i].type == JSMN_STRING) {
         load_json_token(output, line, tokens, i);
         strcat(line, "\n");
-        strcat(help, line);
+        strcat(text, line);
       }
     }
   }
+}
+
+void load_help(char *help) {
+  FILE *f = loader_get_data_file(FILE_HELP, 0);
+  load_full_text(f, help);
   fclose(f);
 }
 
@@ -554,6 +557,12 @@ int load_dialogs(struct npc npcs_data[], int nlmax, struct dialog data[], int lm
     npcs_data[npc_idx].c_dialog = data;
   }
   return elements_count;
+}
+
+void load_intro(char *intro) {
+  FILE *f = loader_get_data_file(FILE_INTRO, 0);
+  load_full_text(f, intro);
+  fclose(f);
 }
 
 /*

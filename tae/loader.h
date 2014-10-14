@@ -68,6 +68,12 @@ int load_npcs(struct npc data[], int lmax);
 
 int load_dialogs(struct npc npcs_data[], int nlmax, struct dialog data[], int lmax);
 
+// intro
+#define FILE_INTRO "intro.json"
+#define MAX_INTRO_TEXT_CHARS 2048
+
+void load_intro(char *text);
+
 // descriptions
 #define FILE_DESCRIPTIONS "descriptions.txt"
 #define MAX_DESCRIPTIONS 1000

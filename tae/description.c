@@ -8,7 +8,7 @@
 struct description *descriptions;
 int descriptions_count = 0;
 
-char *help_description;
+char *help_text, *intro_text;
 
 extern struct phrases phrases_data;
 extern int current_area;
@@ -19,8 +19,12 @@ void description_set_descriptions(struct description *desc_data, int desc_data_c
   descriptions_count = desc_data_count;
 }
 
+void description_set_intro(char *intro) {
+  intro_text = intro;
+}
+
 void description_set_help(char *help) {
-  help_description = help;
+  help_text = help;
 }
 
 char *description_by_area_place() {
@@ -30,8 +34,8 @@ char *description_by_area_place() {
   static char output[1024];
   strncpy(output, "", sizeof(output));
 
-  if (current_area == 0 && descriptions[desc_idx].id == 0) {
-    snprintf(output, 1024, "%s\n\n", descriptions[desc_idx].text);
+  if (current_area == 0 && current_place == 0) {
+    snprintf(output, 1024, "%s\n", intro_text);
     current_area = 1;
     current_place = 1;
     has_text = 1;
@@ -223,7 +227,7 @@ char *description_by_action(struct action *caction) {
       strcat(output, description_by_area_place());
 
     } else if (strcmp(caction->in_command, "help") == 0) {
-      strcat(output, help_description);
+      strcat(output, help_text);
       strcat(output, "\n");
 
     } else if (strcmp(caction->in_command, "inventory") == 0) {
