@@ -39,7 +39,6 @@ char *description_by_area_place() {
     current_area = 1;
     current_place = 1;
     has_text = 1;
-    desc_idx++;
   }
 
   // get more data of the current area place

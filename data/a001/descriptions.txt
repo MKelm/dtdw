@@ -1,6 +1,3 @@
-#0
-Hallo Joara, du hast gerade eben deinen 23. Geburtstag gefeiert und bist eine angehende Portalwächterin. Im Moment bist du noch die Assistentin von deinem Meister Taomix, aber dieser wird bald das Amt niederlegen. Wie auch immer, an Arbeit ist jetzt garnicht zu denken, du bist erschöpft von der Feier. Aber irgend etwas wolltest du noch vorher erledigen ...
-
 #1
 Du bist in deinem Zimmer. Es gibt eine #Tür# zum Flur der nach unten führt.
 #2$1$2$3
