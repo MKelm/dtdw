@@ -235,82 +235,77 @@ int load_places(struct place *data, int lmax) {
   jsmntok_t tokens[128];
   load_json(f, output, 2048, tokens, 128);
 
-  int j, j_max, k, k_max, i = 1, idx = 0, trans_idx = 0;
-  int in_place = 0, in_data = 1, has_title = 0;
+  int i = 0, j, j_max, k, k_max, l, l_max, m, m_max, idx = 0, trans_idx = 0;
   char line[MAX_JSON_LINE_CHARS];
-  while (tokens[i].end != 0 && tokens[i].end < tokens[0].end) {
-    load_json_token(output, line, tokens, i);
 
-    if (in_place == 0 && tokens[i].type == JSMN_STRING) {
-      data[idx].area_id = current_area_id;
-      data[idx].id = atoi(line);
-      in_place = 1;
-
-    } else if (in_place == 1 && in_data == 0 && tokens[i].type == JSMN_OBJECT) {
-      in_data = 1;
-    } else if (in_data == 1 && has_title == 0 && tokens[i].type == JSMN_STRING) {
-      load_json_token(output, line, tokens, ++i);
-      strncpy(data[idx].title, line, sizeof(data[idx].title));
-
-      has_title = 1;
-    } else if (has_title == 1 && tokens[i].type == JSMN_ARRAY) {
-      // iterate through transitions
-      trans_idx = 0;
-      j_max = tokens[i].size;
-      for (j = 0; j < j_max; j++) {
+  if (tokens[i].type == JSMN_OBJECT) {
+    // iterate through places parts
+    j_max = tokens[i].size;
+    for (j = 0; j < j_max; j++) {
+      i++;
+      if (tokens[i].type == JSMN_PRIMITIVE) {
+        load_json_token(output, line, tokens, i);
+        data[idx].area_id = current_area_id;
+        data[idx].id = atoi(line);
         i++;
-        if (tokens[i].type == JSMN_OBJECT) {
-          // iterate thorough transition object parts
+        if (tokens[i].type == JSMN_OBJECT && tokens[i].size > 0) {
+          // iterate through place parts
           k_max = tokens[i].size;
-          i++;
-          for (k = 0; k < k_max - 1; k++) {
+          for (k = 0; k < k_max; k++) {
+            i++;
             if (k % 2 == 0 && tokens[i].type == JSMN_STRING) {
               load_json_token(output, line, tokens, i);
-
-              // detect transition data elements
-              if (strcmp(line, "title") == 0) {
-                i++; // get title value
-                load_json_token(output, line, tokens, i);
-                strncpy(data[idx].transitions[trans_idx].title, line,
-                  sizeof(data[idx].transitions[trans_idx].title));
-
-              } else if (strcmp(line, "target_place_id") == 0) {
-                i++; // get target place id value
-                load_json_token(output, line, tokens, i);
-                data[idx].transitions[trans_idx].id = atoi(line);
-
-              } else if (strcmp(line, "status") == 0) {
-                i++; // get status and key item value
-                load_json_token(output, line, tokens, i);
-                if (strcmp(line, "locked") == 0) {
-                  data[idx].transitions[trans_idx].status = TRANSITION_STATUS_LOCKED;
-                } else if (strcmp(line, "closed") == 0) {
-                  data[idx].transitions[trans_idx].status = TRANSITION_STATUS_CLOSED;
-                } else {
-                  data[idx].transitions[trans_idx].status = TRANSITION_STATUS_OPEN;
+              if (strcmp("title", line) == 0) {
+                load_json_token(output, line, tokens, i+1);
+                strncpy(data[idx].title, line, sizeof(data[idx].title));
+              } else if (strcmp("transitions", line) == 0) {
+                i++;
+                trans_idx = 0;
+                // iterrate through trans array
+                l_max = tokens[i].size;
+                for (l = 0; l < l_max; l++) {
+                  i++;
+                  // iterrate throught trans array part elements
+                  m_max = tokens[i].size;
+                  for (m = 0; m < m_max; m++) {
+                    i++;
+                    if (m % 2 == 0 && tokens[i].type == JSMN_STRING) {
+                      // get trans array part by key
+                      load_json_token(output, line, tokens, i);
+                      if (strcmp("title", line) == 0) {
+                        load_json_token(output, line, tokens, i+1);
+                        strncpy(data[idx].transitions[trans_idx].title, line,
+                          sizeof(data[idx].transitions[trans_idx].title));
+                      } else if (strcmp("target_place_id", line) == 0) {
+                        load_json_token(output, line, tokens, i+1);
+                        data[idx].transitions[trans_idx].id = atoi(line);
+                      } else if (strcmp("status", line) == 0) {
+                        load_json_token(output, line, tokens, i+1);
+                        // get status and key item value
+                        if (strcmp(line, "locked") == 0) {
+                          data[idx].transitions[trans_idx].status = TRANSITION_STATUS_LOCKED;
+                        } else if (strcmp(line, "closed") == 0) {
+                          data[idx].transitions[trans_idx].status = TRANSITION_STATUS_CLOSED;
+                        } else {
+                          data[idx].transitions[trans_idx].status = TRANSITION_STATUS_OPEN;
+                        }
+                      } else if (strcmp("unlock_item_id", line) == 0) {
+                        load_json_token(output, line, tokens, i+1);
+                        data[idx].transitions[trans_idx].ul_item_id = atoi(line);
+                      }
+                    }
+                  }
+                  trans_idx++;
                 }
-
-              } else if (strcmp(line, "unlock_item_id") == 0) {
-                i++; // get item id to unlock trans
-                load_json_token(output, line, tokens, i);
-                data[idx].transitions[trans_idx].ul_item_id = atoi(line);
-
+                i--;
               }
-            } else {
-              i++;
             }
           }
         }
-        trans_idx++;
       }
-      in_place = 0, in_data = 1, has_title = 0;
       idx++;
     }
-    if (tokens[i].end >= tokens[0].end)
-      break;
-    i++;
   }
-
   fclose(f);
   return idx;
 }
