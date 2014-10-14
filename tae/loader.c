@@ -335,33 +335,37 @@ int load_items(struct item data[], int lmax) {
   jsmntok_t tokens[256];
   load_json(f, output, 4096, tokens, 256);
 
-  int i = 1, j = 0, j_max = 0, k = 0, k_max = 0, l = 0, l_max = 0, m = 0, m_max = 0;
+  int i = 0, j, j_max, k, k_max, l, l_max, m, m_max;
   int idx = 0, desc_idx = 0;
   char line[MAX_JSON_LINE_CHARS];
 
-  if (tokens[i].type == JSMN_STRING) {
-    i++;
-    if (tokens[i].type == JSMN_ARRAY) {
-      // iterate through items array
-      j_max = tokens[i].size;
-      for (j = 0; j < j_max; j++) {
+  if (tokens[i].type == JSMN_OBJECT) {
+    // iterate through items objects
+    j_max = tokens[i].size;
+    for (j = 0; j < j_max; j++) {
+      i++;
+      if (j % 2 == 0 && tokens[i].type == JSMN_PRIMITIVE) {
+        load_json_token(output, line, tokens, i);
+        data[idx].id = atoi(line);
+
         i++;
         if (tokens[i].type == JSMN_OBJECT) {
-          // iterate through item object parts
+          // iterate through item part object elements
           k_max = tokens[i].size;
           for (k = 0; k < k_max; k++) {
             i++;
-            if (k % 2 == 0 && tokens[i].type == JSMN_STRING) {
+            if (j % 2 == 0 && tokens[i].type == JSMN_STRING) {
+              // get item part object element content by key
               load_json_token(output, line, tokens, i);
-              // get item object part by key
-              load_json_token(output, line, tokens, i);
-              if (strcmp(line, "id") == 0) {
+              if (strcmp("title", line) == 0) {
                 load_json_token(output, line, tokens, i+1);
-                data[idx].id = atoi(line);
-              } else if (strcmp(line, "comb_id") == 0) {
+                strncpy(data[idx].title, line, sizeof(data[idx].title));
+
+              } else if (strcmp("comb_id", line) == 0) {
                 load_json_token(output, line, tokens, i+1);
                 data[idx].comb_id = atoi(line);
-              } else if (strcmp(line, "comb_type") == 0) {
+
+              } else if (strcmp("comb_type", line) == 0) {
                 load_json_token(output, line, tokens, i+1);
                 if (strcmp(line, "item") == 0) {
                   data[idx].comb_type = ITEM_COMB_TYPE_ITEM;
@@ -370,15 +374,14 @@ int load_items(struct item data[], int lmax) {
                 } else if (strcmp(line, "trans") == 0) {
                   data[idx].comb_type = ITEM_COMB_TYPE_TRANS;
                 }
-              } else if (strcmp(line, "final_id") == 0) {
+
+              } else if (strcmp("final_id", line) == 0) {
                 load_json_token(output, line, tokens, i+1);
                 data[idx].final_id = atoi(line);
-              } else if (strcmp(line, "title") == 0) {
-                load_json_token(output, line, tokens, i+1);
-                strncpy(data[idx].title, line, sizeof(data[idx].title));
-              } else if (strcmp(line, "descriptions") == 0) {
+
+              } else if (strcmp("descriptions", line) == 0) {
                 i++;
-                // todo go through descriptions array / objects
+                // go through descriptions array / objects
                 if (tokens[i].type == JSMN_ARRAY && tokens[i].size > 0) {
                   desc_idx = 0;
                   l_max = tokens[i].size;
@@ -406,17 +409,17 @@ int load_items(struct item data[], int lmax) {
                     }
                     desc_idx++;
                   }
-                  i--; // reduce token idx after descriptions to get next object token correctly
                 }
+                i--;
               }
             }
           }
+          idx++;
         }
-        idx++;
+        i--;
       }
     }
   }
-
   fclose(f);
   return idx;
 }
