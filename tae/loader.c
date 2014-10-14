@@ -100,33 +100,33 @@ void load_meta(struct meta *data) {
   jsmntok_t tokens[128];
   load_json(f, output, 2048, tokens, 128);
 
-  int i = 1;
+  int i = 0, j, j_max;
   char line[MAX_JSON_LINE_CHARS];
-  while (tokens[i].end != 0 && tokens[i].end < tokens[0].end) {
 
-    if (tokens[i].type == JSMN_STRING) {
-      strncpy(line, "", sizeof(line));
-      strncpy(line, output + tokens[i].start, tokens[i].end - tokens[i].start);
+  if (tokens[i].type == JSMN_OBJECT) {
+    // iterate through meta object parts
+    j_max = tokens[i].size;
+    for (j = 0; j < j_max; j++) {
       i++;
-      if (strcmp(line, "title") == 0) {
+      if (j % 2 == 0 && tokens[i].type == JSMN_STRING) {
         load_json_token(output, line, tokens, i);
-        strncpy(data->title, line, sizeof(data->title));
-      } else if (strcmp(line, "version") == 0) {
-        load_json_token(output, line, tokens, i);
-        strncpy(data->version, line, sizeof(data->version));
-      } else if (strcmp(line, "author") == 0) {
-        load_json_token(output, line, tokens, i);
-        strncpy(data->author, line, sizeof(data->author));
-      } else if (strcmp(line, "year") == 0) {
-        load_json_token(output, line, tokens, i);
-        data->cyear = atoi(line);
+        // get meta object part content by key
+        if (strcmp(line, "title") == 0) {
+          load_json_token(output, line, tokens, i+1);
+          strncpy(data->title, line, sizeof(data->title));
+        } else if (strcmp(line, "version") == 0) {
+          load_json_token(output, line, tokens, i+1);
+          strncpy(data->version, line, sizeof(data->version));
+        } else if (strcmp(line, "author") == 0) {
+          load_json_token(output, line, tokens, i+1);
+          strncpy(data->author, line, sizeof(data->author));
+        } else if (strcmp(line, "year") == 0) {
+          load_json_token(output, line, tokens, i+1);
+          data->cyear = atoi(line);
+        }
       }
     }
-    if (tokens[i].end >= tokens[0].end)
-      break;
-    i++;
   }
-
   fclose(f);
 }
 
