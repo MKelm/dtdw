@@ -506,7 +506,6 @@ int load_dialogs(struct npc npcs_data[], int nlmax, struct dialog data[], int lm
         if (j % 2 == 0 && tokens[i].type == JSMN_PRIMITIVE) {
           load_json_token(output, line, tokens, i);
           data[npc_idx].elements[element_idx].id = atoi(line);
-          printf("dialog id %s\n", line);
 
           i++;
           // iterate through item part object elements
@@ -536,7 +535,6 @@ int load_dialogs(struct npc npcs_data[], int nlmax, struct dialog data[], int lm
                     if (tokens[i].type == JSMN_PRIMITIVE) {
                       load_json_token(output, line, tokens, i);
                       data[npc_idx].elements[element_idx].next_ids[l] = atoi(line);
-                       printf("dialog next id %s\n", line);
                     }
                   }
                   i--;
