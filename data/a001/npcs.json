@@ -1,10 +1,7 @@
 {
-  "npcs" : [
-    {
-      "id" : 1,
-      "name" : "Marunix",
-      "area_id" : 1,
-      "place_id" : 2
-    }
-  ]
+  1 : {
+    "name" : "Marunix",
+    "area_id" : 1,
+    "place_id" : 2
+  }
 }

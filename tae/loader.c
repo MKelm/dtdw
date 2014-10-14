@@ -431,44 +431,43 @@ int load_npcs(struct npc data[], int lmax) {
   jsmntok_t tokens[128];
   load_json(f, output, 2048, tokens, 128);
 
-  int i = 1, j, j_max, k, k_max, idx = 0;
+  int i = 0, j, j_max, k, k_max, idx = 0;
   char line[MAX_JSON_LINE_CHARS];
-  if (tokens[i].type == JSMN_STRING) {
-    i++;
-    if (tokens[i].type == JSMN_ARRAY) {
-      // iterate through npcs array
-      j_max = tokens[i].size;
-      for (j = 0; j < j_max; j++) {
+  if (tokens[i].type == JSMN_OBJECT) {
+    j_max = tokens[i].size;
+    for (j = 0; j < j_max; j++) {
+      i++;
+      if (j % 2 == 0 && tokens[i].type == JSMN_PRIMITIVE) {
+        load_json_token(output, line, tokens, i);
+        data[idx].id = atoi(line);
+
         i++;
-        if (tokens[i].type == JSMN_OBJECT) {
-          // iterate through npc object parts
-          k_max = tokens[i].size;
-          for (k = 0; k < k_max; k++) {
-            i++;
-            if (k % 2 == 0 && tokens[i].type == JSMN_STRING) {
-              // get npc object part by key
-              load_json_token(output, line, tokens, i);
-              if (strcmp(line, "id") == 0) {
-                load_json_token(output, line, tokens, i+1);
-                data[idx].id = atoi(line);
-              } else if (strcmp(line, "name") == 0) {
-                load_json_token(output, line, tokens, i+1);
-                strncpy(data[idx].title, line, sizeof(data[idx].title));
-              } else if (strcmp(line, "area_id") == 0) {
-                load_json_token(output, line, tokens, i+1);
-                data[idx].area_id = atoi(line);
-              } else if (strcmp(line, "place_id") == 0) {
-                load_json_token(output, line, tokens, i+1);
-                data[idx].place_id = atoi(line);
-              }
+        // iterate through item part object elements
+        k_max = tokens[i].size;
+        for (k = 0; k < k_max; k++) {
+          i++;
+          if (j % 2 == 0 && tokens[i].type == JSMN_STRING) {
+            // get npc object part by key
+            load_json_token(output, line, tokens, i);
+            if (strcmp(line, "name") == 0) {
+              load_json_token(output, line, tokens, i+1);
+              strncpy(data[idx].title, line, sizeof(data[idx].title));
+
+            } else if (strcmp(line, "area_id") == 0) {
+              load_json_token(output, line, tokens, i+1);
+              data[idx].area_id = atoi(line);
+
+            } else if (strcmp(line, "place_id") == 0) {
+              load_json_token(output, line, tokens, i+1);
+              data[idx].place_id = atoi(line);
             }
           }
         }
+        i--;
+        idx++;
       }
-      idx++;
     }
   }
-
   fclose(f);
   return idx;
 }
