@@ -1,7 +1,7 @@
 *
 !data
 !data/*
-!data/*/dialogs
+!data/*/*
 !tae
 !tae/jsmn
 !.gitignore
