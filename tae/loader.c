@@ -428,38 +428,53 @@ int load_items(struct item data[], int lmax) {
   return idx;
 }
 
-/* configuration style:
- &1 // npc id
- Marunix // npc title
- 1#2 // npc area and place
-*/
 int load_npcs(struct npc data[], int lmax) {
-  int data_idx = 0, run = 1, data_type = 0;
-  char npc_title[MAX_NPC_NAME_LENGTH], npc_id[24], area_id[24], place_id[24];
   FILE *f = loader_get_data_file(FILE_NPCS, 1);
-  do {
-    if (data_type == 0 && fscanf(f, "&%[0-9]\n", npc_id) && strlen(npc_id) > 0) {
-      data[data_idx].id = atoi(npc_id);
-      strncpy(npc_id, "", sizeof(npc_id));
-      data_type = 1;
-    } else if (data_type == 1 && fscanf(f, "%[^\n]\n", npc_title) && strlen(npc_title) > 0) {
-      strncpy(data[data_idx].title, npc_title, sizeof(data[data_idx].title));
-      strncpy(npc_title, "", sizeof(npc_title));
-      data_type = 2;
-    } else if (data_type == 2 && fscanf(f, "%[0-9]#%[0-9]\n", area_id, place_id) &&
-               strlen(area_id) > 0 && strlen(place_id) > 0) {
-      data[data_idx].area_id = atoi(area_id);
-      data[data_idx].place_id = atoi(place_id);
-      strncpy(area_id, "", sizeof(area_id));
-      strncpy(place_id, "", sizeof(place_id));
-      data_type = 0;
-      data_idx++;
-    } else {
-      run = 0;
+
+  char output[2048];
+  jsmntok_t tokens[128];
+  load_json(f, output, 2048, tokens, 128);
+
+  int i = 1, j, j_max, k, k_max, idx = 0;
+  char line[MAX_JSON_LINE_CHARS];
+  if (tokens[i].type == JSMN_STRING) {
+    i++;
+    if (tokens[i].type == JSMN_ARRAY) {
+      // iterate through npcs array
+      j_max = tokens[i].size;
+      for (j = 0; j < j_max; j++) {
+        i++;
+        if (tokens[i].type == JSMN_OBJECT) {
+          // iterate through npc object parts
+          k_max = tokens[i].size;
+          for (k = 0; k < k_max; k++) {
+            i++;
+            if (k % 2 == 0 && tokens[i].type == JSMN_STRING) {
+              // get npc object part by key
+              load_json_token(output, line, tokens, i);
+              if (strcmp(line, "id") == 0) {
+                load_json_token(output, line, tokens, i+1);
+                data[idx].id = atoi(line);
+              } else if (strcmp(line, "name") == 0) {
+                load_json_token(output, line, tokens, i+1);
+                strncpy(data[idx].title, line, sizeof(data[idx].title));
+              } else if (strcmp(line, "area_id") == 0) {
+                load_json_token(output, line, tokens, i+1);
+                data[idx].area_id = atoi(line);
+              } else if (strcmp(line, "place_id") == 0) {
+                load_json_token(output, line, tokens, i+1);
+                data[idx].place_id = atoi(line);
+              }
+            }
+          }
+        }
+      }
+      idx++;
     }
-  } while (run == 1);
+  }
+
   fclose(f);
-  return data_idx;
+  return idx;
 }
 
 int load_dialogs(struct npc npcs_data[], int nlmax, struct dialog data[], int lmax) {

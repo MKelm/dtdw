@@ -57,7 +57,7 @@ int load_places(struct place data[], int lmax);
 int load_items(struct item data[], int lmax);
 
 // npcs
-#define FILE_NPCS "npcs.txt"
+#define FILE_NPCS "npcs.json"
 #define MAX_NPCS 500
 
 int load_npcs(struct npc data[], int lmax);
