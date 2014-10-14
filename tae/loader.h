@@ -44,7 +44,7 @@ int load_commands(struct command data[], int lmax);
 int load_areas(struct area data[], int lmax);
 
 // places
-#define FILE_PLACES "places.txt"
+#define FILE_PLACES "places.json"
 #define MAX_PLACES_LINE_CHARS 1024
 #define MAX_PLACES 200
 

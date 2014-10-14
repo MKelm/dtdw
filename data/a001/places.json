@@ -1,0 +1,22 @@
+{
+  "1" : {
+    "title" : "Joara's Zimmer (oben)",
+    "transitions" : [
+      {
+        "title" : "Tür",
+        "target_place_id" : "2",
+        "status" : "locked",
+        "unlock_item_id" : "10"
+      }
+    ]
+  },
+  "2" : {
+    "title" : "Wohnzimmer (unten)",
+    "transitions" : [
+      {
+        "title" : "Treppe",
+        "target_place_id" : "1"
+      }
+    ]
+  }
+}

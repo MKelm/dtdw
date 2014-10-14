@@ -268,10 +268,89 @@ int load_places_rec(FILE *f, struct place *data, int data_idx) {
 
 int load_places(struct place *data, int lmax) {
   FILE *f = loader_get_data_file(FILE_PLACES, 1);
-  int data_idx = 0;
-  data_idx = load_places_rec(f, data, data_idx);
+
+  char output[2048];
+  jsmntok_t tokens[128];
+  load_json(f, output, 2048, tokens, 128);
+
+  int j, j_max, k, k_max, i = 1, idx = 0, trans_idx = 0;
+  int in_place = 0, in_data = 1, has_title = 0;
+  char line[MAX_JSON_LINE_CHARS];
+  while (tokens[i].end != 0 && tokens[i].end < tokens[0].end) {
+    load_json_token(output, line, tokens, i);
+
+    if (in_place == 0 && tokens[i].type == JSMN_STRING) {
+      data[idx].area_id = current_area_id;
+      data[idx].id = atoi(line);
+      in_place = 1;
+
+    } else if (in_place == 1 && in_data == 0 && tokens[i].type == JSMN_OBJECT) {
+      in_data = 1;
+    } else if (in_data == 1 && has_title == 0 && tokens[i].type == JSMN_STRING) {
+      load_json_token(output, line, tokens, ++i);
+      strncpy(data[idx].title, line, sizeof(data[idx].title));
+
+      has_title = 1;
+    } else if (has_title == 1 && tokens[i].type == JSMN_ARRAY) {
+      // iterate through transitions
+      trans_idx = 0;
+      j_max = tokens[i].size;
+      for (j = 0; j < j_max; j++) {
+        i++;
+        if (tokens[i].type == JSMN_OBJECT) {
+          // iterate thorough transition object parts
+          k_max = tokens[i].size;
+          i++;
+          for (k = 0; k < k_max - 1; k++) {
+            if (k % 2 == 0 && tokens[i].type == JSMN_STRING) {
+              load_json_token(output, line, tokens, i);
+
+              // detect transition data elements
+              if (strcmp(line, "title") == 0) {
+                i++; // get title value
+                load_json_token(output, line, tokens, i);
+                strncpy(data[idx].transitions[trans_idx].title, line,
+                  sizeof(data[idx].transitions[trans_idx].title));
+
+              } else if (strcmp(line, "target_place_id") == 0) {
+                i++; // get target place id value
+                load_json_token(output, line, tokens, i);
+                data[idx].transitions[trans_idx].id = atoi(line);
+
+              } else if (strcmp(line, "status") == 0) {
+                i++; // get status and key item value
+                load_json_token(output, line, tokens, i);
+                if (strcmp(line, "locked") == 0) {
+                  data[idx].transitions[trans_idx].status = TRANSITION_STATUS_LOCKED;
+                } else if (strcmp(line, "closed") == 0) {
+                  data[idx].transitions[trans_idx].status = TRANSITION_STATUS_CLOSED;
+                } else {
+                  data[idx].transitions[trans_idx].status = TRANSITION_STATUS_OPEN;
+                }
+
+              } else if (strcmp(line, "unlock_item_id") == 0) {
+                i++; // get item id to unlock trans
+                load_json_token(output, line, tokens, i);
+                data[idx].transitions[trans_idx].ul_item_id = atoi(line);
+
+              }
+            } else {
+              i++;
+            }
+          }
+        }
+        trans_idx++;
+      }
+      in_place = 0, in_data = 1, has_title = 0;
+      idx++;
+    }
+    if (tokens[i].end >= tokens[0].end)
+      break;
+    i++;
+  }
+
   fclose(f);
-  return ++data_idx;
+  return idx;
 }
 
 int load_transitions(struct placetrans transitions_data[], int transitions_lmax,
