@@ -478,9 +478,8 @@ int load_npcs(struct npc data[], int lmax) {
 }
 
 int load_dialogs(struct npc npcs_data[], int nlmax, struct dialog data[], int lmax) {
-  int npc_idx, title_idx, elements_count, element_idx;
-  int data_mode = 0, run, ch;
-  char line[1024], file_name[1024], dialog_text[DIALOG_MAX_TEXT_LENGTH], dialog_int_str[24];
+  int npc_idx, title_idx, elements_count;
+  char file_name[1024], line[MAX_JSON_LINE_CHARS];
   FILE *f;
 
   elements_count = 0;
@@ -496,37 +495,61 @@ int load_dialogs(struct npc npcs_data[], int nlmax, struct dialog data[], int lm
     snprintf(file_name, 1024, "%s%s%s", FILE_DIALOGS_FOLDER, line, FILE_DIALOGS_POSTFIX);
 
     f = loader_get_data_file(file_name, 1);
-    run = 1;
-    element_idx = 0;
-    do {
-      if (data_mode == 0 && fscanf(f, "!%[0-9]\n", dialog_int_str) &&
-          strlen(dialog_int_str) > 0) {
-        // get dialog element id
-        data[npc_idx].elements[element_idx].id = atoi(dialog_int_str);
-        strncpy(dialog_int_str, "", sizeof(dialog_int_str));
-        data_mode = 1;
-      } else if (data_mode == 1 && fscanf(f, "%[^\n]\n", dialog_text) &&
-                 strlen(dialog_text) > 0) {
-        // get dialog element text
-        strncpy(data[npc_idx].elements[element_idx].text, dialog_text,
-          sizeof(data[npc_idx].elements[element_idx].text));
-        strncpy(dialog_text, "", sizeof(dialog_text));
-        data_mode = 2;
-      } else if (data_mode == 2) {
-        // get next ids
-        int i = 0;
-        while ((ch = fgetc(f)) != '\n' && fscanf(f, "%[0-9]", dialog_int_str) && dialog_int_str > 0) {
-          data[npc_idx].elements[element_idx].next_mchoice = (ch == '?') ? 1 : 0;
-          data[npc_idx].elements[element_idx].next_ids[i] = atoi(dialog_int_str);
-          i++;
+
+    char output[2048];
+    jsmntok_t tokens[128];
+    load_json(f, output, 2048, tokens, 128);
+
+    int i = 0, j, j_max, k, k_max, l, l_max, element_idx = 0;
+    if (tokens[i].type == JSMN_ARRAY && tokens[i].size > 0) {
+      // iterate through dialogs array
+      j_max = tokens[i].size;
+      for (j = 0; j < j_max; j++) {
+        i++;
+        if (tokens[i].type == JSMN_OBJECT && tokens[i].size > 0) {
+          // iterate through dialogs element object
+          k_max = tokens[i].size;
+          for (k = 0; k < k_max; k++) {
+            i++;
+            if (k % 2 == 0 && tokens[i].type == JSMN_STRING) {
+              // get dialog element object part by key
+              load_json_token(output, line, tokens, i);
+              if (strcmp("id", line) == 0) {
+                load_json_token(output, line, tokens, i+1);
+                data[npc_idx].elements[element_idx].id = atoi(line);
+              } else if (strcmp("text", line) == 0) {
+                load_json_token(output, line, tokens, i+1);
+                strncpy(data[npc_idx].elements[element_idx].text,
+                  line, sizeof(data[npc_idx].elements[element_idx].text));
+              } else if (strcmp("next_ids", line) == 0) {
+                if (tokens[i+1].type == JSMN_ARRAY && tokens[i+1].size > 0) {
+                  i++;
+                  // iterate through next ids array
+                  l_max = tokens[i].size;
+                  for (l = 0; l < l_max; l++) {
+                    i++;
+                    if (tokens[i].type == JSMN_PRIMITIVE) {
+                      load_json_token(output, line, tokens, i);
+                      data[npc_idx].elements[element_idx].next_ids[l] = atoi(line);
+                    }
+                  }
+                  i--;
+                }
+              } else if (strcmp("is_multi_choice", line) == 0) {
+                i++;
+                if (tokens[i].type == JSMN_PRIMITIVE) {
+                  load_json_token(output, line, tokens, i);
+                  data[npc_idx].elements[element_idx].next_mchoice = atoi(line);
+                }
+                i--;
+              }
+            }
+          }
         }
-        data_mode = 0;
         element_idx++;
-        fseek(f, ftell(f) + 1, SEEK_SET);
-      } else {
-        run = 0;
       }
-    } while (run == 1);
+    }
+
     fclose(f);
     elements_count += element_idx;
     // link dialog to npc
