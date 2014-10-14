@@ -1,0 +1,70 @@
+[
+  {
+    "text" : "Du bist im Wohnzimmer. In der Mitte steht eine $Couch$.",
+    "transitions" : [ 1 ],
+    "items" : [ 7, 8 ],
+    "npcs" : [ 1 ]
+  },
+  {
+    "condition" : {
+      "item" : { "id" : 7 },
+      "action" : { "command" : "lookat" }
+    },
+    "text" : "Die Couch ist schon einige Jahre alt, man sieht erste Abnutzungspuren."
+  },
+  {
+    "condition" : {
+      "item" : { "id" : 7 },
+      "action" : { "command" : "lookat" }
+    },
+    "text" : "Auf der Lehne der Couch liegt ein $Feuerzeug$.",
+    "items" : [ 8 ]
+  },
+  {
+    "condition" : {
+      "item" : { "id" : 8 },
+      "action" : { "command" : "pickup" }
+    },
+    "text" : "Du gehst zur Couch und steckst dir das Feuerzeug in deine Tasche."
+  },
+  {
+    "condition" : {
+      "npc" : { "id" : 1 }
+    },
+    "text" : "Auf ihr sitzt &Marunix& bequem."
+  },
+  {
+    "condition" : {
+      "transition" : { "id" : 1 }
+    },
+    "text" : "Zudem gibt es eine #Treppe# die nach oben führt."
+  },
+  {
+    "condition" : {
+      "transition" : { "id" : 1 },
+      "action" : { "command" : "lookat" }
+    },
+    "text" : "Eine Treppe mit 24 Stufen, um nicht auszurutschen ist sie aus Palmholz mit Rillen geschnitzt."
+  },
+  {
+    "condition" : {
+      "transition" : { "id" : 1 },
+      "action" : { "command" : "use" }
+    },
+    "text" : "Du gehst über die Treppe nach oben in dein Zimmer."
+  },
+  {
+    "condition" : {
+      "npc" : { "id" : 1 },
+      "action" : { "command" : "lookat" }
+    },
+    "text" : "Marunix ließt gerade die Hazard Times, eine lokel Zeitung mit allerlei Tratsch und Klatsch."
+  },
+  {
+    "condition" : {
+      "npc" : { "id" : 1 },
+      "action" : { "command" : "talkto" }
+    },
+    "text" : "Du näherst dich Marunix und beginnst ein Gespräch."
+  }
+]

@@ -1,0 +1,164 @@
+[
+  {
+    "text" : "Du bist in deinem Zimmer. Es gibt eine #Tür# zum Flur der nach unten führt.",
+    "transitions" : [ 2 ],
+    "items" : [ 1, 2, 3 ]
+  },
+  {
+    "condition" : {
+      "transition" : { "id" : 2, "status" : "open" },
+      "action" : { "command" : "lookat" }
+    },
+    "text" : "Eine solide Holztür, sie steht offen."
+  },
+  {
+    "condition" : {
+      "transition" : { "id" : 2, "status" : "locked" },
+      "action" : { "command" : "lookat" }
+    },
+    "text" : "Eine solide Holztür, sie ist verschlossen. Auf ihr ist ein Heavy Xettel-Poster."
+  },
+  {
+    "condition" : {
+      "transition" : { "id" : 2, "status" : "locked" },
+      "action" : { "command" : "use" }
+    },
+    "text" : "Das ist nicht möglich, leider ist die Tür verriegelt, du brauchst einen Schlüssel."
+  },
+  {
+    "condition" : {
+      "transition" : { "id" : 2, "status" : "locked" },
+      "action" : { "command" : "use", "item_id" : 10 }
+    },
+    "text" : "Du gehst zur Tür und benutzt den Zimmerschlüssel um die Tür zu entriegeln."
+  },
+  {
+    "condition" : {
+      "transition" : { "id" : 2, "status" : "closed" },
+      "action" : { "command" : "lookat" }
+    },
+    "text" : "Eine solide Holztür, sie ist noch geschlossen. Auf ihr ist ein Heavy Xettel-Poster."
+  },
+  {
+    "condition" : {
+      "transition" : { "id" : 2, "status" : "closed" },
+      "action" : { "command" : "use" }
+    },
+    "text" : "Das ist nicht möglich, leider ist die Tür noch geschlossen."
+  },
+  {
+    "condition" : {
+      "transition" : { "id" : 2, "status" : "closed" },
+      "action" : { "command" : "open" }
+    },
+    "text" : "Du gehst zu Tür und öffnest sie."
+  },
+  {
+    "condition" : {
+      "transition" : { "id" : 2, "status" : "open" },
+      "action" : { "command" : "close" }
+    },
+    "text" : "Du gehst zu Tür und schließt sie."
+  },
+  {
+    "condition" : {
+      "transition" : { "id" : 2, "status" : "open" },
+      "action" : { "command" : "use" }
+    },
+    "text" : "Du gehst durch die Tür nach unten ins Wohnzimmer."
+  },
+  {
+    "condition" : {
+      "item" : { "id" : 1 }
+    },
+    "text" : "In der linken Ecke steht eine alte $Holzbank$.",
+    "items" : [ 1 ]
+  },
+  {
+    "condition" : {
+      "item" : { "id" : 1 },
+      "action" : { "command" : "lookat" }
+    },
+    "text" : "Die Holzbank hat dir dein Vater Marunix mit 3 Jahren geschenkt."
+  },
+  {
+    "condition" : {
+      "item" : { "id" : 1 },
+      "action" : { "command" : "lookat" }
+    },
+    "text" : "Auf ihr liegt ein gelber $Zettel$.",
+    "items" : [ 4 ]
+  },
+  {
+    "condition" : {
+      "item" : { "id" : 4 },
+      "action" : { "command" : "lookat" }
+    },
+    "text" : "Es ist ein gelber Zettel, auf diesem stehen die Zugangscodes für die Portaladministration."
+  },
+  {
+    "condition" : {
+      "item" : { "id" : 4 },
+      "action" : { "command" : "pickup" }
+    },
+    "text" : "Du nimmst den Zettel von der Holzbank und steckst ihn in deine Tasche."
+  },
+  {
+    "condition" : {
+      "item" : { "id" : 2 },
+    },
+    "text" : "In der rechten Ecke steht eine $Kommode$.",
+    "items" : [ 2 ]
+  },
+  {
+    "condition" : {
+      "item" : { "id" : 3 },
+    },
+    "text" : "Auf der rechten Seite ein $Bett$.",
+    "items" : [ 3 ]
+  },
+  {
+    "condition" : {
+      "item" : { "id" : 2 },
+      "action" : { "commando" : "lookat" }
+    },
+    "text" : "Die Kommode ist ein altes Relikt das von Großmutter stammt.",
+  },
+  {
+    "condition" : {
+      "item" : { "id" : 2 },
+      "action" : { "commando" : "lookat" }
+    },
+    "text" : "Auf ihr steht eine $Kerze$ die noch ungenutzt ist.",
+    "items" : [ 5 ]
+  },
+  {
+    "condition" : {
+      "item" : { "id" : 5 },
+      "action" : { "commando" : "pickup" }
+    },
+    "text" : "Du nimmst die Kerze von der Kommode und steckst sie in deine Tasche."
+  },
+  {
+    "condition" : {
+      "item" : { "id" : 3 },
+      "action" : { "commando" : "lookat" }
+    },
+    "text" : "Ein reinrassiges Holzbett der Marke Friöör Mikea, macht sich in jeder Lage gut."
+  },
+  {
+    "condition" : {
+      "item" : { "id" : 3 },
+      "action" : { "commando" : "lookat" }
+    },
+    "text" : "Ein reinrassiges Holzbett der Marke Friöör Mikea, macht sich in jeder Lage gut.",
+    "items" : [ 10 ]
+  },
+  {
+    "condition" : {
+      "item" : { "id" : 10 },
+      "action" : { "commando" : "pickup" }
+    },
+    "text" : "Du nimmst den Zimmerschlüssel von deinem Bett."
+  }
+]
