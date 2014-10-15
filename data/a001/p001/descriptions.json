@@ -105,14 +105,14 @@
   },
   {
     "condition" : {
-      "item" : { "id" : 2 },
+      "item" : { "id" : 2 }
     },
     "text" : "In der rechten Ecke steht eine $Kommode$.",
     "items" : [ 2 ]
   },
   {
     "condition" : {
-      "item" : { "id" : 3 },
+      "item" : { "id" : 3 }
     },
     "text" : "Auf der rechten Seite ein $Bett$.",
     "items" : [ 3 ]
@@ -120,14 +120,14 @@
   {
     "condition" : {
       "item" : { "id" : 2 },
-      "action" : { "commando" : "lookat" }
+      "action" : { "command" : "lookat" }
     },
     "text" : "Die Kommode ist ein altes Relikt das von Großmutter stammt.",
   },
   {
     "condition" : {
       "item" : { "id" : 2 },
-      "action" : { "commando" : "lookat" }
+      "action" : { "command" : "lookat" }
     },
     "text" : "Auf ihr steht eine $Kerze$ die noch ungenutzt ist.",
     "items" : [ 5 ]
@@ -135,21 +135,21 @@
   {
     "condition" : {
       "item" : { "id" : 5 },
-      "action" : { "commando" : "pickup" }
+      "action" : { "command" : "pickup" }
     },
     "text" : "Du nimmst die Kerze von der Kommode und steckst sie in deine Tasche."
   },
   {
     "condition" : {
       "item" : { "id" : 3 },
-      "action" : { "commando" : "lookat" }
+      "action" : { "command" : "lookat" }
     },
     "text" : "Ein reinrassiges Holzbett der Marke Friöör Mikea, macht sich in jeder Lage gut."
   },
   {
     "condition" : {
       "item" : { "id" : 3 },
-      "action" : { "commando" : "lookat" }
+      "action" : { "command" : "lookat" }
     },
     "text" : "Ein reinrassiges Holzbett der Marke Friöör Mikea, macht sich in jeder Lage gut.",
     "items" : [ 10 ]
@@ -157,7 +157,7 @@
   {
     "condition" : {
       "item" : { "id" : 10 },
-      "action" : { "commando" : "pickup" }
+      "action" : { "command" : "lookat" }
     },
     "text" : "Du nimmst den Zimmerschlüssel von deinem Bett."
   }
