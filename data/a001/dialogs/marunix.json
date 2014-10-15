@@ -1,37 +1,37 @@
 {
-  1 : {
+  "1" : {
     "text" : "Hallo Marunix!",
     "next_ids" : [ 2 ]
   },
-  2: {
+  "2" : {
     "text" : "Hallo Joarana!",
     "next_ids" : [ 3, 4 ],
     "is_multi_choice" : 1
   },
-  3 : {
+  "3" : {
     "text" : "Bist du hier weil du Langeweile hast?",
     "next_ids" : [ 5 ]
   },
-  4 : {
+  "4" : {
     "text" : "Hast du schon gesehen es gibt Eis!",
     "next_ids" : [ 6 ]
   },
-  5 : {
+  "5" : {
     "text" : "Ne Joarana, ich hab auf dich gewartet.",
     "next_ids" : [ 7, 8 ],
     "is_multi_choice" : 1
   },
-  6 : {
+  "6" : {
     "text" : "Ja, davon habe ich schon gekostet, vollzüglich.",
   },
-  7 : {
+  "7" : {
     "text" : "Auf mich, wieso was habe ich verbrochen?",
     "next_ids" : [ 9 ]
   },
-  8 : {
+  "8" : {
     "text" : "Achso, ja dann ist ja gut.",
   },
-  9 : {
+  "9" : {
     "text" : "Nichts, aber ich möchte dir noch einmal gratulieren.",
   }
 ]

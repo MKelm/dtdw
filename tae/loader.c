@@ -517,7 +517,7 @@ int load_dialogs(struct npc npcs_data[], int nlmax, struct dialog data[], int lm
       j_max = tokens[i].size;
       for (j = 0; j < j_max; j++) {
         i++;
-        if (j % 2 == 0 && tokens[i].type == JSMN_PRIMITIVE) {
+        if (j % 2 == 0 && tokens[i].type == JSMN_STRING) {
           load_json_token(output, line, tokens, i);
           data[npc_idx].elements[element_idx].id = atoi(line);
 
