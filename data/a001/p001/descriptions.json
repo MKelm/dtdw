@@ -151,13 +151,13 @@
       "item" : { "id" : 3 },
       "action" : { "command" : "lookat" }
     },
-    "text" : "Ein reinrassiges Holzbett der Marke Friöör Mikea, macht sich in jeder Lage gut.",
+    "text" : "Auf dem Bett liegt dein $Zimmerschlüssel$.",
     "items" : [ 10 ]
   },
   {
     "condition" : {
       "item" : { "id" : 10 },
-      "action" : { "command" : "lookat" }
+      "action" : { "command" : "pickup" }
     },
     "text" : "Du nimmst den Zimmerschlüssel von deinem Bett."
   }
