@@ -52,6 +52,9 @@
     "title" : "Couch"
   },
   8 : {
+    "comb_id" : 5,
+    "comb_type" : "item",
+    "final_id" : 9,
     "title" : "Feuerzeug"
   },
   9 : {
