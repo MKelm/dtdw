@@ -277,7 +277,7 @@ void load_data(void) {
   // items
   data_counts[3] = load_items(items_data, MAX_ITEMS);
   // descriptions
-  data_counts[4] = load_descriptions(descriptions_data, MAX_DESCRIPTIONS);
+  data_counts[4] = load_descriptions(descriptions_data, MAX_DESCRIPTIONS, places_data, data_counts[2]);
   description_set_descriptions(descriptions_data, data_counts[4]);
   // transitions related to places
   data_counts[5] = load_transitions(

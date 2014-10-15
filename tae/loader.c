@@ -19,8 +19,8 @@ void loader_set_area_id(int area_id) {
   current_area_id = area_id;
 }
 
-FILE *loader_get_data_file(char *file_name, short in_area) {
-  char tmp1[256], tmp2[256];
+FILE *loader_get_data_file(char *file_name, short in_area, short place_id) {
+  char tmp1[256] = "", tmp2[256] = "", tmp3[256] = "";
   strncpy(tmp1, data_directory, 256);
   if (in_area == 1) {
     strcat(tmp1, "a");
@@ -33,8 +33,20 @@ FILE *loader_get_data_file(char *file_name, short in_area) {
     snprintf(buffer, sizeof(buffer), "%d/", current_area_id);
     strcat(tmp1, buffer);
   }
-  strncpy(tmp2, file_name, 256);
+  if (place_id > 0) {
+    strcat(tmp2, "p");
+    if (place_id < 10) {
+      strcat(tmp2, "00");
+    } else if (place_id < 100) {
+      strcat(tmp2, "0");
+    }
+    char buffer[256];
+    snprintf(buffer, sizeof(buffer), "%d/", place_id);
+    strcat(tmp2, buffer);
+  }
   strcat(tmp1, tmp2);
+  strncpy(tmp3, file_name, 256);
+  strcat(tmp1, tmp3);
   return fopen(tmp1, "r");
 }
 
@@ -91,13 +103,13 @@ void load_full_text(FILE *f, char *text) {
 }
 
 void load_help(char *help) {
-  FILE *f = loader_get_data_file(FILE_HELP, 0);
+  FILE *f = loader_get_data_file(FILE_HELP, 0, 0);
   load_full_text(f, help);
   fclose(f);
 }
 
 void load_meta(struct meta *data) {
-  FILE *f = loader_get_data_file(FILE_META, 0);
+  FILE *f = loader_get_data_file(FILE_META, 0, 0);
 
   char output[2048];
   jsmntok_t tokens[128];
@@ -134,7 +146,7 @@ void load_meta(struct meta *data) {
 }
 
 void load_phrases(struct phrases *data) {
-  FILE *f = loader_get_data_file(FILE_PHRASES, 0);
+  FILE *f = loader_get_data_file(FILE_PHRASES, 0, 0);
 
   char output[2048];
   jsmntok_t tokens[128];
@@ -174,7 +186,7 @@ void load_phrases(struct phrases *data) {
 }
 
 int load_commands(struct command *data, int lmax) {
-  FILE *f = loader_get_data_file(FILE_COMMANDS, 0);
+  FILE *f = loader_get_data_file(FILE_COMMANDS, 0, 0);
 
   char output[2048];
   jsmntok_t tokens[128];
@@ -203,7 +215,7 @@ int load_commands(struct command *data, int lmax) {
 }
 
 int load_areas(struct area *data, int lmax) {
-  FILE *f = loader_get_data_file(FILE_AREAS, 0);
+  FILE *f = loader_get_data_file(FILE_AREAS, 0, 0);
 
   char output[2048];
   jsmntok_t tokens[128];
@@ -232,7 +244,7 @@ int load_areas(struct area *data, int lmax) {
 }
 
 int load_places(struct place *data, int lmax) {
-  FILE *f = loader_get_data_file(FILE_PLACES, 1);
+  FILE *f = loader_get_data_file(FILE_PLACES, 1, 0);
 
   char output[2048];
   jsmntok_t tokens[128];
@@ -305,8 +317,8 @@ int load_places(struct place *data, int lmax) {
             }
           }
         }
+        idx++;
       }
-      idx++;
     }
   }
   fclose(f);
@@ -332,7 +344,7 @@ int load_transitions(struct placetrans transitions_data[], int transitions_lmax,
 }
 
 int load_items(struct item data[], int lmax) {
-  FILE *f = loader_get_data_file(FILE_ITEMS, 1);
+  FILE *f = loader_get_data_file(FILE_ITEMS, 1, 0);
 
   char output[4096];
   jsmntok_t tokens[256];
@@ -428,7 +440,7 @@ int load_items(struct item data[], int lmax) {
 }
 
 int load_npcs(struct npc data[], int lmax) {
-  FILE *f = loader_get_data_file(FILE_NPCS, 1);
+  FILE *f = loader_get_data_file(FILE_NPCS, 1, 0);
 
   char output[2048];
   jsmntok_t tokens[128];
@@ -492,7 +504,7 @@ int load_dialogs(struct npc npcs_data[], int nlmax, struct dialog data[], int lm
     }
     snprintf(file_name, 1024, "%s%s%s", FILE_DIALOGS_FOLDER, line, FILE_DIALOGS_POSTFIX);
 
-    f = loader_get_data_file(file_name, 1);
+    f = loader_get_data_file(file_name, 1, 0);
 
     char output[2048];
     jsmntok_t tokens[128];
@@ -558,101 +570,20 @@ int load_dialogs(struct npc npcs_data[], int nlmax, struct dialog data[], int lm
 }
 
 void load_intro(char *intro) {
-  FILE *f = loader_get_data_file(FILE_INTRO, 0);
+  FILE *f = loader_get_data_file(FILE_INTRO, 0, 0);
   load_full_text(f, intro);
   fclose(f);
 }
 
-/*
- Description definitions:
- #placeId&npcId$itemId...(optional)/verb(optional)
- Text with #transition# or &npc& or $item$ ...
- #transitionIDs...npcIDs...$itemIDs...
-*/
-int load_descriptions_rec(FILE *f, struct description *data, int data_idx) {
-  char str[256];
-  int tmp, ch;
-
-  if (fscanf(f, "#%d", &data[data_idx].id)) {
-    // switch to get id transitions / id npcs or id items
-    if ((ch = fgetc(f)) != '\n') {
-      int id_trans_idx = 0, id_npc_idx = 0, id_item_idx = 0;
-      do {
-        fseek(f, ftell(f) - 1, SEEK_SET);
-        fscanf(f, "%[#&$]%d", str, &tmp);
-        if (strcmp(str, "#") == 0 && id_trans_idx < MAX_DESC_ID_EXTRAS) {
-          data[data_idx].id_transitions[id_trans_idx] = tmp;
-          data[data_idx].id_trans_status[id_trans_idx] = TRANSITION_STATUS_OPEN;
-          // id trans status used to get descriptions in relation to closed / locked status
-          if ((ch = fgetc(f)) == '<') {
-            fscanf(f, "%[^\n^/^$]", str);
-            if (strcmp(str, "c") == 0) {
-              data[data_idx].id_trans_status[id_trans_idx] = TRANSITION_STATUS_CLOSED;
-              data[data_idx].id_trans_item_id[id_trans_idx] = 0;
-            } else if (strcmp(str, "l") == 0) {
-              data[data_idx].id_trans_status[id_trans_idx] = TRANSITION_STATUS_LOCKED;
-              // needs an item (id) to unlock transition
-              fscanf(f, "$%d", &data[data_idx].id_trans_item_id[id_trans_idx]);
-            }
-          } else {
-            fseek(f, ftell(f) - 1, SEEK_SET);
-          }
-          id_trans_idx++;
-        } else if (strcmp(str, "&") == 0 && id_npc_idx < MAX_DESC_ID_EXTRAS) {
-          data[data_idx].id_npcs[id_npc_idx] = tmp;
-          id_npc_idx++;
-        } else if (strcmp(str, "$") == 0 && id_item_idx < MAX_DESC_ID_EXTRAS) {
-          data[data_idx].id_items[id_item_idx] = tmp;
-          id_item_idx++;
-        }
-      } while ((ch = fgetc(f)) != '\n' && ch != '/');
-    }
-    // command detection
-    if (ch != '\n' && ch == '/') {
-      fscanf(f, "%[^\n]\n", data[data_idx].id_verb);
-    }
-    // get text
-    fgets(data[data_idx].text, sizeof(data[data_idx].text), f);
-    int len = strlen(data[data_idx].text);
-    if (data[data_idx].text[len - 1] == '\n')
-        data[data_idx].text[len - 1] = '\0';
-    // switch to get transitions / npcs or items
-    if ((ch = fgetc(f)) != '\n') {
-      int trans_idx = 0, npc_idx = 0, item_idx = 0;
-      do {
-        strncpy(str, "", sizeof(str));
-        fseek(f, ftell(f) - 1, SEEK_SET);
-        fscanf(f, "%[#&$]%d", str, &tmp);
-        if (strcmp(str, "#") == 0 && trans_idx < MAX_DESC_TEXT_TRANS) {
-          data[data_idx].transitions[trans_idx] = tmp;
-          trans_idx++;
-        } else if (strcmp(str, "&") == 0 && npc_idx < MAX_DESC_TEXT_NPCS) {
-          data[data_idx].npcs[npc_idx] = tmp;
-          npc_idx++;
-        } else if (strcmp(str, "$") == 0 && item_idx < MAX_DESC_TEXT_ITEMS) {
-          data[data_idx].items[item_idx] = tmp;
-          item_idx++;
-        }
-      } while ((ch = fgetc(f)) != '\n');
-    } else {
-      fseek(f, ftell(f) - 1, SEEK_SET);
-    }
-    // search for more entries to get data from
-    while ((ch = fgetc(f)) == '\n');
-    if (ch == '#') {
-      fseek(f, ftell(f) - 1, SEEK_SET);
-      data_idx++;
-      data_idx = load_descriptions_rec(f, data, data_idx);
-    }
+int load_descriptions(struct description *data, int lmax,
+                      struct place *places_data, int places_lmax) {
+  int place_idx, data_idx;
+  for (place_idx = 0; place_idx < places_lmax; place_idx++) {
+    printf("%d\n", places_data[place_idx].id);
+    FILE *f = loader_get_data_file(FILE_DESCRIPTIONS, 1, places_data[place_idx].id);
+    data_idx = 0;
+    // todo new descriptions loader
+    fclose(f);
   }
-
   return data_idx;
-}
-
-int load_descriptions(struct description *data, int lmax) {
-  FILE *f = loader_get_data_file(FILE_DESCRIPTIONS, 1);
-  int data_idx = 0;
-  data_idx = load_descriptions_rec(f, data, data_idx);
-  fclose(f);
-  return ++data_idx;
 }

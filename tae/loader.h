@@ -7,7 +7,7 @@
 void loader_set_data_dir(void);
 void loader_set_area_id(int area_id);
 
-FILE *loader_get_data_file(char *file_name, short in_area);
+FILE *loader_get_data_file(char *file_name, short in_area, short place_id);
 void load_json(FILE *f, char *output, int output_length, jsmntok_t *tokens, int tokens_length);
 void load_json_token(char* input, char *token, jsmntok_t *tokens, int token_idx);
 
@@ -75,11 +75,11 @@ int load_dialogs(struct npc npcs_data[], int nlmax, struct dialog data[], int lm
 void load_intro(char *text);
 
 // descriptions
-#define FILE_DESCRIPTIONS "descriptions.txt"
+#define FILE_DESCRIPTIONS "descriptions.json"
 #define MAX_DESCRIPTIONS 1000
 
-int load_descriptions(struct description data[], int lmax);
-int load_descriptions_rec(FILE *f, struct description *data, int data_idx);
+int load_descriptions(struct description *data, int lmax,
+                      struct place *places_data, int places_lmax);
 
 // transitions
 #define MAX_PLACETRANS 1000
