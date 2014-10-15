@@ -45,8 +45,8 @@ char *description_by_area_place() {
   int base_idx = -1, base_item_idx = 0, base_npc_idx = 0, base_trans_idx = 0;
   int has_item = 0, has_transition = 0, has_npc = 0;
   while (desc_idx < descriptions_count) {
-    if (descriptions[desc_idx].id == current_place &&
-        strlen(descriptions[desc_idx].id_verb) == 0) {
+    if (descriptions[desc_idx].cond.place_id == current_place &&
+        strlen(descriptions[desc_idx].cond.action_command) == 0) {
 
       if (base_idx == -1) {
         base_idx = desc_idx;
@@ -57,16 +57,20 @@ char *description_by_area_place() {
 
         // show place descriptions with valid item only
         for (base_item_idx = 0; base_item_idx < MAX_DESC_TEXT_ITEMS; base_item_idx++) {
-          if (descriptions[base_idx].items[base_item_idx] > 0 &&
-              descriptions[base_idx].items[base_item_idx] == descriptions[desc_idx].id_items[0]) {
+          if (descriptions[base_idx].item_ids[base_item_idx] > 0 &&
+              descriptions[desc_idx].cond.elem_id > 0 &&
+              descriptions[desc_idx].cond.elem_type == DESC_ELEM_TYPE_ITEM &&
+              descriptions[base_idx].item_ids[base_item_idx] == descriptions[desc_idx].cond.elem_id) {
             has_item = 1;
           }
         }
         if (has_item == 0) {
           // show place descriptions with valid npc only
           for (base_npc_idx = 0; base_npc_idx < MAX_DESC_TEXT_NPCS; base_npc_idx++) {
-            if (descriptions[base_idx].npcs[base_npc_idx] > 0 &&
-                descriptions[base_idx].npcs[base_npc_idx] == descriptions[desc_idx].id_npcs[0]) {
+            if (descriptions[base_idx].npc_ids[base_npc_idx] > 0 &&
+                descriptions[desc_idx].cond.elem_id > 0 &&
+                descriptions[desc_idx].cond.elem_type == DESC_ELEM_TYPE_NPC &&
+                descriptions[base_idx].npc_ids[base_npc_idx] == descriptions[desc_idx].cond.elem_id) {
               has_npc = 1;
             }
           }
@@ -74,9 +78,11 @@ char *description_by_area_place() {
         if (has_item == 0 && has_npc == 0) {
           // show place descriptions with valid transitions only
           for (base_trans_idx = 0; base_trans_idx < MAX_DESC_TEXT_TRANS; base_trans_idx++) {
-            if (descriptions[base_idx].transitions[base_trans_idx] > 0 &&
-                descriptions[base_idx].transitions[base_trans_idx] ==
-                  descriptions[desc_idx].id_transitions[0]) {
+            if (descriptions[base_idx].transition_ids[base_trans_idx] > 0 &&
+                descriptions[desc_idx].cond.elem_id > 0 &&
+                descriptions[desc_idx].cond.elem_type == DESC_ELEM_TYPE_TRANSITION &&
+                descriptions[base_idx].transition_ids[base_trans_idx] ==
+                  descriptions[desc_idx].cond.elem_id) {
               has_transition = 1;
             }
           }
@@ -92,7 +98,7 @@ char *description_by_area_place() {
           has_text = 1;
         }
       }
-    } else if (descriptions[desc_idx].id == current_place + 1) {
+    } else if (descriptions[desc_idx].cond.place_id == current_place + 1) {
       break;
     }
     desc_idx++;
@@ -147,30 +153,32 @@ char *description_by_action(struct action *caction) {
     // for transition / item / npc action commands
     desc_idx = 0;
     while (desc_idx < descriptions_count) {
-      if (descriptions[desc_idx].id == current_place &&
-          strcmp(descriptions[desc_idx].id_verb, caction->in_command) == 0) {
+      if (descriptions[desc_idx].cond.place_id == current_place &&
+          strcmp(descriptions[desc_idx].cond.action_command, caction->in_command) == 0) {
 
         // check status of id item / transition / npc
         has_item = 0;
         has_transition = 0;
         has_npc = 0;
         if (caction->p_item != NULL && caction->p_item->id > 0 &&
-            descriptions[desc_idx].id_items[0] == caction->p_item->id) {
+            descriptions[desc_idx].cond.elem_type == DESC_ELEM_TYPE_ITEM &&
+            descriptions[desc_idx].cond.elem_id == caction->p_item->id) {
           has_item = 1;
 
         } else if (caction->transition != NULL && caction->transition->id > 0 &&
-                   descriptions[desc_idx].id_transitions[0] == caction->transition->id) {
+                   descriptions[desc_idx].cond.elem_type == DESC_ELEM_TYPE_TRANSITION &&
+                   descriptions[desc_idx].cond.elem_id == caction->transition->id) {
 
-          if (descriptions[desc_idx].id_trans_status[0] == caction->transition->status) {
+          if (descriptions[desc_idx].cond.elem_status == caction->transition->status) {
             // set has transition with valid status only
             if (caction->transition->status == STATUS_TRANSITION_LOCKED &&
-                caction->p_item == NULL && descriptions[desc_idx].id_trans_item_id[0] == 0) {
+                caction->p_item == NULL && descriptions[desc_idx].cond.action_item_id == 0) {
               // use (unlock) command without correct item
               has_transition = 1;
 
             } else if (caction->transition->status == STATUS_TRANSITION_LOCKED &&
                 caction->p_item != NULL &&
-                descriptions[desc_idx].id_trans_item_id[0] == caction->p_item->id) {
+                descriptions[desc_idx].cond.action_item_id == caction->p_item->id) {
               // use (unlock) command with correct item
               has_transition = 1;
             } else if (caction->transition->status != STATUS_TRANSITION_LOCKED) {
@@ -180,7 +188,8 @@ char *description_by_action(struct action *caction) {
           }
 
         } else if (caction->c_npc != NULL && caction->c_npc->id > 0 &&
-                   descriptions[desc_idx].id_npcs[0] == caction->c_npc->id) {
+                   descriptions[desc_idx].cond.elem_type == DESC_ELEM_TYPE_NPC &&
+                   descriptions[desc_idx].cond.elem_id == caction->c_npc->id) {
           has_npc = 1;
         }
 
@@ -188,7 +197,7 @@ char *description_by_action(struct action *caction) {
           // check status of available text items to hide descriptions
           // of items which have another location than "in place"
           for (i = 0; i < MAX_DESC_TEXT_ITEMS; i++) {
-            struct item *citem = get_item_by_id(descriptions[desc_idx].items[i]);
+            struct item *citem = get_item_by_id(descriptions[desc_idx].item_ids[i]);
             if (citem != NULL && citem->location != ITEM_LOCATION_PLACE) {
               has_item = 0;
               has_transition = 0;
@@ -203,7 +212,7 @@ char *description_by_action(struct action *caction) {
           }
         }
 
-      } else if (descriptions[desc_idx].id == current_place + 1) {
+      } else if (descriptions[desc_idx].cond.place_id == current_place + 1) {
         break;
       }
       desc_idx++;

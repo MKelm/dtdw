@@ -591,15 +591,15 @@ void load_desc_text_ids(char *output, jsmntok_t *tokens, int *i,
         switch (id_type) {
           case 0:
             // get transition id(s)
-            data[*data_idx].transitions[id_idx] = atoi(line);
+            data[*data_idx].transition_ids[id_idx] = atoi(line);
             break;
           case 1:
             // get item id(s)
-            data[*data_idx].items[id_idx] = atoi(line);
+            data[*data_idx].item_ids[id_idx] = atoi(line);
             break;
           case 2:
             // get npc id(s)
-            data[*data_idx].npcs[id_idx] = atoi(line);
+            data[*data_idx].npc_ids[id_idx] = atoi(line);
             break;
         }
         id_idx++;
@@ -623,26 +623,32 @@ void load_desc_cond_element(char *output, jsmntok_t *tokens, int *i,
       if (j % 2 == 0 && tokens[*i].type == JSMN_STRING) {
         load_json_token(output, line, tokens, *i);
         if (strcmp(line, "id") == 0) {
+          data[*data_idx].cond.elem_type = elem_type;
           load_json_token(output, line, tokens, *i + 1);
           switch (elem_type) {
-            case 0: // transition
-              data[*data_idx].id_transitions[0] = atoi(line);
-              data[*data_idx].id_trans_status[0] = STATUS_TRANSITION_OPEN;
+            case DESC_ELEM_TYPE_TRANSITION: // transition
+              data[*data_idx].cond.elem_id = atoi(line);
+              data[*data_idx].cond.elem_status = STATUS_TRANSITION_OPEN;
               break;
-            case 1: // item
-              data[*data_idx].id_items[0] = atoi(line);
+            case DESC_ELEM_TYPE_ITEM: // item
+              data[*data_idx].cond.elem_id = atoi(line);
+              data[*data_idx].cond.elem_status = STATUS_ITEM_NORMAL;
               break;
-            case 2: // npc
-              data[*data_idx].id_npcs[0] = atoi(line);
+            case DESC_ELEM_TYPE_NPC: // npc
+              data[*data_idx].cond.elem_id = atoi(line);
               break;
           }
         } else if (strcmp(line, "status") == 0) {
-          // status for transitions currently
+          // status for condition transition / item
           load_json_token(output, line, tokens, *i + 1);
           if (strcmp(line, "locked") == 0) {
-            data[*data_idx].id_trans_status[0] = STATUS_TRANSITION_LOCKED;
+            data[*data_idx].cond.elem_status = STATUS_TRANSITION_LOCKED;
           } else if (strcmp(line, "closed") == 0) {
-            data[*data_idx].id_trans_status[0] = STATUS_TRANSITION_CLOSED;
+            data[*data_idx].cond.elem_status = STATUS_TRANSITION_CLOSED;
+          } else if (strcmp(line, "pushed") == 0) {
+            data[*data_idx].cond.elem_status = STATUS_ITEM_PUSHED;
+          } else if (strcmp(line, "pulled") == 0) {
+            data[*data_idx].cond.elem_status = STATUS_ITEM_PULLED;
           }
         }
       }
@@ -667,11 +673,12 @@ void load_desc_cond_action(char *output, jsmntok_t *tokens, int *i,
         if (strcmp(line, "command") == 0) {
           // load command sub-element
           load_json_token(output, line, tokens, *i + 1);
-          strncpy(data[*data_idx].id_verb, line, sizeof(data[*data_idx].id_verb));
+          strncpy(data[*data_idx].cond.action_command, line,
+            sizeof(data[*data_idx].cond.action_command));
         } else if (strcmp(line, "item_id") == 0) {
           // load item_id sub-element
           load_json_token(output, line, tokens, *i + 1);
-          data[*data_idx].id_trans_item_id[0] = atoi(line);
+          data[*data_idx].cond.action_item_id = atoi(line);
         }
       }
     }
@@ -694,13 +701,19 @@ void load_desc_condition(char *output, jsmntok_t *tokens, int *i,
         load_json_token(output, line, tokens, *i);
         if (strcmp(line, "transition") == 0) {
           // load description condition element transition
-          load_desc_cond_element(output, tokens, i, data_idx, data, 0);
+          load_desc_cond_element(
+            output, tokens, i, data_idx, data, DESC_ELEM_TYPE_TRANSITION
+          );
         } else if (strcmp(line, "item") == 0) {
           // load description condition element item
-          load_desc_cond_element(output, tokens, i, data_idx, data, 1);
+          load_desc_cond_element(
+            output, tokens, i, data_idx, data, DESC_ELEM_TYPE_ITEM
+          );
         } else if (strcmp(line, "npc") == 0) {
           // load description condition element npc
-          load_desc_cond_element(output, tokens, i, data_idx, data, 2);
+          load_desc_cond_element(
+            output, tokens, i, data_idx, data, DESC_ELEM_TYPE_NPC
+          );
         } else if (strcmp(line, "action") == 0) {
           // load description condition element action
           load_desc_cond_action(output, tokens, i, data_idx, data);
@@ -733,13 +746,19 @@ void load_desc_element(char *output, jsmntok_t *tokens, int *i,
           strncpy(data[*data_idx].text, line, sizeof(data[*data_idx].text));
         } else if (strcmp(line, "transitions") == 0) {
           // load transitions
-          load_desc_text_ids(output, tokens, i, data_idx, data, 0);
+          load_desc_text_ids(
+            output, tokens, i, data_idx, data, DESC_ELEM_TYPE_TRANSITION
+          );
         } else if (strcmp(line, "items") == 0) {
           // load items
-          load_desc_text_ids(output, tokens, i, data_idx, data, 1);
+          load_desc_text_ids(
+            output, tokens, i, data_idx, data, DESC_ELEM_TYPE_ITEM
+          );
         } else if (strcmp(line, "npcs") == 0) {
           // load npcs
-          load_desc_text_ids(output, tokens, i, data_idx, data, 2);
+          load_desc_text_ids(
+            output, tokens, i, data_idx, data, DESC_ELEM_TYPE_NPC
+          );
         }
       }
     }
@@ -763,7 +782,9 @@ int load_descriptions(struct description *data, int lmax,
       // iterate through array of descriptions
       for (j = 0; j < j_max; j++) {
         i++;
-        data[data_idx].id = places_data[place_idx].id;
+        // set default condition, place id
+        data[data_idx].cond.place_id = places_data[place_idx].id;
+        // load description element with condition, text and text elements
         load_desc_element(output, tokens, &i, &data_idx, data);
         data_idx = data_idx + 1;
       }

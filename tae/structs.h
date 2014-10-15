@@ -114,23 +114,29 @@ struct npc {
   struct dialog *c_dialog;
 };
 
-#define MAX_DESC_ID_EXTRAS 5
 #define MAX_DESC_TEXT_TRANS 5
 #define MAX_DESC_TEXT_ITEMS 10
 #define MAX_DESC_TEXT_NPCS 10
 
+#define DESC_ELEM_TYPE_TRANSITION 0
+#define DESC_ELEM_TYPE_ITEM 1
+#define DESC_ELEM_TYPE_NPC 2
+
+struct description_condition {
+  int place_id; // place id
+  int elem_type; // element == item, npc or transition
+  int elem_id; // element id
+  int elem_status; // element status e.g. open or closed
+  char action_command[24];
+  int action_item_id;
+};
+
 struct description {
-  int id;
-  int id_transitions[MAX_DESC_ID_EXTRAS];
-  int id_trans_status[MAX_DESC_ID_EXTRAS];
-  int id_trans_item_id[MAX_DESC_ID_EXTRAS];
-  int id_items[MAX_DESC_ID_EXTRAS];
-  int id_npcs[MAX_DESC_ID_EXTRAS];
-  char id_verb[24];
+  struct description_condition cond;
   char text[1024];
-  int transitions[MAX_DESC_TEXT_TRANS]; // text transitions
-  int items[MAX_DESC_TEXT_ITEMS]; // text items
-  int npcs[MAX_DESC_TEXT_NPCS];
+  int transition_ids[MAX_DESC_TEXT_TRANS]; // transitions in text
+  int item_ids[MAX_DESC_TEXT_ITEMS]; // items in text
+  int npc_ids[MAX_DESC_TEXT_NPCS]; // npcs in text
 };
 
 struct action {
