@@ -79,7 +79,7 @@ int main(void) {
         } else if (caction->transition != NULL && caction->transition->id > 0) {
 
           if (strcmp(caction->in_command, "use") == 0 &&
-              caction->transition->status == TRANSITION_STATUS_OPEN) {
+              caction->transition->status == STATUS_TRANSITION_OPEN) {
             // location change with open transitions only
             // output transition action description before location change
             dsp_set_output(description_by_action(action_get()));
@@ -88,29 +88,29 @@ int main(void) {
 
           } else if (strcmp(caction->in_command, "use") == 0 &&
                      caction->transition != NULL &&
-                     caction->transition->status == TRANSITION_STATUS_LOCKED &&
+                     caction->transition->status == STATUS_TRANSITION_LOCKED &&
                      caction->p_item != NULL) {
 
             if (inventory_has_item(caction->p_item)) {
               // remove locked status by use item command
               dsp_set_output(description_by_action(action_get()));
-              caction->transition->status = TRANSITION_STATUS_CLOSED; // unlock -> closed status
+              caction->transition->status = STATUS_TRANSITION_CLOSED; // unlock -> closed status
               inventory_rm_item(caction->p_item);
             }
             output_change = 0;
 
           } else if (strcmp(caction->in_command, "open") == 0 &&
-                     caction->transition->status == TRANSITION_STATUS_CLOSED) {
+                     caction->transition->status == STATUS_TRANSITION_CLOSED) {
             // remove closed status by open command
             dsp_set_output(description_by_action(action_get()));
-            caction->transition->status = TRANSITION_STATUS_OPEN;
+            caction->transition->status = STATUS_TRANSITION_OPEN;
             output_change = 0;
 
           } else if (strcmp(caction->in_command, "close") == 0 &&
-                     caction->transition->status == TRANSITION_STATUS_OPEN) {
+                     caction->transition->status == STATUS_TRANSITION_OPEN) {
             // remove open status by close command
             dsp_set_output(description_by_action(action_get()));
-            caction->transition->status = TRANSITION_STATUS_CLOSED;
+            caction->transition->status = STATUS_TRANSITION_CLOSED;
             output_change = 0;
           }
 
@@ -153,12 +153,12 @@ int main(void) {
         } else if (strcmp(caction->in_command, "push") == 0 &&
                    caction->p_item != NULL && caction->p_item->id > 0) {
 
-            caction->p_item->status = ITEM_STATUS_PUSHED;
+            caction->p_item->status = STATUS_ITEM_PUSHED;
 
         } else if (strcmp(caction->in_command, "pull") == 0 &&
                    caction->p_item != NULL && caction->p_item->id > 0) {
 
-            caction->p_item->status = ITEM_STATUS_PULLED;
+            caction->p_item->status = STATUS_ITEM_PULLED;
         }
 
         // check output change, change output display window if needed

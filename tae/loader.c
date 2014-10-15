@@ -298,11 +298,11 @@ int load_places(struct place *data, int lmax) {
                         load_json_token(output, line, tokens, i+1);
                         // get status and key item value
                         if (strcmp(line, "locked") == 0) {
-                          data[idx].transitions[trans_idx].status = TRANSITION_STATUS_LOCKED;
+                          data[idx].transitions[trans_idx].status = STATUS_TRANSITION_LOCKED;
                         } else if (strcmp(line, "closed") == 0) {
-                          data[idx].transitions[trans_idx].status = TRANSITION_STATUS_CLOSED;
+                          data[idx].transitions[trans_idx].status = STATUS_TRANSITION_CLOSED;
                         } else {
-                          data[idx].transitions[trans_idx].status = TRANSITION_STATUS_OPEN;
+                          data[idx].transitions[trans_idx].status = STATUS_TRANSITION_OPEN;
                         }
                       } else if (strcmp("unlock_item_id", line) == 0) {
                         load_json_token(output, line, tokens, i+1);
@@ -627,7 +627,7 @@ void load_desc_cond_element(char *output, jsmntok_t *tokens, int *i,
           switch (elem_type) {
             case 0: // transition
               data[*data_idx].id_transitions[0] = atoi(line);
-              data[*data_idx].id_trans_status[0] = TRANSITION_STATUS_OPEN;
+              data[*data_idx].id_trans_status[0] = STATUS_TRANSITION_OPEN;
               break;
             case 1: // item
               data[*data_idx].id_items[0] = atoi(line);
@@ -640,9 +640,9 @@ void load_desc_cond_element(char *output, jsmntok_t *tokens, int *i,
           // status for transitions currently
           load_json_token(output, line, tokens, *i + 1);
           if (strcmp(line, "locked") == 0) {
-            data[*data_idx].id_trans_status[0] = TRANSITION_STATUS_LOCKED;
+            data[*data_idx].id_trans_status[0] = STATUS_TRANSITION_LOCKED;
           } else if (strcmp(line, "closed") == 0) {
-            data[*data_idx].id_trans_status[0] = TRANSITION_STATUS_CLOSED;
+            data[*data_idx].id_trans_status[0] = STATUS_TRANSITION_CLOSED;
           }
         }
       }

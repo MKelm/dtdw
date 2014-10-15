@@ -32,14 +32,14 @@ struct area {
   char title[MAX_AREA_TITLE_LENGTH];
 };
 
-#define TRANSITION_STATUS_OPEN 0
-#define TRANSITION_STATUS_CLOSED 1
-#define TRANSITION_STATUS_LOCKED 2
+#define STATUS_TRANSITION_OPEN 1
+#define STATUS_TRANSITION_CLOSED 2
+#define STATUS_TRANSITION_LOCKED 3
 
 struct placetrans {
   int id;
   char title[56];
-  int status; // 0 = open, 1 = closed, 2 = locked
+  int status; // 1 = open, 2 = closed, 3 = locked
   int ul_item_id; // item id to unlock transition
 };
 
@@ -71,9 +71,9 @@ struct itemdescription {
 #define ITEM_LOCATION_INVENTORY 1
 #define ITEM_LOCATION_NONE 2
 
-#define ITEM_STATUS_NORMAL 0
-#define ITEM_STATUS_PUSHED 1
-#define ITEM_STATUS_PULLED 2
+#define STATUS_ITEM_NORMAL -1
+#define STATUS_ITEM_PUSHED -2
+#define STATUS_ITEM_PULLED -3
 
 struct item {
   int id;
@@ -82,7 +82,7 @@ struct item {
   int final_id; // final item id after combination
   char title[MAX_ITEM_TITLE_LENGTH];
   int location; // 0 == in place, 1 == in inventory, 2 == exists no longer
-  int status; // 0 == normal, 1 = pushed, 2 = pulled
+  int status; // -1 == normal, -2 = pushed, -3 = pulled
   struct itemdescription descriptions[MAX_ITEM_DESCRIPTIONS];
 };
 
