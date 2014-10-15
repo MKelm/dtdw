@@ -155,11 +155,15 @@ int main(void) {
         } else if (strcmp(caction->in_command, "push") == 0 &&
                    caction->p_item != NULL && caction->p_item->id > 0) {
 
+            dsp_set_output(description_by_action(action_get()));
+            output_change = 0;
             caction->p_item->status = STATUS_ITEM_PUSHED;
 
         } else if (strcmp(caction->in_command, "pull") == 0 &&
                    caction->p_item != NULL && caction->p_item->id > 0) {
 
+            dsp_set_output(description_by_action(action_get()));
+            output_change = 0;
             caction->p_item->status = STATUS_ITEM_PULLED;
         }
 

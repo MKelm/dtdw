@@ -292,6 +292,8 @@ int load_places(struct place *data, int lmax) {
                         load_json_token(output, line, tokens, i+1);
                         strncpy(data[idx].transitions[trans_idx].title, line,
                           sizeof(data[idx].transitions[trans_idx].title));
+                        // set default status for transition
+                        data[idx].transitions[trans_idx].status = STATUS_TRANSITION_OPEN;
                       } else if (strcmp("target_place_id", line) == 0) {
                         load_json_token(output, line, tokens, i+1);
                         data[idx].transitions[trans_idx].id = atoi(line);
@@ -364,6 +366,8 @@ int load_items(struct item data[], int lmax) {
       if (j % 2 == 0 && tokens[i].type == JSMN_STRING) {
         load_json_token(output, line, tokens, i);
         data[idx].id = atoi(line);
+        // set default status for item
+        data[idx].status = STATUS_ITEM_NORMAL;
 
         i++;
         if (tokens[i].type == JSMN_OBJECT) {
@@ -630,10 +634,12 @@ void load_desc_cond_element(char *output, jsmntok_t *tokens, int *i,
           switch (elem_type) {
             case DESC_ELEM_TYPE_TRANSITION: // transition
               data[*data_idx].cond.elem_id = atoi(line);
+              // set default status for transition
               data[*data_idx].cond.elem_status = STATUS_TRANSITION_OPEN;
               break;
             case DESC_ELEM_TYPE_ITEM: // item
               data[*data_idx].cond.elem_id = atoi(line);
+              // set default status for item
               data[*data_idx].cond.elem_status = STATUS_ITEM_NORMAL;
               break;
             case DESC_ELEM_TYPE_NPC: // npc

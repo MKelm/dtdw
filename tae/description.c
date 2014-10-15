@@ -137,7 +137,7 @@ char *description_by_action(struct action *caction) {
              (caction->transition != NULL && caction->transition->id > 0) ||
              (caction->c_npc != NULL && caction->c_npc->id > 0)) {
 
-    // for item actions (lookat / give)
+    // for inventory item actions (lookat / give to)
     if (caction->p_item != NULL && caction->p_item->id > 0 &&
         inventory_has_item(caction->p_item) == 1) {
 
@@ -163,7 +163,10 @@ char *description_by_action(struct action *caction) {
         if (caction->p_item != NULL && caction->p_item->id > 0 &&
             descriptions[desc_idx].cond.elem_type == DESC_ELEM_TYPE_ITEM &&
             descriptions[desc_idx].cond.elem_id == caction->p_item->id) {
-          has_item = 1;
+
+          if (descriptions[desc_idx].cond.elem_status == caction->p_item->status) {
+            has_item = 1;
+          }
 
         } else if (caction->transition != NULL && caction->transition->id > 0 &&
                    descriptions[desc_idx].cond.elem_type == DESC_ELEM_TYPE_TRANSITION &&
