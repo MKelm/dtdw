@@ -361,7 +361,7 @@ int load_items(struct item data[], int lmax) {
     j_max = tokens[i].size;
     for (j = 0; j < j_max; j++) {
       i++;
-      if (j % 2 == 0 && tokens[i].type == JSMN_PRIMITIVE) {
+      if (j % 2 == 0 && tokens[i].type == JSMN_STRING) {
         load_json_token(output, line, tokens, i);
         data[idx].id = atoi(line);
 

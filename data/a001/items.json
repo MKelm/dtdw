@@ -1,14 +1,14 @@
 {
-  1 : {
+  "1" : {
     "title" : "Holzbank"
   },
-  2 : {
+  "2" : {
     "title" : "Kommode"
   },
-  3 : {
+  "3" : {
     "title" : "Bett"
   },
-  4 : {
+  "4" : {
     "comb_id" : 9,
     "comb_type" : "item",
     "final_id" : 6,
@@ -20,7 +20,7 @@
       }
     ]
   },
-  5 : {
+  "5" : {
     "comb_id" : 8,
     "comb_type" : "item",
     "final_id" : 9,
@@ -32,7 +32,7 @@
       }
     ]
   },
-  6 : {
+  "6" : {
     "comb_id" : 1,
     "comb_type" : "npc",
     "final_id" : 11,
@@ -48,16 +48,16 @@
       }
     ]
   },
-  7 : {
+  "7" : {
     "title" : "Couch"
   },
-  8 : {
+  "8" : {
     "comb_id" : 5,
     "comb_type" : "item",
     "final_id" : 9,
     "title" : "Feuerzeug"
   },
-  9 : {
+  "9" : {
     "comb_id" : 4,
     "comb_type" : "item",
     "final_id" : 6,
@@ -69,12 +69,12 @@
       }
     ]
   },
-  10 : {
+  "10" : {
     "comb_id" : 2,
     "comb_type" : "trans",
     "title" : "Zimmerschlüssel"
   },
-  11 : {
+  "11" : {
     "title" : "Kuscheltier",
     "descriptions" : [
       {
