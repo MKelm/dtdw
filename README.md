@@ -7,6 +7,14 @@ engine related source code and contents are in english.
 
 ## Changelog
 
+### v0.0.5 alpha
+- tae: added jsmn to parse json data files
+- tae: changed all loader functions to handle json data files
+- tae: improved description data structure
+- tae: improved some const values for status conditions
+- dtdw: changed text data files to json data files
+- dtdw: splitted description data files by place id
+
 ### v0.0.4 alpha
 - tae: added logic to push/pull items
 - tae: added logic to give items to npcs
