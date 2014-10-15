@@ -116,7 +116,9 @@ int main(void) {
 
         } else if (strcmp(caction->in_command, "use") == 0 &&
                    caction->p_item != NULL && caction->s_item != NULL &&
-                   caction->p_item->id > 0 && caction->s_item->id > 0) {
+                   caction->f_item != NULL &&
+                   caction->p_item->id > 0 && caction->s_item->id > 0 &&
+                   caction->f_item->id) {
 
           // combine two items and put new item to inventory
           inventory_rm_item(caction->s_item);
