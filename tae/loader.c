@@ -262,7 +262,7 @@ int load_places(struct place *data, int lmax) {
         load_json_token(output, line, tokens, i);
         data[idx].area_id = current_area_id;
         data[idx].id = atoi(line);
-        printf("place id %s\n", line);
+
         i++;
         if (tokens[i].type == JSMN_OBJECT && tokens[i].size > 0) {
           // iterate through place parts
@@ -454,7 +454,7 @@ int load_npcs(struct npc data[], int lmax) {
     j_max = tokens[i].size;
     for (j = 0; j < j_max; j++) {
       i++;
-      if (j % 2 == 0 && tokens[i].type == JSMN_PRIMITIVE) {
+      if (j % 2 == 0 && tokens[i].type == JSMN_STRING) {
         load_json_token(output, line, tokens, i);
         data[idx].id = atoi(line);
 
