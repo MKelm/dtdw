@@ -65,6 +65,7 @@ void load_json(FILE *f, char *output, int output_length, jsmntok_t *tokens, int 
     }
     ch_count++;
   }
+  printf("chcount %d\n", ch_count);
   int r;
   jsmn_parser p;
   jsmn_init(&p);
@@ -575,15 +576,209 @@ void load_intro(char *intro) {
   fclose(f);
 }
 
+void load_desc_text_ids(char *output, jsmntok_t *tokens, int *i,
+                        int *data_idx, struct description *data, char id_type) {
+  int j, j_max, id_idx;
+  char line[MAX_JSON_LINE_CHARS];
+  *i = *i + 1;
+  if (tokens[*i].type == JSMN_ARRAY && tokens[*i].size > 0) {
+    j_max = tokens[*i].size;
+    id_idx = 0;
+    // iterate through elements of text ids array
+    for (j = 0; j < j_max; j++) {
+      *i = *i + 1;
+      if (tokens[*i].type == JSMN_PRIMITIVE) {
+        load_json_token(output, line, tokens, *i);
+        switch (id_type) {
+          case 0:
+            // get transition id(s)
+            data[*data_idx].transitions[id_idx] = atoi(line);
+            printf("idtype %d -> prim %d\n", id_type, data[*data_idx].transitions[id_idx]);
+            break;
+          case 1:
+            // get item id(s)
+            data[*data_idx].items[id_idx] = atoi(line);
+            printf("idtype %d -> prim %d\n", id_type, data[*data_idx].items[id_idx]);
+            break;
+          case 2:
+            // get npc id(s)
+            data[*data_idx].npcs[id_idx] = atoi(line);
+            printf("idtype %d -> prim %d\n", id_type, data[*data_idx].npcs[id_idx]);
+            break;
+        }
+        id_idx++;
+      }
+    }
+  }
+  *i = *i - 1;
+}
+
+void load_desc_cond_element(char *output, jsmntok_t *tokens, int *i,
+                            int *data_idx, struct description *data, int elem_type) {
+  int j, j_max;
+  char line[MAX_JSON_LINE_CHARS];
+  *i = *i + 1;
+  if (tokens[*i].type == JSMN_OBJECT && tokens[*i].size > 0) {
+    j_max = tokens[*i].size;
+    // iterate through sub-elements of condition element
+    for (j = 0; j < j_max; j++) {
+      *i = *i + 1;
+      // get each condition sub-element key to perform further actions
+      if (j % 2 == 0 && tokens[*i].type == JSMN_STRING) {
+        load_json_token(output, line, tokens, *i);
+        if (strcmp(line, "id") == 0) {
+          load_json_token(output, line, tokens, *i + 1);
+          switch (elem_type) {
+            case 0: // transition
+              data[*data_idx].id_transitions[0] = atoi(line);
+              data[*data_idx].id_trans_status[0] = TRANSITION_STATUS_OPEN;
+              printf("cond type %d -> prim %d\n", elem_type, atoi(line));
+              break;
+            case 1: // item
+              data[*data_idx].id_items[0] = atoi(line);
+              printf("cond type %d -> prim %d\n", elem_type, atoi(line));
+              break;
+            case 2: // npc
+              data[*data_idx].id_npcs[0] = atoi(line);
+              printf("cond type %d -> prim %d\n", elem_type, atoi(line));
+              break;
+          }
+        } else if (strcmp(line, "status") == 0) {
+          // status for transitions currently
+          load_json_token(output, line, tokens, *i + 1);
+          printf("cond type %d -> status %s\n", elem_type, line);
+          if (strcmp(line, "locked") == 0) {
+            data[*data_idx].id_trans_status[0] = TRANSITION_STATUS_LOCKED;
+          } else if (strcmp(line, "closed") == 0) {
+            data[*data_idx].id_trans_status[0] = TRANSITION_STATUS_CLOSED;
+          }
+        }
+      }
+    }
+  }
+  *i = *i - 1;
+}
+
+void load_desc_cond_action(char *output, jsmntok_t *tokens, int *i,
+                           int *data_idx, struct description *data) {
+  int j, j_max;
+  char line[MAX_JSON_LINE_CHARS];
+  *i = *i + 1;
+  if (tokens[*i].type == JSMN_OBJECT && tokens[*i].size > 0) {
+    j_max = tokens[*i].size;
+    // iterate through sub-elements of condition action element
+    for (j = 0; j < j_max; j++) {
+      *i = *i + 1;
+      // get each condition sub-element key to perform further actions
+      if (j % 2 == 0 && tokens[*i].type == JSMN_STRING) {
+        load_json_token(output, line, tokens, *i);
+        if (strcmp(line, "command") == 0) {
+          // load command sub-element
+          load_json_token(output, line, tokens, *i + 1);
+          strncpy(data[*data_idx].id_verb, line, sizeof(data[*data_idx].id_verb));
+        } else if (strcmp(line, "item_id") == 0) {
+          // load item_id sub-element
+          load_json_token(output, line, tokens, *i + 1);
+          data[*data_idx].id_trans_item_id[0] = atoi(line);
+        }
+      }
+    }
+  }
+  *i = *i - 1;
+}
+
+void load_desc_condition(char *output, jsmntok_t *tokens, int *i,
+                         int *data_idx, struct description *data) {
+  int j, j_max;
+  char line[MAX_JSON_LINE_CHARS];
+  *i = *i + 1;
+  if (tokens[*i].type == JSMN_OBJECT && tokens[*i].size > 0) {
+    j_max = tokens[*i].size;
+    // iterate through elements of condition
+    for (j = 0; j < j_max; j++) {
+      *i = *i + 1;
+      // get each condition element key to perform further actions
+      if (j % 2 == 0 && tokens[*i].type == JSMN_STRING) {
+        load_json_token(output, line, tokens, *i);
+        if (strcmp(line, "transition") == 0) {
+          // load description condition element transition
+          load_desc_cond_element(output, tokens, i, data_idx, data, 0);
+        } else if (strcmp(line, "item") == 0) {
+          // load description condition element item
+          load_desc_cond_element(output, tokens, i, data_idx, data, 1);
+        } else if (strcmp(line, "npc") == 0) {
+          // load description condition element npc
+          load_desc_cond_element(output, tokens, i, data_idx, data, 2);
+        } else if (strcmp(line, "action") == 0) {
+          // load description condition element action
+          load_desc_cond_action(output, tokens, i, data_idx, data);
+        }
+      }
+    }
+  }
+  *i = *i - 1;
+}
+
+void load_desc_element(char *output, jsmntok_t *tokens, int *i,
+                       int *data_idx, struct description *data) {
+  int j, j_max;
+  char line[MAX_JSON_LINE_CHARS];
+  if (tokens[*i].type == JSMN_OBJECT && tokens[*i].size > 0) {
+    j_max = tokens[*i].size;
+    // iterate through elements of description
+    for (j = 0; j < j_max; j++) {
+      *i = *i + 1;
+      // get each element key to perform further actions
+      if (j % 2 == 0 && tokens[*i].type == JSMN_STRING) {
+        load_json_token(output, line, tokens, *i);
+
+        if (strcmp(line, "condition") == 0) {
+          // load condition
+          load_desc_condition(output, tokens, i, data_idx, data);
+        } else if (strcmp(line, "text") == 0) {
+          // load text
+          load_json_token(output, line, tokens, *i + 1);
+          strncpy(data[*data_idx].text, line, sizeof(data[*data_idx].text));
+        } else if (strcmp(line, "transitions") == 0) {
+          // load transitions
+          load_desc_text_ids(output, tokens, i, data_idx, data, 0);
+        } else if (strcmp(line, "items") == 0) {
+          // load items
+          load_desc_text_ids(output, tokens, i, data_idx, data, 1);
+        } else if (strcmp(line, "npcs") == 0) {
+          // load npcs
+          load_desc_text_ids(output, tokens, i, data_idx, data, 2);
+        }
+      }
+      *data_idx =  *data_idx + 1;
+    }
+  }
+}
+
 int load_descriptions(struct description *data, int lmax,
                       struct place *places_data, int places_lmax) {
   int place_idx, data_idx;
   for (place_idx = 0; place_idx < places_lmax; place_idx++) {
     printf("%d\n", places_data[place_idx].id);
     FILE *f = loader_get_data_file(FILE_DESCRIPTIONS, 1, places_data[place_idx].id);
+
+    char output[6000];
+    jsmntok_t tokens[1024];
+    load_json(f, output, 6000, tokens, 1024);
+
+    int i = 0, j, j_max;
     data_idx = 0;
-    // todo new descriptions loader
+    if (tokens[i].type == JSMN_ARRAY && tokens[i].size > 0) {
+      j_max = tokens[i].size;
+      printf("jmax %d\n", j_max);
+      // iterate through array of descriptions
+      for (j = 0; j < j_max; j++) {
+        i++;
+        load_desc_element(output, tokens, &i, &data_idx, data);
+      }
+    }
     fclose(f);
   }
+  exit(0);
   return data_idx;
 }
