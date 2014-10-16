@@ -296,7 +296,7 @@ int load_places(struct place *data, int lmax) {
                         data[idx].transitions[trans_idx].status = STATUS_TRANSITION_OPEN;
                       } else if (strcmp("target_place_id", line) == 0) {
                         load_json_token(output, line, tokens, i+1);
-                        data[idx].transitions[trans_idx].id = atoi(line);
+                        data[idx].transitions[trans_idx].target_place_id = atoi(line);
                       } else if (strcmp("status", line) == 0) {
                         load_json_token(output, line, tokens, i+1);
                         // get status and key item value
@@ -335,7 +335,7 @@ int load_transitions(struct placetrans transitions_data[], int transitions_lmax,
   for (pidx = 0; pidx < places_lmax; pidx++) {
     ptidx = 0;
     for (ptidx = 0; ptidx < placetrans_lmax; ptidx++) {
-      if (places_data[pidx].transitions[ptidx].id > 0) {
+      if (places_data[pidx].transitions[ptidx].target_place_id > 0) {
         transitions_data[tidx] = places_data[pidx].transitions[ptidx];
         tidx++;
         if (tidx == transitions_lmax)

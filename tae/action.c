@@ -98,7 +98,7 @@ int action_handle_input(char *input) {
                 // check try item / transition combination
                 c_action.transition = get_transition(inputarr[3]);
                 if (c_action.transition != NULL &&
-                    c_action.transition->id != c_action.p_item->comb_id) {
+                    c_action.transition->target_place_id != c_action.p_item->comb_id) {
                   c_action.p_item = NULL;
                   c_action.transition = NULL;
                 }

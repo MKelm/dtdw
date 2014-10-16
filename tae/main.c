@@ -76,14 +76,14 @@ int main(void) {
             output_change = dialog_handle_input(caction->in_command);
           }
 
-        } else if (caction->transition != NULL && caction->transition->id > 0) {
+        } else if (caction->transition != NULL && caction->transition->target_place_id > 0) {
 
           if (strcmp(caction->in_command, "use") == 0 &&
               caction->transition->status == STATUS_TRANSITION_OPEN) {
             // location change with open transitions only
             // output transition action description before location change
             dsp_set_output(description_by_action(action_get()));
-            current_place = caction->transition->id;
+            current_place = caction->transition->target_place_id;
             location_change = 1;
 
           } else if (strcmp(caction->in_command, "use") == 0 &&

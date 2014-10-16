@@ -138,7 +138,7 @@ char *description_by_action(struct action *caction) {
     has_text = 1;
 
   } else if ((caction->p_item != NULL && caction->p_item->id > 0) ||
-             (caction->transition != NULL && caction->transition->id > 0) ||
+             (caction->transition != NULL && caction->transition->target_place_id > 0) ||
              (caction->c_npc != NULL && caction->c_npc->id > 0)) {
 
     // for inventory item actions (lookat / give to)
@@ -172,9 +172,9 @@ char *description_by_action(struct action *caction) {
             has_item = 1;
           }
 
-        } else if (caction->transition != NULL && caction->transition->id > 0 &&
+        } else if (caction->transition != NULL && caction->transition->target_place_id > 0 &&
                    descriptions[desc_idx].cond.elem_type == DESC_ELEM_TYPE_TRANSITION &&
-                   descriptions[desc_idx].cond.elem_id == caction->transition->id) {
+                   descriptions[desc_idx].cond.elem_id == caction->transition->target_place_id) {
 
           if (descriptions[desc_idx].cond.elem_status == caction->transition->status) {
             // set has transition with valid status only

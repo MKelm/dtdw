@@ -37,8 +37,8 @@ struct area {
 #define STATUS_TRANSITION_LOCKED 3
 
 struct placetrans {
-  int id;
   char title[56];
+  int target_place_id;
   int status; // 1 = open, 2 = closed, 3 = locked
   int ul_item_id; // item id to unlock transition
 };
