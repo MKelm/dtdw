@@ -7,6 +7,14 @@ engine related source code and contents are in english.
 
 ## Changelog
 
+### v0.0.6 alpha
+- tae: added logic to handle item status in place descriptions
+- tae: added item status values with options and changes to use it
+- tae: changes to use pulled/pushed item status
+- tae: some minor bugfixes and improvements in loader and data structures
+- dtdw: added a third room for tests
+- dtdw: some corrections in json data
+
 ### v0.0.5 alpha
 - tae: added jsmn to parse json data files
 - tae: changed all loader functions to handle json data files
