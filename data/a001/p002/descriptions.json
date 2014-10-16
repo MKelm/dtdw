@@ -99,6 +99,12 @@
       "item" : { "id" : 12, "status" : "pulled" },
       "action" : { "command" : "push" }
     },
-    "text" : "Du drückst am Hebel. Der Hebel ist nun wieder nicht gezogen."
+    "text" : "Du drückst am Hebel. Der Hebel ist nun wieder in seiner Ausgangsposition."
+  },
+  {
+    "condition" : {
+      "item" : { "id" : 12, "status" : "pulled" }
+    },
+    "text" : "In der linken Ecke ist nun die #Kellertür# zu sehen."
   }
 ]

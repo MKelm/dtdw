@@ -1,6 +1,6 @@
 {
   "1" : {
-    "title" : "Joara's Zimmer (oben)",
+    "title" : "Joara's Zimmer (Obergeschoss)",
     "transitions" : [
       {
         "title" : "Tür",
@@ -11,11 +11,24 @@
     ]
   },
   "2" : {
-    "title" : "Wohnzimmer (unten)",
+    "title" : "Wohnzimmer (Erdgeschoss)",
     "transitions" : [
       {
         "title" : "Treppe",
         "target_place_id" : 1
+      },
+      {
+        "title" : "Kellertür",
+        "target_place_id" : 3
+      }
+    ]
+  },
+  "3" : {
+    "title" : "Kellerraum (Untergeschoss)",
+    "transitions" : [
+      {
+        "title" : "Treppe",
+        "target_place_id" : 2
       }
     ]
   }
