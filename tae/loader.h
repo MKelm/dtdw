@@ -55,6 +55,10 @@ int load_places(struct place data[], int lmax);
 #define MAX_ITEMS 500
 
 int load_items(struct item data[], int lmax);
+void load_items_element(char *output, jsmntok_t *tokens, int *i,
+                        int *data_idx, struct item *data);
+void load_items_element_descs(char *output, jsmntok_t *tokens, int *i,
+                              int *data_idx, struct item *data);
 
 // npcs
 #define FILE_NPCS "npcs.json"

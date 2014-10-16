@@ -347,6 +347,89 @@ int load_transitions(struct placetrans transitions_data[], int transitions_lmax,
   return tidx;
 }
 
+void load_item_element_descs(char *output, jsmntok_t *tokens, int *i,
+                             int *data_idx, struct item *data) {
+  int l, l_max, m, m_max, desc_idx;
+  char line[MAX_JSON_LINE_CHARS];
+  *i = *i + 1;
+  // go through descriptions array / objects
+  if (tokens[*i].type == JSMN_ARRAY && tokens[*i].size > 0) {
+    desc_idx = 0;
+    l_max = tokens[*i].size;
+    for (l = 0; l < l_max; l++) {
+      *i = *i + 1;
+      if (tokens[*i].type == JSMN_OBJECT) {
+        load_json_token(output, line, tokens, *i);
+        m_max = tokens[*i].size;
+        // iterate through description object elements
+        for (m = 0; m < m_max; m++) {
+          *i = *i + 1;
+          if (m % 2 == 0 && tokens[*i].type == JSMN_STRING) {
+            load_json_token(output, line, tokens, *i);
+            if (strcmp(line, "command") == 0) {
+              load_json_token(output, line, tokens, *i + 1);
+              strncpy(data[*data_idx].descriptions[desc_idx].i_command,
+                line, sizeof(data[*data_idx].descriptions[desc_idx].i_command));
+            } else if (strcmp(line, "text") == 0) {
+              load_json_token(output, line, tokens, *i + 1);
+              strncpy(data[*data_idx].descriptions[desc_idx].i_description,
+                line, sizeof(data[*data_idx].descriptions[desc_idx].i_description));
+            }
+          }
+        }
+      }
+      desc_idx++;
+    }
+  }
+  *i = *i - 1;
+}
+
+void load_item_elements(char *output, jsmntok_t *tokens, int *i,
+                         int *data_idx, struct item *data) {
+  int k, k_max;
+  char line[MAX_JSON_LINE_CHARS];
+  *i = *i + 1;
+  if (tokens[*i].type == JSMN_OBJECT) {
+    // iterate through item part object elements
+    k_max = tokens[*i].size;
+    for (k = 0; k < k_max; k++) {
+      *i = *i + 1;
+      if (k % 2 == 0 && tokens[*i].type == JSMN_STRING) {
+        // get item part object element content by key
+        load_json_token(output, line, tokens, *i);
+        if (strcmp("title", line) == 0) {
+          load_json_token(output, line, tokens, *i + 1);
+          strncpy(data[*data_idx].title, line, sizeof(data[*data_idx].title));
+
+        } else if (strcmp("comb_id", line) == 0) {
+          load_json_token(output, line, tokens, *i + 1);
+          data[*data_idx].comb_id = atoi(line);
+
+        } else if (strcmp("comb_type", line) == 0) {
+          load_json_token(output, line, tokens, *i + 1);
+          if (strcmp(line, "item") == 0) {
+            data[*data_idx].comb_type = ITEM_COMB_TYPE_ITEM;
+          } else if (strcmp(line, "npc") == 0) {
+            data[*data_idx].comb_type = ITEM_COMB_TYPE_NPC;
+          } else if (strcmp(line, "trans") == 0) {
+            data[*data_idx].comb_type = ITEM_COMB_TYPE_TRANS;
+          }
+
+        } else if (strcmp("final_id", line) == 0) {
+          load_json_token(output, line, tokens, *i + 1);
+          data[*data_idx].final_id = atoi(line);
+
+        } else if (strcmp("descriptions", line) == 0) {
+          load_item_element_descs(output, tokens, i, data_idx, data);
+        }
+      }
+    }
+    *data_idx = *data_idx + 1;
+  }
+  *i = *i - 1;
+
+}
+
 int load_items(struct item data[], int lmax) {
   FILE *f = loader_get_data_file(FILE_ITEMS, 1, 0);
 
@@ -354,8 +437,7 @@ int load_items(struct item data[], int lmax) {
   jsmntok_t tokens[256];
   load_json(f, output, 4096, tokens, 256);
 
-  int i = 0, j, j_max, k, k_max, l, l_max, m, m_max;
-  int idx = 0, desc_idx = 0;
+  int i = 0, j, j_max, data_idx = 0;
   char line[MAX_JSON_LINE_CHARS];
 
   if (tokens[i].type == JSMN_OBJECT) {
@@ -365,84 +447,16 @@ int load_items(struct item data[], int lmax) {
       i++;
       if (j % 2 == 0 && tokens[i].type == JSMN_STRING) {
         load_json_token(output, line, tokens, i);
-        data[idx].id = atoi(line);
+        data[data_idx].id = atoi(line);
         // set default status for item
-        data[idx].status = STATUS_ITEM_NORMAL;
-
-        i++;
-        if (tokens[i].type == JSMN_OBJECT) {
-          // iterate through item part object elements
-          k_max = tokens[i].size;
-          for (k = 0; k < k_max; k++) {
-            i++;
-            if (j % 2 == 0 && tokens[i].type == JSMN_STRING) {
-              // get item part object element content by key
-              load_json_token(output, line, tokens, i);
-              if (strcmp("title", line) == 0) {
-                load_json_token(output, line, tokens, i+1);
-                strncpy(data[idx].title, line, sizeof(data[idx].title));
-
-              } else if (strcmp("comb_id", line) == 0) {
-                load_json_token(output, line, tokens, i+1);
-                data[idx].comb_id = atoi(line);
-
-              } else if (strcmp("comb_type", line) == 0) {
-                load_json_token(output, line, tokens, i+1);
-                if (strcmp(line, "item") == 0) {
-                  data[idx].comb_type = ITEM_COMB_TYPE_ITEM;
-                } else if (strcmp(line, "npc") == 0) {
-                  data[idx].comb_type = ITEM_COMB_TYPE_NPC;
-                } else if (strcmp(line, "trans") == 0) {
-                  data[idx].comb_type = ITEM_COMB_TYPE_TRANS;
-                }
-
-              } else if (strcmp("final_id", line) == 0) {
-                load_json_token(output, line, tokens, i+1);
-                data[idx].final_id = atoi(line);
-
-              } else if (strcmp("descriptions", line) == 0) {
-                i++;
-                // go through descriptions array / objects
-                if (tokens[i].type == JSMN_ARRAY && tokens[i].size > 0) {
-                  desc_idx = 0;
-                  l_max = tokens[i].size;
-                  for (l = 0; l < l_max; l++) {
-                    i++;
-                    if (tokens[i].type == JSMN_OBJECT) {
-                      load_json_token(output, line, tokens, i);
-                      m_max = tokens[i].size;
-                      // iterate through description object elements
-                      for (m = 0; m < m_max; m++) {
-                        i++;
-                        if (m % 2 == 0 && tokens[i].type == JSMN_STRING) {
-                          load_json_token(output, line, tokens, i);
-                          if (strcmp(line, "command") == 0) {
-                            load_json_token(output, line, tokens, i+1);
-                            strncpy(data[idx].descriptions[desc_idx].i_command,
-                              line, sizeof(data[idx].descriptions[desc_idx].i_command));
-                          } else if (strcmp(line, "text") == 0) {
-                            load_json_token(output, line, tokens, i+1);
-                            strncpy(data[idx].descriptions[desc_idx].i_description,
-                              line, sizeof(data[idx].descriptions[desc_idx].i_description));
-                          }
-                        }
-                      }
-                    }
-                    desc_idx++;
-                  }
-                }
-                i--;
-              }
-            }
-          }
-          idx++;
-        }
-        i--;
+        data[data_idx].status = STATUS_ITEM_NORMAL;
+        // load further item elements
+        load_item_elements(output, tokens, &i, &data_idx, data);
       }
     }
   }
   fclose(f);
-  return idx;
+  return data_idx;
 }
 
 int load_npcs(struct npc data[], int lmax) {
