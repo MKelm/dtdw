@@ -99,6 +99,6 @@
       "item" : { "id" : 12, "status" : "pulled" },
       "action" : { "command" : "push" }
     },
-    "text" : "Du drückst am Hebel. Der Hebel ist nun gedrückt."
+    "text" : "Du drückst am Hebel. Der Hebel ist nun wieder nicht gezogen."
   }
 ]

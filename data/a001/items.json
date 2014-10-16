@@ -76,18 +76,22 @@
   },
   "11" : {
     "title" : "Kuscheltier",
+    "status" : { "current" : "normal", "options" : [ "normal", "pushed" ] },
     "descriptions" : [
       {
+        "status" : "normal",
         "command" : "push",
-        "text" : "Du drückst das Kuscheltier und es macht Mäh, es ist jetzt zerdrückt."
+        "text" : "Du drückst das Kuscheltier und es macht Mäh. Es ist jetzt zerdrückt."
       },
       {
+        "status" : "pushed"
         "command" : "pull",
-        "text" : "Du ziehst am Kuscheltier und es macht Möh, es ist jetzt verzogen."
+        "text" : "Du ziehst etwas am Kuscheltier hier und da bis es Möh macht. Es ist jetzt nicht mehr zerdrückt."
       }
     ]
   },
   "12" : {
-    "title" : "Hebel"
+    "title" : "Hebel",
+    "status" : { "current" : "normal", "options" : [ "normal", "pulled" ] }
   }
 }

@@ -164,7 +164,7 @@ char *description_by_action(struct action *caction) {
             descriptions[desc_idx].cond.elem_type == DESC_ELEM_TYPE_ITEM &&
             descriptions[desc_idx].cond.elem_id == caction->p_item->id) {
 
-          if (descriptions[desc_idx].cond.elem_status == caction->p_item->status) {
+          if (descriptions[desc_idx].cond.elem_status == caction->p_item->status.current) {
             has_item = 1;
           }
 

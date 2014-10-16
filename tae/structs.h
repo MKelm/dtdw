@@ -61,6 +61,17 @@ struct itemdescription {
   char i_description[MAX_ITEM_DESCRIPTION_LENGTH];
 };
 
+#define STATUS_ITEM_NORMAL -1
+#define STATUS_ITEM_PUSHED -2
+#define STATUS_ITEM_PULLED -3
+
+#define MAX_ITEM_STATUS_OPTIONS 3
+
+struct item_status {
+  int current; // STATUS_ITEM_NORMAL ...
+  int options[MAX_ITEM_STATUS_OPTIONS];
+};
+
 #define ITEM_COMB_TYPE_ITEM 0
 #define ITEM_COMB_TYPE_NPC 1
 #define ITEM_COMB_TYPE_TRANS 2
@@ -71,18 +82,14 @@ struct itemdescription {
 #define ITEM_LOCATION_INVENTORY 1
 #define ITEM_LOCATION_NONE 2
 
-#define STATUS_ITEM_NORMAL -1
-#define STATUS_ITEM_PUSHED -2
-#define STATUS_ITEM_PULLED -3
-
 struct item {
   int id;
   int comb_type; // combination type item, npc or transition
   int comb_id; // combination item/npc/transition id
   int final_id; // final item id after combination
   char title[MAX_ITEM_TITLE_LENGTH];
-  int location; // 0 == in place, 1 == in inventory, 2 == exists no longer
-  int status; // -1 == normal, -2 = pushed, -3 = pulled
+  int location; // ITEM_LOCATION_PLACE ...
+  struct item_status status;
   struct itemdescription descriptions[MAX_ITEM_DESCRIPTIONS];
 };
 

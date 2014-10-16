@@ -384,6 +384,62 @@ void load_item_element_descs(char *output, jsmntok_t *tokens, int *i,
   *i = *i - 1;
 }
 
+int load_item_status_value(char *input) {
+  if (strcmp(input, "pulled") == 0) {
+    return STATUS_ITEM_PULLED;
+  } else if (strcmp(input, "pushed") == 0) {
+    return STATUS_ITEM_PUSHED;
+  }
+  return STATUS_ITEM_NORMAL;
+}
+
+void load_item_element_status_options(char *output, jsmntok_t *tokens, int *i,
+                                      int *data_idx, struct item *data) {
+  int m, m_max, status_idx;
+  char line[MAX_JSON_LINE_CHARS];
+  *i = *i + 1;
+  // go through status object parts
+  if (tokens[*i].type == JSMN_ARRAY && tokens[*i].size > 0) {
+    status_idx = 0;
+    m_max = tokens[*i].size;
+    // iterate through status options elements
+    for (m = 0; m < m_max; m++) {
+      *i = *i + 1;
+      load_json_token(output, line, tokens, *i);
+      data[*data_idx].status.options[status_idx] = atoi(line);
+      status_idx++;
+    }
+  }
+  *i = *i - 1;
+}
+
+void load_item_element_status(char *output, jsmntok_t *tokens, int *i,
+                              int *data_idx, struct item *data) {
+  int l, l_max;
+  char line[MAX_JSON_LINE_CHARS];
+  *i = *i + 1;
+  // go through status object parts
+  if (tokens[*i].type == JSMN_OBJECT && tokens[*i].size > 0) {
+    l_max = tokens[*i].size;
+    for (l = 0; l < l_max; l++) {
+      *i = *i + 1;
+      if (l % 2 == 0 && tokens[*i].type == JSMN_STRING) {
+        // get status object part element content by key
+        load_json_token(output, line, tokens, *i);
+
+        if (strcmp(line, "current") == 0) {
+          load_json_token(output, line, tokens, *i + 1);
+          data[*data_idx].status.current = load_item_status_value(line);
+
+        } else if (strcmp(line, "options") == 0) {
+          load_item_element_status_options(output, tokens, i, data_idx, data);
+        }
+      }
+    }
+  }
+  *i = *i - 1;
+}
+
 void load_item_elements(char *output, jsmntok_t *tokens, int *i,
                          int *data_idx, struct item *data) {
   int k, k_max;
@@ -419,6 +475,9 @@ void load_item_elements(char *output, jsmntok_t *tokens, int *i,
           load_json_token(output, line, tokens, *i + 1);
           data[*data_idx].final_id = atoi(line);
 
+        } else if (strcmp("status", line) == 0) {
+          load_item_element_status(output, tokens, i, data_idx, data);
+
         } else if (strcmp("descriptions", line) == 0) {
           load_item_element_descs(output, tokens, i, data_idx, data);
         }
@@ -427,7 +486,6 @@ void load_item_elements(char *output, jsmntok_t *tokens, int *i,
     *data_idx = *data_idx + 1;
   }
   *i = *i - 1;
-
 }
 
 int load_items(struct item data[], int lmax) {
@@ -449,7 +507,7 @@ int load_items(struct item data[], int lmax) {
         load_json_token(output, line, tokens, i);
         data[data_idx].id = atoi(line);
         // set default status for item
-        data[data_idx].status = STATUS_ITEM_NORMAL;
+        data[data_idx].status.current = STATUS_ITEM_NORMAL;
         // load further item elements
         load_item_elements(output, tokens, &i, &data_idx, data);
       }

@@ -59,6 +59,11 @@ void load_items_element(char *output, jsmntok_t *tokens, int *i,
                         int *data_idx, struct item *data);
 void load_items_element_descs(char *output, jsmntok_t *tokens, int *i,
                               int *data_idx, struct item *data);
+void load_item_element_status(char *output, jsmntok_t *tokens, int *i,
+                              int *data_idx, struct item *data);
+void load_item_element_status_options(char *output, jsmntok_t *tokens, int *i,
+                                      int *data_idx, struct item *data);
+int load_item_status_value(char *input);
 
 // npcs
 #define FILE_NPCS "npcs.json"
