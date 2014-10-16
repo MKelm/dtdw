@@ -337,7 +337,6 @@ int load_transitions(struct placetrans transitions_data[], int transitions_lmax,
     for (ptidx = 0; ptidx < placetrans_lmax; ptidx++) {
       if (places_data[pidx].transitions[ptidx].id > 0) {
         transitions_data[tidx] = places_data[pidx].transitions[ptidx];
-        ptidx++;
         tidx++;
         if (tidx == transitions_lmax)
           return tidx;
