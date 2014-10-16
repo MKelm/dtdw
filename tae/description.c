@@ -61,7 +61,11 @@ char *description_by_area_place() {
               descriptions[desc_idx].cond.elem_id > 0 &&
               descriptions[desc_idx].cond.elem_type == DESC_ELEM_TYPE_ITEM &&
               descriptions[base_idx].item_ids[base_item_idx] == descriptions[desc_idx].cond.elem_id) {
-            has_item = 1;
+
+            struct item *citem = get_item_by_id(descriptions[desc_idx].cond.elem_id);
+            if (citem->status.current == descriptions[desc_idx].cond.elem_status) {
+              has_item = 1;
+            }
           }
         }
         if (has_item == 0) {
