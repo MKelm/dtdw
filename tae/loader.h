@@ -89,6 +89,16 @@ void load_intro(char *text);
 
 int load_descriptions(struct description *data, int lmax,
                       struct place *places_data, int places_lmax);
+void load_desc_element(char *output, jsmntok_t *tokens, int *i,
+                       int *data_idx, struct description *data);
+void load_desc_condition(char *output, jsmntok_t *tokens, int *i,
+                         int *data_idx, struct description *data);
+void load_desc_cond_action(char *output, jsmntok_t *tokens, int *i,
+                           int *data_idx, struct description *data);
+void load_desc_cond_element(char *output, jsmntok_t *tokens, int *i,
+                            int *data_idx, struct description *data, int elem_type);
+void load_desc_text_ids(char *output, jsmntok_t *tokens, int *i,
+                        int *data_idx, struct description *data, char id_type);
 
 // transitions
 #define MAX_PLACETRANS 1000

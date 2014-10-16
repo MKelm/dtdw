@@ -141,9 +141,9 @@ struct description_condition {
 struct description {
   struct description_condition cond;
   char text[1024];
-  int transition_ids[MAX_DESC_TEXT_TRANS]; // transitions in text
-  int item_ids[MAX_DESC_TEXT_ITEMS]; // items in text
-  int npc_ids[MAX_DESC_TEXT_NPCS]; // npcs in text
+  int transition_ids[MAX_DESC_TEXT_TRANS]; // transition ids in text
+  int item_ids[MAX_DESC_TEXT_ITEMS]; // item ids in text
+  int npc_ids[MAX_DESC_TEXT_NPCS]; // npc ids in text
 };
 
 struct action {
