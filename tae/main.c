@@ -152,22 +152,36 @@ int main(void) {
           // optional get item from npc to inventory
           inventory_add_item(caction->f_item);
 
-        } else if (strcmp(caction->in_command, "push") == 0 &&
+        } else if ((strcmp(caction->in_command, "push") == 0 ||
+                    strcmp(caction->in_command, "pull") == 0) &&
                    caction->p_item != NULL && caction->p_item->id > 0) {
 
-          // todo: set new status depending on item status options
-          dsp_set_output(description_by_action(action_get()));
+          int has_new_status = 0, new_status;
+          if (strcmp(caction->in_command, "push") == 0 &&
+              caction->p_item->status.current != STATUS_ITEM_PUSHED) {
+            // set new status like NORMAL -> PUSHED and PULLED -> NORMAL
+            new_status = (caction->p_item->status.current == STATUS_ITEM_NORMAL) ?
+              STATUS_ITEM_PUSHED : STATUS_ITEM_NORMAL;
+            has_new_status = 1;
+          } else if (strcmp(caction->in_command, "pull") == 0 &&
+                     caction->p_item->status.current != STATUS_ITEM_PULLED) {
+            // set new status like NORMAL -> PULLED and PUSHED -> NORMAL
+            new_status = (caction->p_item->status.current == STATUS_ITEM_NORMAL) ?
+              STATUS_ITEM_PULLED : STATUS_ITEM_NORMAL;
+            has_new_status = 1;
+          }
+
           output_change = 0;
-          caction->p_item->status.current = STATUS_ITEM_PUSHED;
+          if (has_new_status == 1) {
+            int status_idx;
+            for (status_idx = 0; status_idx < MAX_ITEM_STATUS_OPTIONS; status_idx++) {
 
-
-        } else if (strcmp(caction->in_command, "pull") == 0 &&
-                   caction->p_item != NULL && caction->p_item->id > 0) {
-
-            // todo: set new status depending on item status options
-            dsp_set_output(description_by_action(action_get()));
-            output_change = 0;
-            caction->p_item->status.current = STATUS_ITEM_PULLED;
+              if (caction->p_item->status.options[status_idx] == new_status) {
+                dsp_set_output(description_by_action(action_get()));
+                caction->p_item->status.current = new_status;
+              }
+            }
+          }
         }
 
         // check output change, change output display window if needed
