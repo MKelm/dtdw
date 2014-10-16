@@ -849,28 +849,30 @@ int load_descriptions(struct description *data, int lmax,
                       struct place *places_data, int places_lmax) {
   int place_idx, data_idx, i, j, j_max;
   data_idx = 0;
+
   for (place_idx = 0; place_idx < places_lmax; place_idx++) {
     FILE *f = loader_get_data_file(FILE_DESCRIPTIONS, 1, places_data[place_idx].id);
 
-    char output[6000];
-    jsmntok_t tokens[1024];
-    load_json(f, output, 6000, tokens, 1024);
+    if (f != NULL) {
+      char output[6000];
+      jsmntok_t tokens[1024];
+      load_json(f, output, 6000, tokens, 1024);
 
-    i = 0;
-    if (tokens[i].type == JSMN_ARRAY && tokens[i].size > 0) {
-      j_max = tokens[i].size;
-      // iterate through array of descriptions
-      for (j = 0; j < j_max; j++) {
-        i++;
-        // set default condition, place id
-        data[data_idx].cond.place_id = places_data[place_idx].id;
-        // load description element with condition, text and text elements
-        load_desc_element(output, tokens, &i, &data_idx, data);
-        data_idx = data_idx + 1;
+      i = 0;
+      if (tokens[i].type == JSMN_ARRAY && tokens[i].size > 0) {
+        j_max = tokens[i].size;
+        // iterate through array of descriptions
+        for (j = 0; j < j_max; j++) {
+          i++;
+          // set default condition, place id
+          data[data_idx].cond.place_id = places_data[place_idx].id;
+          // load description element with condition, text and text elements
+          load_desc_element(output, tokens, &i, &data_idx, data);
+          data_idx = data_idx + 1;
+        }
       }
+      fclose(f);
     }
-    fclose(f);
   }
-
   return data_idx;
 }
