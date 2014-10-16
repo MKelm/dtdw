@@ -27,7 +27,7 @@
     "title" : "Kellerraum (Untergeschoss)",
     "transitions" : [
       {
-        "title" : "Treppe",
+        "title" : "Kellertreppe",
         "target_place_id" : 2
       }
     ]
