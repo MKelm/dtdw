@@ -84,7 +84,7 @@
         "text" : "Du drückst das Kuscheltier und es macht Mäh. Es ist jetzt zerdrückt."
       },
       {
-        "status" : "pushed"
+        "status" : "pushed",
         "command" : "pull",
         "text" : "Du ziehst etwas am Kuscheltier hier und da bis es Möh macht. Es ist jetzt nicht mehr zerdrückt."
       }
