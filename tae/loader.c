@@ -406,7 +406,7 @@ void load_item_element_status_options(char *output, jsmntok_t *tokens, int *i,
     for (m = 0; m < m_max; m++) {
       *i = *i + 1;
       load_json_token(output, line, tokens, *i);
-      data[*data_idx].status.options[status_idx] = atoi(line);
+      data[*data_idx].status.options[status_idx] = load_item_status_value(line);
       status_idx++;
     }
   }
